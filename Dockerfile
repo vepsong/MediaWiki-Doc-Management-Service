@@ -3,6 +3,7 @@ FROM ubuntu:22.04
 
 # Обновляем пакеты и устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
+    git \ 
     gnupg \
     software-properties-common \
     curl \
@@ -26,12 +27,6 @@ RUN echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] http
 
 # Обновляем пакеты и устанавливаем Terraform
 RUN apt-get update && apt-get install -y terraform
-
-# Копируем код из текущего репозитория в контейнер
-COPY . /app
-
-# Переходим в директорию с проектом
-WORKDIR /app
 
 # Открываем bash по умолчанию
 CMD ["/bin/bash"]
