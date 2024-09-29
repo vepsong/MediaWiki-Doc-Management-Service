@@ -1,0 +1,11 @@
+# Исключение настроек IDE/редакторов
+.vscode/
+
+# Файлы окружения
+.env
+.env.local
+.env.*.local
+
+# Файлы с секретами
+YC_meta.json
+key.json

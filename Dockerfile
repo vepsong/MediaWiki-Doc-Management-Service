@@ -9,7 +9,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     git \
-    unzip
+    unzip \
+    python3 \
+    python3-pip \
+    bash-completion
 
 # Добавляем HashiCorp GPG ключ
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | \
@@ -27,6 +30,12 @@ RUN echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] http
 
 # Обновляем пакеты и устанавливаем Terraform
 RUN apt-get update && apt-get install -y terraform
+
+# Устанавливаем Yandex Cloud CLI
+RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+
+# Активируем bash-completion для текущей сессии bash
+RUN echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
 
 # Открываем bash по умолчанию
 CMD ["/bin/bash"]
