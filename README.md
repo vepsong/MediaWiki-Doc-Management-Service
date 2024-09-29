@@ -26,10 +26,10 @@
 
 ## 3. Деплой
 [1. Настройка Docker для развёртывания сервисной ВМ](Solution/3.1.%20Docker%20setup%20for%20deploying%20a%20service%20VM.md "Docker setup for deploying a service VM")  
-2. Клонирование репозитория в корневой каталог пользователя
+2. Клонирование репозитория в корневой каталог пользователя  
 3. Настройка облачного провайдера Yandex Cloud для работы с Terraform
-    1. [Установка и настройка Yandex Cloud CLI](Solution/3.3.1.%20YС%20CLI%20installation&configuration.md)
-    2. [Настройка сервисного аккаунта Yandex Cloud](Solution/3.3.2.%20YC%20service%20account%20configuration.md)
+    1. [Установка и настройка Yandex Cloud CLI](Solution/3.3.1.%20YС%20CLI%20installation&configuration.md)  
+    2. [Настройка сервисного аккаунта Yandex Cloud](Solution/3.3.2.%20YC%20service%20account%20configuration.md)  
 
 
 
