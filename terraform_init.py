@@ -31,7 +31,7 @@ def copy_terraform_config(repo_name):
 
 def init_terraform(repo_name):
     # Выполняем команды перехода в директорию и инициализации Terraform
-    command = f'cd {repo_name}/Terraform_MediaWiki && terraform init'
+    command = f'cd ~/{repo_name}/Terraform_MediaWiki && terraform init'
     result = os.system(command)
 
     if result == 0:
