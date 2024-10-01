@@ -448,7 +448,7 @@
 4. [Настройка Terraform](/Solution/4.%20Terraform%20setup.md)
 
 
-<!-- START TERRAFORM SETUP -->
+	<!-- START TERRAFORM SETUP -->
 	<!-- # Настройка Terraform для облачного развёртывания виртуальных машин -->
 	
 	
