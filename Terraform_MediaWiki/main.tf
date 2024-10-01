@@ -10,7 +10,7 @@ resource "yandex_compute_instance" "group1" {
 
   resources {
     cores  = var.group1_vm_cpu  # Количество ядер
-    memory = var.group1_ram * 1024  # Оперативная память в МБ
+    memory = var.group1_ram # Оперативная память в GB
   }
 
   boot_disk {
@@ -25,7 +25,7 @@ resource "yandex_compute_instance" "group1" {
   }
 
   network_interface {
-    subnet_id = "yandex_vpc_subnet.subnet-1.id"  # Подсеть
+    subnet_id = var.group1_network["existing_subnet_id"]  # Подсеть
     nat       = true  # Включаем NAT для доступа в интернет
   }
 

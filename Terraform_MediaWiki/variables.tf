@@ -43,6 +43,15 @@ variable "group1_zone" {
   type        = string
 }
 
+variable "group1_description" {
+  description = "Описание группы 1"
+  type        = string
+}
+
+variable "group1_network" {
+  description = "Cеть и подсеть группы 1"
+  type        = map(string)
+}
 
 # Объявляем переменную group2_unique_names
 variable "group2_unique_names" {
@@ -82,6 +91,15 @@ variable "group2_zone" {
   type        = string
 }
 
+variable "group2_description" {
+  description = "Описание группы 2"
+  type        = string
+}
+
+variable "group2_network" {
+  description = "Cеть и подсеть группы 2"
+  type        = map(string)
+}
 
 
 # Объявляем переменную group3_unique_names
@@ -122,6 +140,15 @@ variable "group3_zone" {
   type        = string
 }
 
+variable "group3_description" {
+  description = "Описание группы 3"
+  type        = string
+}
+
+variable "group3_network" {
+  description = "Cеть и подсеть группы 3"
+  type        = map(string)
+}
 
 
 # Объявляем переменную group4_unique_names
@@ -143,4 +170,14 @@ variable "group4_type" {
 variable "group4_disk_size" {
   description = "Объем диска (в ГБ)"
   type        = number
+}
+
+variable "group4_description" {
+  description = "Описание группы 4"
+  type        = string
+}
+
+variable "group4_network" {
+  description = "Cеть и подсеть группы 4"
+  type        = map(string)
 }
