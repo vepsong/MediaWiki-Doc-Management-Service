@@ -19,7 +19,7 @@ def update_readme(content_files, readme_file, indent='\t'):
         # Добавляем табуляцию к каждой строке
         indented_content = add_indentation(new_content, indent)
 
-        
+
         # Создаем шаблон для поиска текста между метками с захватом отступов перед метками
         pattern = re.compile(rf'{re.escape(start_marker)}.*?{re.escape(end_marker)}', re.DOTALL) 
 

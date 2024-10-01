@@ -445,3 +445,8 @@
 <!-- END YC PROVIDER SETUP FOR TERRAFORM -->
 
     
+4. [Настройка Terraform](/Solution/4.%20Terraform%20setup.md)
+
+
+<!-- START TERRAFORM SETUP -->
+<!-- END TERRAFORM SETUP -->
