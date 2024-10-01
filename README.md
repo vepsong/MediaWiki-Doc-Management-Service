@@ -171,7 +171,7 @@
     [Ссылка на .drawio-файл](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/2.1.%20MediaWiki_app_schema.drawio)   
 
     </details> 
-
+  
 
     #### Вариант N3 (компромиссный)
 
@@ -264,12 +264,7 @@
 
     [Ссылка на .drawio-файл](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/3.1.%20MediaWiki_app_schema.drawio)   
 
-    </details> 
-
-
-
-
-
+    </details>  
 2. Создание руководства по восстановлению инфраструктуры в случае аварии
 3. Проверка отказоустойчивости системы
 
