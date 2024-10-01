@@ -13,7 +13,11 @@ RUN apk update && apk add --no-cache \
     py3-pip \
     gnupg \
     ca-certificates \
-    sudo
+    sudo \
+    openssh
+
+# Генерируем SSH-ключи
+RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
 
 # Устанавливаем Terraform
 RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip && \
