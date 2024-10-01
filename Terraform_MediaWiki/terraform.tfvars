@@ -12,6 +12,7 @@ group1_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group1_unique_names = {
   "vm-2" = "vm-2-Ubuntu-22.04-Nginx-Zabbix-Keepalived-ZooKeeper-HAProxy"
   "vm-3" = "vm-3-Ubuntu-22.04-Nginx-Zabbix-Keepalived-ZooKeeper-HAProxy"
+  "description" = ""
 }
 
 # Общие переменные для group2 (VM-4)
@@ -24,6 +25,7 @@ group2_preemptible = true  # Прерываемость ВМ
 group2_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group2_unique_names = {
   "vm-4" = "vm-4-Ubuntu-22.04-MediaWiki"
+  "description" = ""
 }
 
 
@@ -39,6 +41,7 @@ group3_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group3_unique_names = {
   "vm-5" = "vm-5-Ubuntu-22.04-MediaWiki-PostgreSQL"
   "vm-6" = "vm-6-Ubuntu-22.04-MediaWiki-PostgreSQL"
+  "description" = ""
 }
 
 # Общие переменные для group4 (HDD-1)
@@ -47,4 +50,5 @@ group4_type = "network-hdd"  # Тип диска, HDD
 group4_disk_size = 24 # Объем диска (в ГБ)
 group4_unique_names = {
   "hdd-1" = "hdd-1-disk"
+  "description" = "Внешний магнитный жесткий диск для dump'ов БД"
 }
