@@ -449,4 +449,29 @@
 
 
 <!-- START TERRAFORM SETUP -->
+	<!-- # Настройка Terraform для облачного развёртывания виртуальных машин -->
+	
+	### Настройка Terraform для облачного развёртывания виртуальных машин
+	
+	<details>
+	<summary>Развернуть</summary>   
+	
+	#### Автоматическая настройка Terraform
+	
+	<details>
+	<summary>Развернуть</summary>   
+	
+	1. Запуск файла update_meta.py из директории Terraform (где main.tf) для создания/обновления файла meta.txt
+	
+	</details>
+	
+	#### Ручная настройка Terraform
+	Если по каким-то причинам python-скрипт 
+	
+	<details>
+	<summary>Развернуть</summary>   
+	
+	1. Создание и ручное наполнение файла meta.txt в директории Terraform (где main.tf) (за основу взять meta_EXAMPLE.txt)
+	
+	</details>
 <!-- END TERRAFORM SETUP -->
