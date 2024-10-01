@@ -4,7 +4,7 @@
 ## 1. Технические требования к проекту
 
 <details> 
-<summary>Раскрыть</summary>
+<summary>Посмотреть технические требования к проекту</summary>
 
 1. ОС сервисов проекта: Ubuntu 22.04
 2. Необходимые библиотеки и фреймворки:
@@ -22,16 +22,104 @@
 </details>
 
 ## 2. Задачи
-1. [Создание схемы развертываемого приложения](Solution/2.1.%20App%20deployment%20schema.md "App deployment schema")
+
+<details> 
+<summary>Посмотреть задачи</summary>
+
+ 
+1. [Создание схемы развертываемого приложения "Cервиса ведения документации на движке MediaWiki"](Solution/2.1.%20App%20deployment%20schema.md "App deployment schema").  
+Обзор различных вариантов схем, оценка плюсов и минусов
+
+    #### Вариант 1 (базовый)
+    <details>
+    <summary>Развернуть</summary>   
+
+    ##### Компоненты:
+    1. VM-1 - Сервисная VM. Точка входа администратора, деплой, управление, проксирование запросов и мониторинг состояния приложения, запуск Python-скриптов.
+        - Стек технологий: Ubuntu 22.04, proxy-Nginx, Zabbix-Server, Teraform, Ansible, Python-скрипты
+        - [**Zabbix-server**](https://www.zabbix.com/documentation/current/en// "Zabbix-server используется для настройки мониторинга состояния работы приложения"). Мониторинг состояния приложения.
+        - [**Teraform**](https://developer.hashicorp.com/terraform/docs "Teraform используется для автоматизированного развертывания виртуальных машин и пр. элементов сетевой инфраструктуры"). Автоматический деплой ВМ
+        - [**Ansible**](https://docs.ansible.com/ "Ansible используется для автоматической настройки виртуальных машин и пр. элементов сетевой инфраструктуры"). Автоматическая конфигурация ВМ.
+        - proxy-[**Nginx**](https://nginx.org/en/). HTTP-запросы пользователей перенаправляются на один из серверов MediaWiki (VM-2,3,4)
+            - Вид proxy: обратный — HTTP-запросы пользователей перенаправляются на один из серверов MediaWiki (VM-2,3,4)
+            - Метод балансировки: <a href="#" title="Каждый сервер в равной степени поочередно обрабатывает запрос)">Round Robin</a> без веса. 
+    2. VM-2, 3, 4 - серверы MediaWiki
+        - Стек технологий: Ubuntu 22.04, [MediaWiki](https://www.mediawiki.org/wiki/Documentation "движок для создания wiki-проектов (типа Википедии)")
+    3. VM-5 - Primary PostgreSQL
+        - Стек технологий: Ubuntu 22.04, [PostgreSQL](https://www.postgresql.org/), Streaming Replication
+        - Обработка read/write запросов от серверов MediaWiki (VM-2, VM-3, VM-4)
+        - Асинхронный Streaming Replication на Standby PostgreSQL (VM-6)
+    4. VM-6 - Standby PostgreSQL
+        - Стек технологий: Ubuntu 22.04, [PostgreSQL](https://www.postgresql.org/), Streaming Replication
+        - Получение и поддержание реплики данных от Primary PostgreSQL (VM-5)
+        - Регулярное создание дампов базы данных (pg_dump) на внешний жесткий диск (HDD-1)
+    5. HDD-1 - PostgreSQL_dump
+        - Хранение pg_dump, создаваемых на Standby PostgreSQL (VM-6)
+
+    ##### Плюсы/минусы:
+    - Плюсы:
+        - Постоянный мониторинг состояния компонентов приложения
+            - Zabbix-сервер проверяет состояние компонентов приложения и отправляет уведомления системному администратору
+        - Отказоустойчивость серверов MediaWiki (VM-2, 3, 4)
+            - В случае аварии на одном из серверов MediaWiki, обратный proxy-Nginx (VM-1) перенаправит запрос на доступный сервер. 
+        - Отказоустойчивость БД
+            - В случае аварии на Primary PostgreSQL (VM-5), системный администратор получает уведомление от Zabbix-server'а и переведет Standby PostgreSQL (VM-6) в режим работы Primary
+        - Сохранность данных в БД
+            - Полная актуальная копия Primary PostgreSQL (VM-5) с небольшой задержкой хранится на Standby PostgreSQL (VM-6) (задержка обусловлена асинхронным асинхронным Streaming Replication)
+            - Регулярные резервные копии Standby PostgreSQL (VM-6), хранящиеся на внешнем жестком диске (HDD-1)
+        - Сохранность структуры БД
+            - Внешний жесткий диск (HDD-1) хранит несколько резервных копий Standby PostgreSQL (VM-6), что позволяет восстановить БД до определенной точки во времени в случае повреждения структуры на Primary PostgreSQL (VM-5) и Standby PostgreSQL (VM-6).
+
+    - Минусы:
+        - Авария на VM-1 - потенциальная точка отказа приложения (бутылочное горлышко)
+            - Остановка proxy-Nginx приведет к недоступности для пользователей серверов MediaWiki (VM-2, 3, 4)
+            - Остановка Zabbix-server'а остановит информирование системного администратора о состоянии работы приложения и лишит аналитики для оперативного ремонта
+            - Возможное решение:
+                - Дублирование функций VM-1
+                    - Создание дополнительной VM с аналогичным стеком и настройками
+                    - Настройка [**Keepalived**](https://keepalived.readthedocs.io/en/latest/ "Keepalived отслеживает состояние таргетных ВМ, и в случае необходимости, перенаправляет трафик на резерный cервер") на VM-1 и дублирующей VM для автоматического перенаправления трафика в случае аварии
+        - Вероятность потери небольшой части последних записанных данных
+            - Асинхронная репликация между Primary PostgreSQL (VM-5) и Standby PostgreSQL (VM-6) может причиной потери части данных в случае аварии на Primary PostgreSQL (VM-5)
+            - Возможное решение:
+                - Использование синхронной репликации данных между Primary PostgreSQL (VM-5) и Standby PostgreSQL (VM-6)  
+                    - Данное решение способно замедлить общую скорость работы приложения.  
+                    Стоит прибегать только в случае если критична потеря даже небольшого фрагмента последних записанных данных
+        - Отсутствие автоматизированного алгоритма переключения ролей БД в случае аварии
+            - Ручная процедура переключения Standby PostgreSQL (VM-6) в режим Primary, в случае аварии на Primary PostgreSQL (VM-5)
+            - Ручная перенастройка серверов MediaWiki (VM-2, 3, 4) на работу с новой Primary БД
+            - Возможное решение:
+                - Настройка автоматического переключения режимов работы БД, настройка proxy для запросов серверов MediaWiki (VM-2, 3, 4) к БД
+                    - Настройка [**Patroni**](https://patroni.readthedocs.io/en/latest/README.html "Patroni осуществляет auto-failover Standby_db в режим Primary, в случае аварии") на Primary (VM-5) и Standby PostgreSQL (VM-6) для автоматического переключения режимов работы БД (Patroni auto-failover)
+                    - Настройка [**ZooKeeper**](https://zookeeper.apache.org/doc/r3.9.2/index.html "ZooKeeper отслеживает текущее состояние БД и координирует Patroni") на VM-1 для активации Patroni auto-failover
+                    - Настройка [**HAProxy**](https://www.haproxy.org/ "Haproxy балансирует нагрузку между БД и автоматически перенаправляет трафик") на VM-1 для проксирования от серверов MediaWiki (VM-2, VM-3, VM-4) к БД
+        - Повышенная нагрузка на Primary PostgreSQL (VM-5)
+            - Все запросы от серверов MediaWiki (VM-2, 3, 4) обрабатывает Primary PostgreSQL (VM-5), что может стать причиной медленной работы сервиса
+            - Возможное решение:
+                - Настройка [**HAProxy**](https://www.haproxy.org/ "Haproxy балансирует нагрузку между БД и автоматически перенаправляет трафик") на VM-1 для проксирования от серверов MediaWiki (VM-2, VM-3, VM-4) к БД
+                - Настройка Standby PostgreSQL (VM-6) в режим работы "read" для помощи Primary PostgreSQL (VM-5) в обработке части запросов
+                - Добавление отдельного медиасервера для обработки медиафайлов
+
+    ![Схема развертываемого приложения](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/1.2.%20MediaWiki_app_schema.svg)   
+
+    [Ссылка на .drawio-файл](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/1.1.%20MediaWiki_app_schema.drawio)   
+
+
+    </details> 
+
 2. Создание руководства по восстановлению инфраструктуры в случае аварии
 3. Проверка отказоустойчивости системы
-
+</details>
 
 ## 3. Деплой
+
+<details> 
+<summary>Посмотреть деплой</summary>
+
 1. [Настройка Docker для развёртывания сервисной ВМ](Solution/3.1.%20Service%20VM%20Docker%20setup.md "Docker setup for deploying a service VM")
 2. Клонирование git-репозитория в корневой каталог пользователя развернутой в Docker-контейнере ВМ
 3. Настройка облачного провайдера Yandex Cloud для работы с Terraform
     1. [Установка и настройка Yandex Cloud CLI](Solution/3.3.1.%20YС%20CLI%20installation&configuration.md)
     2. [Настройка сервисного аккаунта Yandex Cloud](Solution/3.3.2.%20YC%20service%20account%20configuration.md)
+</details>
 
 
