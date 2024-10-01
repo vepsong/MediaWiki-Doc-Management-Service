@@ -302,9 +302,7 @@
 	</details>  
 <!-- END SERVICE VM DOCKER SETUP -->
 2. Клонирование git-репозитория в корневой каталог пользователя развернутой в Docker-контейнере ВМ
-3. Настройка облачного провайдера Yandex Cloud для работы с Terraform  
-    
-
+3. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/3.3.%20YC%20provider%20setup%20for%20Terraform.md)
     
 	<!-- START YC PROVIDER SETUP FOR TERRAFORM -->
 	<!-- # [Установка Yandex Cloud CLI](https://yandex.cloud/en-ru/docs/cli/quickstart#install)
