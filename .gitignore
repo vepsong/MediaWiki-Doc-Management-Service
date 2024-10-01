@@ -10,3 +10,7 @@
 YC_meta.json
 key.json
 meta.txt
+
+# Служебные файлы Terraform
+.terraform.lock.hcl
+.terraform/
