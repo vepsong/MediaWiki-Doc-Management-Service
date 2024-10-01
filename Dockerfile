@@ -25,7 +25,7 @@ RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_am
 RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
 
 # Копируем бинарные файлы Yandex Cloud CLI в /usr/bin/
-RUN cp -r /root/yandex-cloud/bin/* /usr/bin/
+RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
 
 # Активируем bash-completion
 RUN echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
