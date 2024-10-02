@@ -35,3 +35,15 @@ output "group3_vm_nat_ip" {
   description = "NAT IP-адреса виртуальных машин из группы 3"
   value = { for vm_name, vm in yandex_compute_instance.group3 : vm_name => vm.network_interface[0].nat_ip_address }
 }
+
+# Вывод IP-адресов виртуальных машин для group4
+output "group4_vm_ip" {
+  description = "IP-адреса виртуальных машин из группы 4"
+  value = { for vm_name, vm in yandex_compute_instance.group4 : vm_name => vm.network_interface[0].ip_address }
+}
+
+# Вывод NAT IP-адресов виртуальных машин для group4
+output "group4_vm_nat_ip" {
+  description = "NAT IP-адреса виртуальных машин из группы 4"
+  value = { for vm_name, vm in yandex_compute_instance.group4 : vm_name => vm.network_interface[0].nat_ip_address }
+}

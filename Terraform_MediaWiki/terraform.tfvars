@@ -13,14 +13,14 @@ group1_description = "Ubuntu 22.04, Nginx, Zabbix, Keepalived, ZooKeeper, HAProx
 
 # Уникальные имена для ВМ в group1
 group1_unique_vm_names = {
-  "vm-2" = "vm-02"
-  "vm-3" = "vm-03"
+  "vm-2-disk" = "vm-02"
+  "vm-3-disk" = "vm-03"
 }
 
 # Уникальные имена для дисков ВМ в group1
 group1_unique_disks_names = {
-  "vm-2" = "vm-02-disk"
-  "vm-3" = "vm-03-disk"
+  "vm-2-disk" = "vm-02-disk"
+  "vm-3-disk" = "vm-03-disk"
 }
 
 # Идентификаторы сети group1
@@ -47,7 +47,7 @@ group2_unique_vm_names = {
 
 # Уникальные имена для дисков ВМ в group2
 group2_unique_disks_names = {
-  "vm-4" = "vm-04-disk"
+  "vm-4-disk" = "vm-04-disk"
 }
 
 # Идентификаторы сети group2
@@ -57,7 +57,7 @@ group2_network = {
 }
 
 
-# Общие переменные для group3 (VM-5, VM-6)
+# Общие переменные для group3 (VM-5)
 # Стек технологий (Ubuntu 22.04, MediaWiki, PostgreSQL)
 group3_vm_cpu    = 2  # Количество ядер процессора
 group3_ram       = 8  # Объем оперативной памяти (в ГБ)
@@ -70,13 +70,11 @@ group3_description = "Ubuntu-22.04, MediaWiki, PostgreSQL"
 # Уникальные имена для ВМ в group3
 group3_unique_vm_names = {
   "vm-5" = "vm-05"
-  "vm-6" = "vm-06"
 }
 
 # Уникальные имена для дисков ВМ в group3
 group3_unique_disks_names = {
-  "vm-5" = "vm-05-disk"
-  "vm-6" = "vm-06-disk"
+  "vm-5-disk" = "vm-05-disk"
 }
 
 # Идентификаторы сети group3
@@ -85,19 +83,49 @@ group3_network = {
    "existing_subnet_id" = "e9bsdtj7vme4iddaq7qb"
 }
 
-# Общие переменные для group4 (HDD-1)
-group4_zone = "ru-central1-a"  # Зона, где будет создан диск
-group4_type = "network-hdd"  # Тип диска, HDD
-group4_disk_size = 24 # Объем диска (в ГБ)
-group4_description = "Внешний магнитный жесткий диск для dump'ов БД"
 
-# Уникальные имена для дисков в group4
+# Общие переменные для group4 (VM-5)
+# Стек технологий (Ubuntu 22.04, MediaWiki, PostgreSQL)
+group4_vm_cpu    = 2  # Количество ядер процессора
+group4_ram       = 8  # Объем оперативной памяти (в ГБ)
+group4_disk_size = 23 # Объем диска (в ГБ)
+group4_OC_template  = "fd85bll745cg76f707mq" # Ubuntu 22.04
+group4_preemptible = true  # Прерываемость ВМ
+group4_zone = "ru-central1-a"  # Зона, где будет создана ВМ
+group4_description = "Ubuntu-22.04, MediaWiki, PostgreSQL"
+
+
+# Уникальные имена для ВМ в group4
+group4_unique_vm_names = {
+  "vm-6" = "vm-06"
+}
+
+# Уникальные имена для дисков ВМ в group3
 group4_unique_disks_names = {
-  "hdd-1" = "hdd-1-disk"
+  "vm-6-disk" = "vm-06-disk"
 }
 
 # Идентификаторы сети group4
 group4_network = {
+   "existing_network_id" = "enpq8hrot41agq9ug68l"
+   "existing_subnet_id" = "e9bsdtj7vme4iddaq7qb"
+}
+
+
+
+# Общие переменные для group5 (HDD-1)
+group5_zone = "ru-central1-a"  # Зона, где будет создан диск
+group5_type = "network-hdd"  # Тип диска, HDD
+group5_disk_size = 24 # Объем диска (в ГБ)
+group5_description = "Внешний магнитный жесткий диск для dump'ов БД"
+
+# Уникальные имена для дисков в group5
+group5_unique_disks_names = {
+  "hdd-1-disk" = "hdd-01-disk"
+}
+
+# Идентификаторы сети group5
+group5_network = {
    "existing_network_id" = "enpq8hrot41agq9ug68l"
    "existing_subnet_id" = "e9bsdtj7vme4iddaq7qb"
 }

@@ -131,7 +131,7 @@ variable "group3_ram" {
 }
 
 variable "group3_disk_size" {
-  description = "Размер диска для ВМ group33"
+  description = "Размер диска для ВМ group3"
   type        = number
 }
 
@@ -167,24 +167,41 @@ variable "group3_unique_disks_names" {
 
 
 # Объявляем переменную group4_unique_names
-variable "group4_unique_disks_names" {
-  description = "Уникальные имена для HDD group4"
+variable "group4_unique_vm_names" {
+  description = "Уникальные имена для ВМ группы 4"
   type        = map(string)
 }
 
-variable "group4_zone" {
-  description = "Зона для HDD group4"
-  type        = string
+# Объявляем другие переменные, которые используются в main.tf
+
+variable "group4_vm_cpu" {
+  description = "Количество ядер для ВМ group4"
+  type        = number
 }
 
-variable "group4_type" {
-  description = "Тип диска, HDD group4"
-  type        = string
+variable "group4_ram" {
+  description = "Объем оперативной памяти для ВМ group4"
+  type        = number
 }
 
 variable "group4_disk_size" {
-  description = "Объем диска (в ГБ) group4"
+  description = "Размер диска для ВМ group4"
   type        = number
+}
+
+variable "group4_OC_template" {
+  description = "Образ (шаблон) ОС для ВМ group4"
+  type        = string
+}
+
+variable "group4_preemptible" {
+  description = "Прерываемость для ВМ group4"
+  type        = bool
+}
+
+variable "group4_zone" {
+  description = "Зона для ВМ group4"
+  type        = string
 }
 
 variable "group4_description" {
@@ -194,5 +211,42 @@ variable "group4_description" {
 
 variable "group4_network" {
   description = "Cеть и подсеть group4"
+  type        = map(string)
+}
+
+variable "group4_unique_disks_names" {
+  description = "Уникальные имена для дисков ВМ в group4"
+  type        = map(string)
+}
+
+
+# Объявляем переменную group5_unique_names
+variable "group5_unique_disks_names" {
+  description = "Уникальные имена для HDD group5"
+  type        = map(string)
+}
+
+variable "group5_zone" {
+  description = "Зона для HDD group5"
+  type        = string
+}
+
+variable "group5_type" {
+  description = "Тип диска, HDD group5"
+  type        = string
+}
+
+variable "group5_disk_size" {
+  description = "Объем диска (в ГБ) group5"
+  type        = number
+}
+
+variable "group5_description" {
+  description = "Описание group5"
+  type        = string
+}
+
+variable "group5_network" {
+  description = "Cеть и подсеть group5"
   type        = map(string)
 }

@@ -75,8 +75,7 @@ resource "yandex_compute_instance" "group2" {
   }
 }
 
-
-# Виртуальные машины для group3 (VM-5, VM-6)
+# Виртуальные машины для group3 (VM-5)
 resource "yandex_compute_instance" "group3" {
   for_each = var.group3_unique_vm_names  # Используем уникальные имена для каждой ВМ в group3
 
@@ -110,16 +109,59 @@ resource "yandex_compute_instance" "group3" {
   metadata = {
     user-data = "${file("${path.module}/meta.txt")}"
   }
+
+}
+
+# Виртуальные машины для group4 (VM-6)
+resource "yandex_compute_instance" "group4" {
+  for_each = var.group4_unique_vm_names  # Используем уникальные имена для каждой ВМ в group4
+
+  name        = each.value  # Уникальное имя ВМ
+  description = "Виртуальная машина ${each.value}"
+
+  resources {
+    cores  = var.group4_vm_cpu  # Количество ядер
+    memory = var.group4_ram # Оперативная память в GB
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = var.group4_OC_template  # Шаблон ОС
+      size     = var.group4_disk_size  # Размер диска
+      name     = var.group4_unique_disks_names[each.key]  # Уникальное имя диска
+    }
+  }
+
+  scheduling_policy {
+    preemptible = var.group4_preemptible  # Прерываемость ВМ
+  }
+
+  network_interface {
+    subnet_id = var.group4_network["existing_subnet_id"]  # Подсеть
+    nat       = true  # Включаем NAT для доступа в интернет
+  }
+
+  zone = var.group4_zone  # Зона для создания ВМ
+
+  metadata = {
+    user-data = "${file("${path.module}/meta.txt")}"
+  }
+
+  # Подключаем внешний диск (HDD-1) только к VM-6
+  secondary_disk {
+    disk_id = yandex_compute_disk.group5["hdd-1"].id
+  }
+
 }
 
 
-# Диски для group4 (HDD-1)
-resource "yandex_compute_disk" "group4" {
-  for_each = var.group4_unique_disks_names  # Используем уникальные имена для каждого диска в group4
+# Диски для group5 (HDD-1)
+resource "yandex_compute_disk" "group5" {
+  for_each = var.group5_unique_disks_names  # Используем уникальные имена для каждого диска в group5
 
-  name     = each.value  # Уникальное имя диска group4
-  type     = var.group4_type  # Тип диска (например, HDD)
-  zone     = var.group4_zone  # Зона для создания диска
-  size     = var.group4_disk_size  # Размер диска в ГБ
+  name     = each.value  # Уникальное имя диска group5
+  type     = var.group5_type  # Тип диска (например, HDD)
+  zone     = var.group5_zone  # Зона для создания диска
+  size     = var.group5_disk_size  # Размер диска в ГБ
 
 }
