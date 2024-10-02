@@ -84,7 +84,7 @@ group3_network = {
 }
 
 
-# Общие переменные для group4 (VM-5)
+# Общие переменные для group4 (VM-6)
 # Стек технологий (Ubuntu 22.04, MediaWiki, PostgreSQL)
 group4_vm_cpu    = 2  # Количество ядер процессора
 group4_ram       = 8  # Объем оперативной памяти (в ГБ)
@@ -100,7 +100,7 @@ group4_unique_vm_names = {
   "vm-6" = "vm-06"
 }
 
-# Уникальные имена для дисков ВМ в group3
+# Уникальные имена для дисков ВМ в group4
 group4_unique_disks_names = {
   "vm-6" = "vm-06-disk"
 }
