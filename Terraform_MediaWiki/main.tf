@@ -3,7 +3,7 @@
 
 # Виртуальные машины для group1 (VM-2, VM-3)
 resource "yandex_compute_instance" "group1" {
-  for_each = var.group1_unique_names  # Используем уникальные имена для каждой ВМ в группе 1
+  for_each = var.group1_unique_vm_names  # Используем уникальные имена для каждой ВМ в group1
 
   name        = each.value  # Уникальное имя ВМ
   description = "Виртуальная машина ${each.value}"
