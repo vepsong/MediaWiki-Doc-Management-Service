@@ -13,14 +13,14 @@ group1_description = "Ubuntu 22.04, Nginx, Zabbix, Keepalived, ZooKeeper, HAProx
 
 # Уникальные имена для ВМ в group1
 group1_unique_vm_names = {
-  "vm-2-disk" = "vm-02"
-  "vm-3-disk" = "vm-03"
+  "vm-2" = "vm-02"
+  "vm-3" = "vm-03"
 }
 
 # Уникальные имена для дисков ВМ в group1
 group1_unique_disks_names = {
-  "vm-2-disk" = "vm-02-disk"
-  "vm-3-disk" = "vm-03-disk"
+  "vm-2" = "vm-02-disk"
+  "vm-3" = "vm-03-disk"
 }
 
 # Идентификаторы сети group1
@@ -47,7 +47,7 @@ group2_unique_vm_names = {
 
 # Уникальные имена для дисков ВМ в group2
 group2_unique_disks_names = {
-  "vm-4-disk" = "vm-04-disk"
+  "vm-4" = "vm-04-disk"
 }
 
 # Идентификаторы сети group2
@@ -74,7 +74,7 @@ group3_unique_vm_names = {
 
 # Уникальные имена для дисков ВМ в group3
 group3_unique_disks_names = {
-  "vm-5-disk" = "vm-05-disk"
+  "vm-5" = "vm-05-disk"
 }
 
 # Идентификаторы сети group3
@@ -102,7 +102,7 @@ group4_unique_vm_names = {
 
 # Уникальные имена для дисков ВМ в group3
 group4_unique_disks_names = {
-  "vm-6-disk" = "vm-06-disk"
+  "vm-6" = "vm-06-disk"
 }
 
 # Идентификаторы сети group4
