@@ -17,6 +17,7 @@ resource "yandex_compute_instance" "group1" {
     initialize_params {
       image_id = var.group1_OC_template  # Шаблон ОС
       size     = var.group1_disk_size  # Размер диска
+      name     = var.group1_unique_disks_names[each.key]  # Уникальное имя диска
     }
   }
 
