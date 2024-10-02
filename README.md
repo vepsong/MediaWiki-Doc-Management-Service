@@ -488,6 +488,11 @@
 	       # Остановка нужной ВМ
 	       yc compute instance stop --id <instance-id> 
 	
+	       # Пересоздание ресурса
+	       # terraform taint помечает ресурс как "поврежденный"
+	       terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
+	
+	
 	
 	
 	
