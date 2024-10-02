@@ -182,6 +182,7 @@ resource "yandex_compute_instance" "group4" {
 
   # Используем внешний файл для основных метаданных + добавляем команды для монтирования диска
   metadata = {
+
     user-data = <<-EOF
       ${file("${path.module}/meta.txt")}
 
@@ -190,17 +191,16 @@ resource "yandex_compute_instance" "group4" {
 
       # Монтирование внешнего диска при загрузке
       mounts:
-        - [ /dev/vdb, /mnt/external-hdd, ext4, "defaults", "0", "0" ]
+        - [ /dev/vdb, /mnt/external-${yandex_compute_disk.group5["hdd-1"].name}, ext4, "defaults", "0", "0" ]
+        
 
       # Команды для создания точки монтирования и форматирования диска (если необходимо)
       # Принудительная установка hostname
       runcmd:
-        - mkdir -p /mnt/external-hdd
+        - mkdir -p /mnt/external-${yandex_compute_disk.group5["hdd-1"].name}
         - if [ "$(blkid -o value -s TYPE /dev/vdb)" != "ext4" ]; then mkfs.ext4 /dev/vdb; fi
-        - mount /dev/vdb /mnt/external-hdd
-        - echo "/dev/vdb /mnt/external-hdd ext4 defaults 0 0" >> /etc/fstab
-  
-        # Принудительная установка hostname
+        - mount /dev/vdb /mnt/external-${yandex_compute_disk.group5["hdd-1"].name}
+        - echo "/dev/vdb /mnt/external-${yandex_compute_disk.group5["hdd-1"].name} ext4 defaults 0 0" >> /etc/fstab        
         - echo ${each.value} > /etc/hostname
         - hostnamectl set-hostname ${each.value}
     EOF
