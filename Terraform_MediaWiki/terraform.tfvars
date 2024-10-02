@@ -121,7 +121,7 @@ group5_description = "Внешний магнитный жесткий диск 
 
 # Уникальные имена для дисков в group5
 group5_unique_disks_names = {
-  "hdd-1-disk" = "hdd-01-disk"
+  "hdd-1" = "hdd-01-disk"
 }
 
 # Идентификаторы сети group5
