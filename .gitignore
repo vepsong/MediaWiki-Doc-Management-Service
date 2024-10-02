@@ -1,6 +1,7 @@
 # Исключение настроек IDE/редакторов
 .vscode/
-.root.code-workspace
+root.code-workspace
+
 
 # Файлы окружения
 .env
