@@ -84,7 +84,17 @@ resource "yandex_compute_instance" "group2" {
   zone = var.group2_zone  # Зона для создания ВМ
 
   metadata = {
-    user-data = "${file("${path.module}/meta.txt")}"
+    user-data = <<-EOF
+      ${file("${path.module}/meta.txt")}
+
+      # Установка hostname для каждой ВМ
+      hostname: ${each.value}
+
+      # Дополнительные команды, если необходимо
+      runcmd:
+        - echo ${each.value} > /etc/hostname
+        - hostnamectl set-hostname ${each.value}
+    EOF
   }
 }
 
@@ -120,7 +130,17 @@ resource "yandex_compute_instance" "group3" {
   zone = var.group3_zone  # Зона для создания ВМ
 
   metadata = {
-    user-data = "${file("${path.module}/meta.txt")}"
+    user-data = <<-EOF
+      ${file("${path.module}/meta.txt")}
+
+      # Установка hostname для каждой ВМ
+      hostname: ${each.value}
+
+      # Дополнительные команды, если необходимо
+      runcmd:
+        - echo ${each.value} > /etc/hostname
+        - hostnamectl set-hostname ${each.value}
+    EOF
   }
 
 }
@@ -159,21 +179,30 @@ resource "yandex_compute_instance" "group4" {
   # metadata = {
   #   user-data = "${file("${path.module}/meta.txt")}"
   # }
+
   # Используем внешний файл для основных метаданных + добавляем команды для монтирования диска
   metadata = {
     user-data = <<-EOF
       ${file("${path.module}/meta.txt")}
+
+      # Установка hostname для каждой ВМ
+      hostname: ${each.value}
 
       # Монтирование внешнего диска при загрузке
       mounts:
         - [ /dev/vdb, /mnt/external-hdd, ext4, "defaults", "0", "0" ]
 
       # Команды для создания точки монтирования и форматирования диска (если необходимо)
+      # Принудительная установка hostname
       runcmd:
         - mkdir -p /mnt/external-hdd
         - if [ "$(blkid -o value -s TYPE /dev/vdb)" != "ext4" ]; then mkfs.ext4 /dev/vdb; fi
         - mount /dev/vdb /mnt/external-hdd
         - echo "/dev/vdb /mnt/external-hdd ext4 defaults 0 0" >> /etc/fstab
+  
+        # Принудительная установка hostname
+        - echo ${each.value} > /etc/hostname
+        - hostnamectl set-hostname ${each.value}
     EOF
   }
   # Подключаем внешний диск (HDD-1) только к vm-6
