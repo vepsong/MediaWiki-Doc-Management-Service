@@ -1,6 +1,6 @@
 import os
 import subprocess
-# Импортируем функцию получения имени репозитория и пути к папке Terraform
+# Импортируем функцию получения названия репозитория и пути к папке Terraform
 from utils import get_git_repo_name, find_terraform_directory
 
 

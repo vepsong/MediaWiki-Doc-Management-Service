@@ -11,7 +11,7 @@ root.code-workspace
 # Файлы с секретами
 yc_meta.json
 key.json
-meta.txt
+terraform_meta.txt
 
 # Служебные файлы Terraform
 .terraform.lock.hcl
