@@ -61,3 +61,12 @@ def find_terraform_directory(repo_name=None):
     
     print("Файлы Terraform (.tf) не найдены в репозитории.")
     return None, None
+
+
+# Универсальная функция для выполнения команд с проверкой результата
+def run_command(command):
+    try:
+        subprocess.run(command, check=True)
+        print(f"Команда '{' '.join(command)}' успешно выполнена.")
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка при выполнении команды: {e}")

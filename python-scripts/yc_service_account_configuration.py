@@ -1,17 +1,8 @@
 import json
 import os
 import subprocess
-# Импортируем функцию получения имени репозитория
-from utils import get_git_repo_name  
-
-
-# Универсальная функция для выполнения команд с проверкой результата
-def run_command(command):
-    try:
-        subprocess.run(command, check=True)
-        print(f"Команда '{' '.join(command)}' успешно выполнена.")
-    except subprocess.CalledProcessError as e:
-        print(f"Ошибка при выполнении команды: {e}")
+# Импортируем функцию получения имени репозитория и универсальная функцию для выполнения команд с проверкой результата
+from utils import get_git_repo_name, run_command
 
 
 # Функция для добавления переменной в bashrc
