@@ -367,10 +367,10 @@
 	
 	  1. Создание файла с данными для аутентификации в Yandex Cloud
 	        
-	         # В корневой директории репозитория создать YC_meta.json и заполнить его, согласно документации
-	         # Файл добавлен в .gitignore, поэтому для примера использовать YC_meta_EXAMPLE.json
+	         # В ~/<имя репозитория>/credentials создать yc_meta.json
+	         # Для примера использовать ~/<имя репозитория>/credentials/templates/yc_meta_EXAMPLE.json
 	
-	  2. Запуск Python-скрипта [**YC service account configuration.py**](/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
+	  2. Запуск Python-скрипта [**YC service account configuration.py**](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
 	
 	  3. Запуск Python-скрипта [**terraform_init.py**](/terraform_init.py) для автоматической установки провайдера для работы с YDB  
 	        

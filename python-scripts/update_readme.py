@@ -1,5 +1,7 @@
 import re
 import os
+# Импортируем функцию получения имени репозитория
+from utils import get_git_repo_name  
 
 def add_indentation(text, indent='\t'):
     """Добавляем отступ (табуляцию) в начало каждой строки."""
@@ -38,8 +40,13 @@ def update_readme(content_files, readme_file, indent='\t'):
     print(f"{readme_file} успешно обновлен.")
 
 if __name__ == "__main__":    
-    # Определяем путь к текущей директории скрипта
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+   
+    repo_name = get_git_repo_name()  # Получаем имя репозитория с помощью utils.py
+    if not repo_name:
+        print("Не удалось получить имя репозитория.")
+        exit(1)
+    base_dir = os.path.expanduser(f"~/{repo_name}/")  
+
 
     # Используем относительные пути для файлов
     content_files = [
