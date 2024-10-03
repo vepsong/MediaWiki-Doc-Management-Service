@@ -1,7 +1,7 @@
 # Импортируем необходимые библиотеки
 import os
 # Импортируем функцию получения названия репозитория и функцию получения названия папки Terraform
-from utils import get_git_repo_name, find_terraform_directory
+from utils import get_git_repo_name, find_directory_by_pattern
 
 
 # Получаем имя репозитория
@@ -11,7 +11,8 @@ if not repo_name:
     print("Не удалось получить имя репозитория.")
     exit(1)
 
-_, terraform_folder_name = find_terraform_directory(repo_name)
+# _, terraform_folder_name = find_terraform_directory(repo_name)
+_, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf")
 
 # Имя файла и путь к директории
 file_name = "terraform_meta.txt"
@@ -42,6 +43,10 @@ users:
 """
 
 # Запись содержимого в файл terraform_meta.txt
+# Файлы сохраняются в 2-х директориях:
+# В ~/<repo_name>/credentials/ — для стандартизации хранения переменных авторизации
+# В В ~/<repo_name>/<terraform_folder>/ — для использования Terraform'ом
+
 try:
     with open(file_path_credentials, 'w') as meta_in_credentials, open(file_path_terraform, 'w') as meta_in_terraform:
         meta_in_credentials.write(terraform_meta_content)

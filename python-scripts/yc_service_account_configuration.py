@@ -1,6 +1,5 @@
 import json
 import os
-import subprocess
 # Импортируем функцию получения имени репозитория и универсальная функцию для выполнения команд с проверкой результата
 from utils import get_git_repo_name, run_command
 
