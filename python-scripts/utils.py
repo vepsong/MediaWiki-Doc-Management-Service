@@ -1,6 +1,7 @@
 import subprocess
 import os
 import re
+import json
 
 # Функция для получения имени репозитория
 def get_git_repo_name():
@@ -77,12 +78,25 @@ def find_directory_by_pattern(repo_name=None, pattern=None, file_extension=None)
 
 
 # Универсальная функция для выполнения команд с проверкой результата
-def run_command(command):
+def run_command(command, cwd=None):
     try:
-        result = subprocess.run(command, check=True)
+        # result = subprocess.run(command, check=True)
+        result = subprocess.run(command, check=True, capture_output=True, text=True, cwd=cwd)
         print(f"Команда '{' '.join(command)}' успешно выполнена.")
-        return result.returncode  # Возвращаем код завершения
+        # return result.returncode  # Возвращаем код завершения
+        # print(result.returncode)
+        return result.stdout # Возвращаем вывод команды
     except subprocess.CalledProcessError as e:
         print(f"Ошибка при выполнении команды: {e}")
         return e.returncode  # Возвращаем код ошибки
+    
+# Универсальная функция для записи данных в JSON файл
+def write_json_to_file(data, file_path):
+    """Записываем данные в JSON файл."""
+    try:
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
+        print(f"Файл {file_path} успешно создан.")
+    except (OSError, IOError) as e:
+        print(f"Ошибка при записи в файл {file_path}: {e}")
 

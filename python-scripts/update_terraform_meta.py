@@ -11,7 +11,7 @@ if not repo_name:
     print("Не удалось получить имя репозитория.")
     exit(1)
 
-# _, terraform_folder_name = find_terraform_directory(repo_name)
+# Получить название папки с файлами Terraform
 _, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf")
 
 # Имя файла и путь к директории

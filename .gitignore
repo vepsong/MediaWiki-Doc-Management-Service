@@ -12,6 +12,8 @@ root.code-workspace
 yc_meta.json
 key.json
 terraform_meta.txt
+terraform_vm_data.json
+ansible_meta.json
 
 # Служебные файлы Terraform
 .terraform.lock.hcl
