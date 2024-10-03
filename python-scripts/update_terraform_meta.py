@@ -1,7 +1,8 @@
 # Импортируем необходимые библиотеки
 import os
-# Импортируем функцию получения названия репозитория
-from utils import get_git_repo_name
+# Импортируем функцию получения названия репозитория и функцию получения названия папки Terraform
+from utils import get_git_repo_name, find_terraform_directory
+
 
 # Получаем имя репозитория
 repo_name = get_git_repo_name()
@@ -10,9 +11,12 @@ if not repo_name:
     print("Не удалось получить имя репозитория.")
     exit(1)
 
+_, terraform_folder_name = find_terraform_directory(repo_name)
+
 # Имя файла и путь к директории
 file_name = "terraform_meta.txt"
-file_path = os.path.expanduser(f"~/{repo_name}/credentials/{file_name}")
+file_path_credentials = os.path.expanduser(f"~/{repo_name}/credentials/{file_name}")
+file_path_terraform = os.path.expanduser(f"~/{repo_name}/{terraform_folder_name}/{file_name}")
 
 
 # Путь к файлу с SSH-ключом
@@ -38,7 +42,11 @@ users:
 """
 
 # Запись содержимого в файл terraform_meta.txt
-with open(file_path, 'w') as terraform_meta_file:
-    terraform_meta_file.write(terraform_meta_content)
+try:
+    with open(file_path_credentials, 'w') as meta_in_credentials, open(file_path_terraform, 'w') as meta_in_terraform:
+        meta_in_credentials.write(terraform_meta_content)
+        meta_in_terraform.write(terraform_meta_content)
 
-print(f"Файл {file_path} - успешно обновлен!")
+    print(f"Файлы {file_path_credentials} и {file_path_terraform} - успешно обновлены!")
+except Exception as e:
+    print(f"Произошла ошибка при записи файлов: {e}")
