@@ -1,17 +1,8 @@
 import json
 import os
 # Импортируем функцию получения имени репозитория и универсальная функцию для выполнения команд с проверкой результата
-from utils import get_git_repo_name, run_command
+from utils import get_git_repo_name, run_command, add_env_variable_to_bashrc
 
-
-# Функция для добавления переменной в bashrc
-def add_env_variable_to_bashrc(variable_name, command):
-    bashrc_path = os.path.expanduser('~/.bashrc')
-    with open(bashrc_path, 'a') as bashrc_file:
-        bashrc_file.write(f'\n# Yandex Cloud environment variables\n')
-        bashrc_file.write(f'export {variable_name}=$({command})\n')
-
-    print(f"Переменная окружения {variable_name} добавлена в {bashrc_path}.")
 
 # Шаг 1. Получение имени репозитория и построение пути
 repo_name = get_git_repo_name()  # Получаем имя репозитория с помощью utils.py

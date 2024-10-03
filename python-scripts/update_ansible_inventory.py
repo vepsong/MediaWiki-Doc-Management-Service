@@ -1,55 +1,41 @@
 import os
 import json
+from utils import get_git_repo_name, find_directory_by_pattern, run_command, write_json_to_file, get_file_path
 
-# Импортируем функцию получения названия репозитория, названия папки Terraform,
-# универсальную функцию для выполнения команд с проверкой результата,
-# универсальную функцию для записи json в файл
-from utils import get_git_repo_name, find_directory_by_pattern, run_command, write_json_to_file
+
+# Функция для запроса данных у пользователя Ansible
+def request_ansible_credentials():
+    print("Данные для подключения к ВМ:")
+    ansible_user = input("Введите, пожалуйста, значение ansible_user: ")
+    ansible_password = input("Введите, пожалуйста, значение ansible_password: ")
+    return {"ansible_user": ansible_user, "ansible_password": ansible_password}
+
 
 # Функция для создания/обновления файла параметров аутентификации
-def create_ansible_meta_json(repo_name):
-    # Получаем полный путь к файлу
-    file_name = "ansible_meta.json"
-    ansible_meta_json_file_path = (f'{credentials_path}/{file_name}')
-    
-    # Попытка открыть файл
+def create_ansible_meta_json(repo_name, credentials_path):
+    ansible_meta_json_file_path = get_file_path(repo_name, 'credentials', 'ansible_meta.json')
+
     try:
-        # Проверка на наличие файла и его размер
-        if os.path.exists(ansible_meta_json_file_path):
-            if os.path.getsize(ansible_meta_json_file_path) > 0:
-                with open(ansible_meta_json_file_path, 'r') as config_file:
-                    config = json.load(config_file)
-                ansible_user = config.get('ansible_user')
-                ansible_password = config.get('ansible_password')          
-                print(f"Файл {ansible_meta_json_file_path} найден. Параметры загружены.")
-                
-                # Запрашиваем у пользователя, хочет ли он изменить данные
-                choice = input("Нажмите enter, чтобы оставить текущие данные, или введите 'change', чтобы изменить их: ")
-                print(f"Данные в файле {ansible_meta_json_file_path} остались без изменений.")
+        # Если файл существует и не пустой
+        if os.path.exists(ansible_meta_json_file_path) and os.path.getsize(ansible_meta_json_file_path) > 0:
+            with open(ansible_meta_json_file_path, 'r') as config_file:
+                config = json.load(config_file)
+            ansible_user = config.get('ansible_user')
+            ansible_password = config.get('ansible_password')
+            print(f"Файл {ansible_meta_json_file_path} найден. Параметры загружены.")
 
-                if choice.strip().lower() == "change":
-                    raise FileNotFoundError  # Принудительно заменяем данные
+            # Проверка, хочет ли пользователь заменить данные
+            choice = input("Нажмите enter, чтобы оставить текущие данные, или введите 'change', чтобы изменить их: ")
+            if choice.strip().lower() == "change":
+                raise FileNotFoundError
 
-            else:
-                print(f"Файл {ansible_meta_json_file_path} существует, но пуст.")
-                raise FileNotFoundError  # Если файл пустой, выполняем ту же логику, как и при его отсутствии
         else:
-            print(f"Файл {ansible_meta_json_file_path} не существует.")
-            raise FileNotFoundError  # Если файл не существует
+            print(f"Файл {ansible_meta_json_file_path} существует, но пуст.")
+            raise FileNotFoundError
 
     except (FileNotFoundError, ValueError):
         print(f"Файл {ansible_meta_json_file_path} не найден или пуст. Создаём новый файл.")
-        # Если файл не найден или пуст, запросить данные у пользователя
-        print(f"Данные для подключения к ВМ")
-        ansible_user = input("Введите, пожалуйста, значение ansible_user: ")
-        ansible_password = input("Введите, пожалуйста, значение ansible_password: ")
-
-        # Создаем словарь для данных
-        data = {
-            "ansible_user": ansible_user,
-            "ansible_password": ansible_password
-        }
-
+        data = request_ansible_credentials()
         write_json_to_file(data, ansible_meta_json_file_path)
 
     except KeyError:
@@ -58,23 +44,21 @@ def create_ansible_meta_json(repo_name):
 
 
 # Получение данных созданных через Terraform ВМ
-def get_terraform_vm_data(terraform_path):
-                             
+def get_terraform_vm_data(terraform_path, credentials_path):
     command = ['terraform', 'output', '-json']
     output = run_command(command, cwd=terraform_path)
     data = json.loads(output)
 
     # Записываем данные в новый файл JSON
-    file_name = "terraform_vm_data.json"
-    terraform_vm_data_json_file_path = (f'{credentials_path}/{file_name}')
-
+    terraform_vm_data_json_file_path = get_file_path(credentials_path, '', 'terraform_vm_data.json')
     write_json_to_file(data, terraform_vm_data_json_file_path)
+
 
 if __name__ == '__main__':
     repo_name = get_git_repo_name()  # Получаем имя репозитория
-    credentials_path = os.path.expanduser(f'~/{repo_name}/credentials') # Получаем путь к папке с credentials
-    _, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf") # Получаем название папки с файлами Terraform
-    terraform_path = os.path.expanduser(f"~/{repo_name}/{terraform_folder_name}/") # Получаем путь к папке с Terraform
+    credentials_path = get_file_path(repo_name, 'credentials', '')  # Путь к папке с credentials
+    _, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf")  # Получаем название папки с файлами Terraform
+    terraform_path = get_file_path(repo_name, terraform_folder_name, '')  # Путь к папке с Terraform
 
-    create_ansible_meta_json(repo_name)
-    get_terraform_vm_data(terraform_path)
+    create_ansible_meta_json(repo_name, credentials_path)
+    get_terraform_vm_data(terraform_path, credentials_path)

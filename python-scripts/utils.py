@@ -100,3 +100,40 @@ def write_json_to_file(data, file_path):
     except (OSError, IOError) as e:
         print(f"Ошибка при записи в файл {file_path}: {e}")
 
+# Универсальная функция для получения пути к файлу
+def get_file_path(repo_name, folder_name, file_name):
+    return os.path.expanduser(f'~/{repo_name}/{folder_name}/{file_name}')
+
+
+# # Универсальная функция для добавления переменной в bashrc
+# def add_env_variable_to_bashrc(variable_name, value):
+#     bashrc_path = os.path.expanduser('~/.bashrc')
+#     with open(bashrc_path, 'a') as bashrc_file:
+#         bashrc_file.write(f'export {variable_name}="{value}"\n')
+#     print(f"Переменная окружения {variable_name} добавлена в {bashrc_path}.")
+
+
+# Универсальная функция для добавления переменной в bashrc
+def add_env_variable_to_bashrc(variable_name, value):
+    bashrc_path = os.path.expanduser('~/.bashrc')
+    
+    # Чтение текущего содержимого .bashrc
+    with open(bashrc_path, 'r') as bashrc_file:
+        lines = bashrc_file.readlines()
+
+    # Проверка на наличие переменной и обновление её значения
+    variable_found = False
+    with open(bashrc_path, 'w') as bashrc_file:
+        for line in lines:
+            if line.startswith(f'export {variable_name}='):
+                # Переменная найдена, заменяем её на новую
+                bashrc_file.write(f'export {variable_name}="{value}"\n')
+                variable_found = True
+                print(f"Переменная окружения {variable_name} обновлена в {bashrc_path}.")
+            else:
+                bashrc_file.write(line)
+
+        # Если переменная не была найдена, добавляем её в конец файла
+        if not variable_found:
+            bashrc_file.write(f'export {variable_name}="{value}"\n')
+            print(f"Переменная окружения {variable_name} добавлена в {bashrc_path}.")

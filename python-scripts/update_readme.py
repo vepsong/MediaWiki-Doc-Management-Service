@@ -51,10 +51,11 @@ if __name__ == "__main__":
     # Используем относительные пути для файлов
     content_files = [
         (os.path.join(base_dir, 'Solution', '2.1. App deployment schema.md'), '<!-- START APP DEPLOYMENT SCHEMA -->', '<!-- END APP DEPLOYMENT SCHEMA -->'),
-        (os.path.join(base_dir, 'Solution', '3.1. Service VM Docker setup.md'), '<!-- START SERVICE VM DOCKER SETUP -->', '<!-- END SERVICE VM DOCKER SETUP -->'),
-        (os.path.join(base_dir, 'Solution', '3.3. YC provider setup for Terraform.md'), '<!-- START YC PROVIDER SETUP FOR TERRAFORM -->', '<!-- END YC PROVIDER SETUP FOR TERRAFORM -->'),
-        (os.path.join(base_dir, 'Solution', '4. Terraform setup.md'), '<!-- START TERRAFORM SETUP -->', '<!-- END TERRAFORM SETUP -->'),
-        (os.path.join(base_dir, 'Solution', '5. Ansible setup.md'), '<!-- START ANSIBLE SETUP -->', '<!-- END ANSIBLE SETUP -->')
+        (os.path.join(base_dir, 'Solution', '3. Add_env_var.md'), '<!-- START ADD_ENV_VAR -->', '<!-- END ADD_ENV_VAR -->'),
+        (os.path.join(base_dir, 'Solution', '4.1. Service VM Docker setup.md'), '<!-- START SERVICE VM DOCKER SETUP -->', '<!-- END SERVICE VM DOCKER SETUP -->'),
+        (os.path.join(base_dir, 'Solution', '4.3. YC provider setup for Terraform.md'), '<!-- START YC PROVIDER SETUP FOR TERRAFORM -->', '<!-- END YC PROVIDER SETUP FOR TERRAFORM -->'),
+        (os.path.join(base_dir, 'Solution', '5. Terraform setup.md'), '<!-- START TERRAFORM SETUP -->', '<!-- END TERRAFORM SETUP -->'),
+        (os.path.join(base_dir, 'Solution', '6. Ansible setup.md'), '<!-- START ANSIBLE SETUP -->', '<!-- END ANSIBLE SETUP -->')
 
     ]
 
