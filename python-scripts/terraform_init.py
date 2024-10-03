@@ -7,6 +7,8 @@ from utils import get_git_repo_name, find_directory_by_pattern, run_command
 def copy_terraform_config(repo_name):
 
     # Преобразуем пути
+    # source_path - Изначальное место хранения ".terraformrc"
+    # destination_path - местоназначение для ".terraformrc"
     source_path = os.path.expanduser(f'~/{repo_name}/credentials/{file_name}')
     destination_path = os.path.expanduser('~/')
 
