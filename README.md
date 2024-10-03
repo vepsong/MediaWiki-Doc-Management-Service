@@ -308,8 +308,8 @@
 	<!-- # [Установка Yandex Cloud CLI](https://yandex.cloud/en-ru/docs/cli/quickstart#install)
 	Интерфейс командной строки Yandex Cloud (CLI) — скачиваемое программное обеспечение для управления облачными ресурсами через командную строку.  -->
 	
-	### Установка и настройка Yandex Cloud CLI
-	Интерфейс командной строки Yandex Cloud (CLI) — скачиваемое программное обеспечение для управления облачными ресурсами через командную строку.
+	### [Установка и настройка Yandex Cloud CLI](# "Интерфейс командной строки Yandex Cloud (CLI) — скачиваемое ПО для управления облачными ресурсами через командную строку.")
+	
 	
 	<details>
 	<summary>Развернуть</summary>   
@@ -336,39 +336,17 @@
 	</details>
 	
 	#### Ручная настройка Yandex Cloud CLI
-	Если по каким-то причинам Yandex Cloud CLI не был добавлен в Docker image
+	Если по каким-то причинам Yandex Cloud CLI не был добавлен в Docker image  
+	[Ссылка на инструкцию с официального сайта Yandex Cloud](https://yandex.cloud/ru/docs/cli/operations/install-cli)
 	
-	<details>
-	<summary>Развернуть</summary>   
-	
-	1. Установка Yandex Cloud CLI 
-	
-	       # Скрипт установит CLI и добавит путь до исполняемого файла в переменную окружения PATH.
-	
-	       curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-	
-	2. Настройка профиля Yandex Cloud CLI  
-	
-	       # Начало настройки профиля
-	
-	       yc init
-	
-	       # Продолжение настройки согласно сообщениям командной строки
-	
-	       # Проверка настроек профиля Yandex Cloud CLI
-	
-	       yc config list
 	</details>
-	
-	</details>  
-	
 	
 	<!-- # [Настройка сервисного аккаунта Yandex Cloud](https://yandex.cloud/ru/docs/ydb/terraform/credentials)
 	
 	Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud -->
 	
-	### Настройка сервисного аккаунта Yandex Cloud
-	Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud
+	### [Настройка сервисного аккаунта Yandex Cloud](# "Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud")
+	
 	
 	<details>
 	<summary>Развернуть</summary>   
@@ -391,74 +369,27 @@
 	</details>
 	
 	#### Ручная настройка сервисного аккаунта Yandex Cloud
-	Если по каким-то причинам сервисный аккаунт Yandex Cloud не получается настроить с помощью скрипта
+	Если по каким-то причинам сервисный аккаунт Yandex Cloud не получается настроить с помощью скрипта  
+	[Ссылка на инструкцию с официального сайта Yandex Cloud](https://yandex.cloud/ru/docs/ydb/terraform/credentials#bash_1)
 	
-	<details>
-	<summary>Развернуть</summary>  
 	
-	1. Создание SSH-ключа для аутентификации Terraform в Yandex Cloud
 	
-	       # id сервисного аккаунта можно посмотреть в web-консоли Yandex-Cloud
 	
-	       yc iam key create \
-	       --service-account-id <id сервисного аккаунта> \
-	       --folder-name default \
-	       --output key.json
-	
-	2. Создание локального профиля yc для выполнения операций от имени сервисного аккаунта
-	
-	       yc config profile create <любое имя профиля>
-	
-	       # Настройка конфигурации профиля
-	
-	       # Ключ, созданный на предыдущем шаге
-	       yc config set service-account-key key.json
-	
-	       # ID облака и ID каталога можно посмотреть в web-консоли Yandex Cloud
-	       yc config set cloud-id <ID облака>
-	       yc config set folder-id <ID каталога>
-	
-	       # Для сохранения доступности переменных после перезагрузки сессии терминала:
-	       nano ~/.bashrc
-	
-	       # Добавляем в конец файла
-	       export YC_TOKEN=$(yc iam create-token)
-	       export YC_CLOUD_ID=$(yc config get cloud-id)
-	       export YC_FOLDER_ID=$(yc config get folder-id)
-	
-	       # Применение изменений
-	       source ~/.bashrc
-	
-	       # Проверка после перезапуска терминала
-	       echo $YC_TOKEN
-	       echo $YC_CLOUD_ID
-	       echo $YC_FOLDER_ID
-	
-	3. Установка провайдера для работы с YDB  
-	        
-	       # Копирование конфигурации облачного провайдера
-	       cp .terraformrc ~/
-	       
-	</details>
-	
-	</details>
 <!-- END YC PROVIDER SETUP FOR TERRAFORM -->
 
     
-4. [Настройка Terraform](/YP-sp13_MediaWiki/Solution/4.%20Terraform%20setup.md)
-
+4. [Настройка Terraform](/YP-sp13_MediaWiki/Solution/4.%20Terraform%20setup.md) с помощью python-скриптов  
+Terraform - инструмент по автоматизации развертывания облачной инфраструктуры
 
 	<!-- START TERRAFORM SETUP -->
 	<!-- # Настройка Terraform для облачного развёртывания виртуальных машин -->
 	
+	<!-- Настройка Terraform с помощью python-скриптов
+	Terraform - инструмент автоматизации развертывания облачной инфраструктуры -->
 	
 	<details>
 	<summary>Развернуть</summary>   
 	
-	#### Автоматическая настройка Terraform
-	
-	<details>
-	<summary>Развернуть</summary>   
 	
 	1. Запуск файла update_meta.py из директории Terraform (где main.tf) для создания/обновления файла meta.txt  
 	
@@ -493,28 +424,11 @@
 	       terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
 	
 	
-	
-	
-	
-	
-	</details>
-	
-	#### Ручная настройка Terraform
-	Если по каким-то причинам python-скрипт 
-	
-	<details>
-	<summary>Развернуть</summary>   
-	
-	1. Создание и ручное наполнение файла meta.txt в директории Terraform (где main.tf) (за основу взять meta_EXAMPLE.txt)
-	
-	    - Файлы с публичными и приватными SSH-ключами создаются в папке ~/.ssh автоматически, при сборке образа и запуске нового контейнера  
-	
-	      Если необходимо использовать те, же ключи, что и на другой, уже развернутой ВМ, то их нужно оттуда вручную скопировать на новую ВМ и запустить скрипт
-	
 	</details>
 <!-- END TERRAFORM SETUP -->
 
-5. [Настройка Ansible](/YP-sp13_MediaWiki/Solution/5.%20Ansible%20setup.md) для автоматической конфигурации инфраструктуры
+5. [Настройка Ansible](/YP-sp13_MediaWiki/Solution/5.%20Ansible%20setup.md) с помощью pyton-скриптов  
+Ansible — инструмент для автоматической конфигурации инфраструктуры
 
 	<!-- START ANSIBLE SETUP -->
 	<!-- # Настройка Ansible для автоматической конфигурации сервиса -->
