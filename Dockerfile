@@ -14,7 +14,9 @@ RUN apk update && apk add --no-cache \
     gnupg \
     ca-certificates \
     sudo \
-    openssh
+    openssh \
+    sshpass \
+    ansible  
 
 # Генерируем SSH-ключи
 RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
