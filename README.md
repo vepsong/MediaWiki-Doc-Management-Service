@@ -276,7 +276,7 @@
 
 ## 3. Деплой
 
-1. [Настройка Docker для развёртывания сервисной ВМ](Solution/3.1.%20Service%20VM%20Docker%20setup.md "Docker setup for deploying a service VM")
+1. [Настройка Docker для развёртывания сервисной ВМ](/YP-sp13_MediaWiki/Solution/3.1.%20Service%20VM%20Docker%20setup.md "Docker setup for deploying a service VM")
     
     <!-- START SERVICE VM DOCKER SETUP -->
 	<!-- # Настройка [Docker](https://www.docker.com/ "Официальный сайт Docker") для развёртывания сервисной ВМ -->
@@ -302,7 +302,7 @@
 	</details>  
 <!-- END SERVICE VM DOCKER SETUP -->
 2. Клонирование git-репозитория на созданную ВМ (в каталог ~)
-3. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/3.3.%20YC%20provider%20setup%20for%20Terraform.md)
+3. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/YP-sp13_MediaWiki/Solution/3.3.%20YC%20provider%20setup%20for%20Terraform.md)
     
 	<!-- START YC PROVIDER SETUP FOR TERRAFORM -->
 	<!-- # [Установка Yandex Cloud CLI](https://yandex.cloud/en-ru/docs/cli/quickstart#install)
@@ -445,7 +445,7 @@
 <!-- END YC PROVIDER SETUP FOR TERRAFORM -->
 
     
-4. [Настройка Terraform](/Solution/4.%20Terraform%20setup.md)
+4. [Настройка Terraform](/YP-sp13_MediaWiki/Solution/4.%20Terraform%20setup.md)
 
 
 	<!-- START TERRAFORM SETUP -->
@@ -513,3 +513,9 @@
 	
 	</details>
 <!-- END TERRAFORM SETUP -->
+
+5. [Настройка Ansible](/YP-sp13_MediaWiki/Solution/5.%20Ansible%20setup.md) для автоматической конфигурации инфраструктуры
+
+<!-- START ANSIBLE SETUP -->
+
+<!-- END ANSIBLE SETUP -->
