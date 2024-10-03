@@ -1,11 +1,11 @@
 import json
 import os
 # Импортируем функцию получения имени репозитория и универсальная функцию для выполнения команд с проверкой результата
-from utils import get_git_repo_name, run_command, add_env_variable_to_bashrc
+from utils import get_git_repo_info, run_command, add_env_variable_to_bashrc
 
 
 # Шаг 1. Получение имени репозитория и построение пути
-repo_name = get_git_repo_name()  # Получаем имя репозитория с помощью utils.py
+repo_name, _, _ = get_git_repo_info()  # Получаем имя репозитория с помощью utils.py
 if not repo_name:
     print("Не удалось получить имя репозитория.")
     exit(1)

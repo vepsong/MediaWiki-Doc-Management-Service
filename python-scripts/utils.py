@@ -3,8 +3,8 @@ import os
 import re
 import json
 
-# Функция для получения имени репозитория
-def get_git_repo_name():
+# Функция для получения имени репозитория и путей
+def get_git_repo_info():
     try:
         print("Запуск команды для получения URL репозитория...")
         result = subprocess.run(['git', 'config', '--get', 'remote.origin.url'], capture_output=True, text=True)
@@ -12,7 +12,16 @@ def get_git_repo_name():
             repo_url = result.stdout.strip()
             repo_name = repo_url.split('/')[-1].replace('.git', '')
             print(f"Название репозитория: {repo_name}")
-            return repo_name
+
+            # Определение путей к репозиторию
+            home_dir = os.path.expanduser("~")
+            repo_relative_path = f"~/{repo_name}"  # Относительный путь с использованием '~'
+            repo_path = os.path.join(home_dir, repo_name)  # Полный путь к репозиторию
+
+            print(f"Относительный путь к репозиторию: {repo_relative_path}")
+            print(f"Полный путь к репозиторию: {repo_path}")
+            
+            return repo_name, repo_relative_path, repo_path
         else:
             print("Ошибка при получении URL репозитория Git.")
     except Exception as e:
@@ -25,28 +34,34 @@ def get_git_repo_name():
             repo_name = input("Введите название репозитория: ").strip()
             if repo_name:
                 print(f"Название репозитория: {repo_name}")
-                return repo_name
+
+                # Определение путей для ручного ввода репозитория
+                home_dir = os.path.expanduser("~")
+                repo_relative_path = f"~/{repo_name}"  # Относительный путь
+                repo_path = os.path.join(home_dir, repo_name)  # Полный путь
+
+                print(f"Относительный путь к репозиторию: {repo_relative_path}")
+                print(f"Абсолютный путь к репозиторию: {repo_path}")
+                
+                return repo_name, repo_relative_path, repo_path
             else:
                 print("Название репозитория не может быть пустым. Пожалуйста, введите корректное имя.")
         elif manual_repo_name == 'n':
             print("Отмена операции. Название репозитория не было получено.")
-            return None
+            return None, None, None
         else:
             print("Некорректный ввод. Пожалуйста, ответьте 'y' (да) или 'n' (нет).")
 
 
 # Универсальная функция для поиска директории по шаблону
 # Например, pattern="Ansible" или file_extension=".tf")
-def find_directory_by_pattern(repo_name=None, pattern=None, file_extension=None):
-    if not repo_name:
+def find_directory_by_pattern(repo_path=None, pattern=None, file_extension=None):
+    if not repo_path:
         print("Название репозитория не передано, пытаюсь получить...")
-        repo_name = get_git_repo_name()
-        if not repo_name:
+        repo_name, repo_relative_path, repo_path = get_git_repo_info()
+        if not repo_path:
             print("Не удалось получить название репозитория.")
-            return None, None
-    
-    # Получаем полный путь до репозитория
-    repo_path = os.path.expanduser(f"~/{repo_name}")
+            return None, None, None
     
     # Если передан шаблон для поиска (например, 'ansible'), то компилируем его в регулярное выражение
     if pattern:
@@ -58,23 +73,27 @@ def find_directory_by_pattern(repo_name=None, pattern=None, file_extension=None)
         if pattern:
             for dir_name in dirs:
                 if search_pattern.search(dir_name):
-                    relative_path = os.path.join(root, dir_name).replace(os.path.expanduser('~'), '~')
+                    dir_relative_path = os.path.join(root, dir_name).replace(os.path.expanduser('~'), '~')
+                    dir_absolute_path = os.path.abspath(os.path.join(root, dir_name)) 
                     print(f"Название папки по шаблону '{pattern}': {dir_name}")
-                    print(f"Относительный путь к папке: {relative_path}")
-                    return relative_path, dir_name
+                    print(f"Относительный путь к папке: {dir_relative_path}")
+                    print(f"Абсолютный путь к папке: {dir_absolute_path}")
+                    return dir_name, dir_relative_path, dir_absolute_path
         
         # Если передано расширение файла для поиска (например, '.tf' для Terraform)
         if file_extension:
             for file in files:
                 if file.endswith(file_extension):
-                    relative_path = root.replace(os.path.expanduser('~'), '~')
+                    folder_relative_path = root.replace(os.path.expanduser('~'), '~')  # Относительный путь
+                    folder_absolute_path = os.path.abspath(root)  # Абсолютный путь к папке с файлом
                     folder_name = os.path.basename(root)
                     print(f"Название папки с файлами '{file_extension}': {folder_name}")
-                    print(f"Относительный путь к папке: {relative_path}")
-                    return relative_path, folder_name
+                    print(f"Относительный путь к папке: {folder_relative_path}")
+                    print(f"Абсолютный путь к папке: {folder_absolute_path}")
+                    return folder_name, folder_relative_path, folder_absolute_path
     
     print(f"Папка или файлы с шаблоном '{pattern}' или расширением '{file_extension}' не найдены в репозитории.")
-    return None, None
+    return None, None, None
 
 
 # Универсальная функция для выполнения команд с проверкой результата

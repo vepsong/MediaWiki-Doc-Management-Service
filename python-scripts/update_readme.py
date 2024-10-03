@@ -1,7 +1,9 @@
 import re
 import os
 # Импортируем функцию получения имени репозитория
-from utils import get_git_repo_name  
+# from utils import get_git_repo_name  
+
+repo_name = os.getenv('REPO_NAME')
 
 def add_indentation(text, indent='\t'):
     """Добавляем отступ (табуляцию) в начало каждой строки."""
