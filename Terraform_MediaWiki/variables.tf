@@ -5,6 +5,13 @@
 # }
 
 
+# Объявляем переменную пути к файлу terraform_meta.txt
+variable "meta_file_path" {
+  description = "Относительный путь к файлу terraform_meta.txt"
+  type     = string
+}
+
+
 # Объявляем переменную group1_unique_names
 variable "group1_unique_vm_names" {
   description = "Уникальные имена для ВМ group1"

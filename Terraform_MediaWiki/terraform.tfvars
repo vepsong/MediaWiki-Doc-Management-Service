@@ -1,6 +1,10 @@
 # Файл динамических переменных terraform.tfvars
 # Переменные используются в файле main.tf
 
+# Переменная пути к файлу terraform_meta.txt
+terraform_meta_txt_file_path = "${path.module}/../YP-sp13_MediaWiki/credentials/terraform_meta.txt"
+
+
 # Общие переменные для group1 (VM-2, VM-3)
 # Стек технологий (Ubuntu 22.04, proxy-Nginx, Zabbix-Server, Keepalived, ZooKeeper, HAProxy)
 group1_vm_cpu    = 2  # Количество ядер процессора

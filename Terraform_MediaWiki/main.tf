@@ -32,12 +32,9 @@ resource "yandex_compute_instance" "group1" {
 
   zone = var.group1_zone  # Зона для создания ВМ
 
-  # metadata = {
-  #   user-data = "${file("${path.module}/meta.txt")}"
-  # }
   metadata = {
     user-data = <<-EOF
-      ${file("${path.module}/meta.txt")}
+      ${file("${path.module}/terraform_meta.txt")}
 
       # Установка hostname для каждой ВМ
       hostname: ${each.value}
@@ -85,7 +82,7 @@ resource "yandex_compute_instance" "group2" {
 
   metadata = {
     user-data = <<-EOF
-      ${file("${path.module}/meta.txt")}
+      ${file("${path.module}/terraform_meta.txt")}
 
       # Установка hostname для каждой ВМ
       hostname: ${each.value}
@@ -131,7 +128,7 @@ resource "yandex_compute_instance" "group3" {
 
   metadata = {
     user-data = <<-EOF
-      ${file("${path.module}/meta.txt")}
+      ${file("${path.module}/terraform_meta.txt")}
 
       # Установка hostname для каждой ВМ
       hostname: ${each.value}
@@ -176,15 +173,12 @@ resource "yandex_compute_instance" "group4" {
 
   zone = var.group4_zone  # Зона для создания ВМ
 
-  # metadata = {
-  #   user-data = "${file("${path.module}/meta.txt")}"
-  # }
 
   # Используем внешний файл для основных метаданных + добавляем команды для монтирования диска
   metadata = {
 
     user-data = <<-EOF
-      ${file("${path.module}/meta.txt")}
+      ${file("${path.module}/terraform_meta.txt")}
 
       # Установка hostname для каждой ВМ
       hostname: ${each.value}
