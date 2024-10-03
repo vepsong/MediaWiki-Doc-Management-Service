@@ -517,5 +517,13 @@
 5. [Настройка Ansible](/YP-sp13_MediaWiki/Solution/5.%20Ansible%20setup.md) для автоматической конфигурации инфраструктуры
 
 <!-- START ANSIBLE SETUP -->
-
+	<!-- # Настройка Ansible для автоматической конфигурации сервиса -->
+	
+	
+	<details>
+	<summary>Развернуть</summary>   
+	
+	1. dsdsadsa
+	
+	2. dsadsadsadsa
 <!-- END ANSIBLE SETUP -->
