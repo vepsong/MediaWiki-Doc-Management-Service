@@ -310,7 +310,7 @@
 2. Клонирование git-репозитория на созданную ВМ (в каталог ~)
 
 
-3. [Подготовительная работа](/Solution/3.4.%20preparatory_tasks.md)
+3. [Подготовительная работа](/Solution/3.3.%20preparatory_tasks.md)
 
 	<!-- START PREPARATORY TASKS -->
 	<!-- Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения -->
