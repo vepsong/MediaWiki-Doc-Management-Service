@@ -25,29 +25,12 @@ def check_ssh_public_key(ssh_public_key_path):
 def create_terraform_meta_content(ssh_key):
     """Создает содержимое для файла terraform_meta.txt с переданным SSH-ключом."""
     try:
-        # Спрашиваем у пользователя, хочет ли он оставить данные по умолчанию или изменить их
-        choice = input("Нажмите enter, чтобы оставить текущие данные, или введите 'change', чтобы изменить их: ").strip().lower()
-
-        if choice == 'change':
-            # Запрашиваем пользовательские значения
-            print("Пустой ввод оставит значение поля по-умолчанию")
-            name = input("Введите значение для 'name' (default: root): ") or "root"
-            groups = input("Введите значение для 'groups' (default: sudo): ") or "sudo"
-            shell = input("Введите значение для 'shell' (default: /bin/bash): ") or "/bin/bash"
-            sudo = input("Введите значение для 'sudo' (default: 'ALL=(ALL) NOPASSWD:ALL'): ") or "ALL=(ALL) NOPASSWD:ALL"
-        else:
-            # Используем значения по умолчанию
-            name = "root"
-            groups = "sudo"
-            shell = "/bin/bash"
-            sudo = "ALL=(ALL) NOPASSWD:ALL"
-
         terraform_meta_content = f"""#cloud-config
 users:
-  - name: {name}
-    groups: {groups}
-    shell: {shell}
-    sudo: '{sudo}'
+  - name: root
+    groups: sudo
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
     ssh-authorized-keys:
       - {ssh_key}
 """
