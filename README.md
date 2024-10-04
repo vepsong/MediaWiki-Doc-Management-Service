@@ -345,7 +345,7 @@
 	</details>
 <!-- END PREPARATORY TASKS --> 	
 
-4. [Запуск конвеера по автоматическому запуску и инициализации всех необходимых процессов ](/Solution/4.3.%20start_pipeline.md)
+4. [Запуск конвеера](/Solution/4.3.%20start_pipeline.md). Автоматический запуск и инициализация Yandex Cloud, Terrraform
 
 	<!-- START START PIPELINE -->
 	<details>
@@ -371,6 +371,8 @@
 	
 	      - Основные команды для запуска Terraform  
 	      Выполнять из директории с файлами Terraform
+	        <details>
+	        <summary>Развернуть</summary>  
 	      
 	            # Проверка синтаксиса всех файлов формата tf 
 	            terraform validate
@@ -393,7 +395,7 @@
 	            # Пересоздание ресурса
 	            # terraform taint помечает ресурс как "поврежденный"
 	            terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
-	
+	        </details>
 	    
 	</details>
 	
