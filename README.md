@@ -455,8 +455,8 @@ Ansible — инструмент для автоматической конфи�
 	<summary>Развернуть</summary>   
 	
 	
-	1. Запуск Python-скрипта [**get_terraform_vm_data.py**](python-scripts/get_terraform_vm_data.py) для автоматического формирования terraform_vm_data.json в ~/<имя репозитория>/credentials  
-	Этот файл содержит 
+	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py)  
+	Cкрипт содержит в себе вызовы скриптов: [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) и [update_ansible_meta.py](python-scripts/update_ansible_meta.py) для автоматического и динамического формирования inventory.yaml
 	
 	2. dsadsadsadsa
 	

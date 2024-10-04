@@ -14,7 +14,8 @@ env_var_dic = load_and_check_env_vars(env_vars)
 
 # Шаг 1: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
-    run_command(["python3", path_to_script])
+    comand = ["python3", path_to_script]
+    run_command(comand, capture_output=False)
 
 # Шаг 2: Загрузка данных из JSON-файлов
 def load_json_data(file_path):

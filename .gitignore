@@ -14,6 +14,7 @@ key.json
 terraform_meta.txt
 terraform_vm_data.json
 ansible_meta.json
+inventory.yaml
 
 # Служебные файлы Terraform
 .terraform.lock.hcl

@@ -15,6 +15,7 @@ def create_ansible_meta_content():
     """Создает содержимое для файла ansible_meta.json."""
     try:
         # Спрашиваем у пользователя, хочет ли он оставить данные по умолчанию или изменить их
+        print(f"Выполнение {file_name}")
         choice = input("Нажмите enter, чтобы оставить данные по-умолчанию, или введите 'change', чтобы изменить их: ").strip().lower()
 
         if choice == 'change':
@@ -23,9 +24,8 @@ def create_ansible_meta_content():
             ansible_user = input("Введите значение для 'ansible_user' (default: root): ") or "root"
             ansible_password = input("Введите значение для 'ansible_password' (default: ""): ") or ""
             connection_protocol = input("Введите значение для 'connection_protocol' (default: ssh): ") or "ssh"
-            # ansible_become = input("Введите значение для 'ansible_become' (default: False): ") or False
+            
             # Для ansible_become: принимаем только True/False и преобразуем в булевое значение
-
             while True:
                 ansible_become_input = input("Введите значение для 'ansible_become' (True/False, default: False): ")
                 if ansible_become_input.lower() in ["true", "false", ""]:
@@ -33,7 +33,7 @@ def create_ansible_meta_content():
                     break
                 else:
                     print("Ошибка ввода! Введите 'True' или 'False'.")
-                    
+
         else:
             # Используем значения по умолчанию
             ansible_user = "root"

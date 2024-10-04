@@ -98,14 +98,11 @@ def find_directory_by_pattern(repo_path=None, pattern=None, file_extension=None)
 
 
 # Универсальная функция для выполнения команд с проверкой результата
-def run_command(command, cwd=None):
+def run_command(command, cwd=None, capture_output=True):
     try:
-        # result = subprocess.run(command, check=True)
-        result = subprocess.run(command, check=True, capture_output=True, text=True, cwd=cwd)
+        result = subprocess.run(command, check=True, capture_output=capture_output, text=True, cwd=cwd)
         print(f"Команда '{' '.join(command)}' успешно выполнена.")
-        # return result.returncode  # Возвращаем код завершения
-        # print(result.returncode)
-        return result.stdout # Возвращаем вывод команды
+        return result.stdout if capture_output else None
     except subprocess.CalledProcessError as e:
         print(f"Ошибка при выполнении команды: {e}")
         return e.returncode  # Возвращаем код ошибки
