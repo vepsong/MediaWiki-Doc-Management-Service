@@ -1,4 +1,4 @@
-from utils import run_command, add_env_variable_to_bashrc, load_and_check_env_vars, load_json_data
+from utils import run_command, load_and_check_env_vars, load_json_data
 
 # Имена переменных, которые нужно загрузить
 env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
@@ -52,18 +52,6 @@ def configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path):
     run_command(command_cloud_id)
     run_command(command_folder_id)
 
-# Шаг 4. Добавление переменных окружения в ~/.bashrc
-def configure_bashrc():
-    add_env_variable_to_bashrc('YC_TOKEN', '$(yc iam create-token)')
-    add_env_variable_to_bashrc('YC_CLOUD_ID', '$(yc config get cloud-id)')
-    add_env_variable_to_bashrc('YC_FOLDER_ID', '$(yc config get folder-id)')
-
-    # Используем bash для выполнения source
-    command = ['bash', '-c', f"source ~/.bashrc"]
-    run_command(command)
-
-    print("Для проверки переменных окружения перезапустить терминал и ввести: echo $<переменная окружения>")
-
 
 # Выполнение всех шагов
 if __name__ == "__main__":
@@ -86,5 +74,3 @@ if __name__ == "__main__":
     create_yc_profile(yc_meta_file_data)
     # Настройка локального профиля yc
     configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path)
-    # Добавление переменных окружения в ~/.bashrc
-    configure_bashrc()

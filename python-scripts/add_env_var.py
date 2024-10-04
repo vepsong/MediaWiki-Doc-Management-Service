@@ -87,7 +87,16 @@ def configure_bashrc_credentials(repo_path):
         add_env_variable_to_bashrc('CREDENTIALS_DIR_ABSOLUTE_PATH', credentials_dir_absolute_path)
 
 
-# Шаг 6. Применение изменений в переменных окружения (~/.bashrc)
+# Шаг 6. Добавление данных Yandex Cloud в переменные окружения (~/.bashrc)
+def configure_bashrc_yandex_cloud():
+    """Добавление данных Yandex Cloud в переменные окружения (~/.bashrc)."""
+    add_env_variable_to_bashrc('YC_TOKEN', '$(yc iam create-token)')
+    add_env_variable_to_bashrc('YC_CLOUD_ID', '$(yc config get cloud-id)')
+    add_env_variable_to_bashrc('YC_FOLDER_ID', '$(yc config get folder-id)')
+
+
+
+# Шаг 7. Применение изменений в переменных окружения (~/.bashrc)
 def apply_changes():
     """Применение изменений в переменных окружения (~/.bashrc)."""
 
@@ -95,7 +104,7 @@ def apply_changes():
     run_command(command)
 
 
-# Шаг 7. Проверка настроек после перезагрузки терминала
+# Шаг 8. Проверка настроек после перезагрузки терминала
 def check_env_variables():
     print("Для проверки переменных окружения перезапусти терминал и введи в командную строку следующие команды:")
     print("echo $<ИМЯ ПЕРЕМЕННОЙ ОКРУЖЕНИЯ>")
@@ -108,5 +117,6 @@ if __name__ == "__main__":
     configure_bashrc_ansible(repo_path)
     configure_bashrc_python_scripts(repo_path)
     configure_bashrc_credentials(repo_path)
+    configure_bashrc_yandex_cloud()
     apply_changes()
     check_env_variables()

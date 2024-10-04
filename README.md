@@ -276,7 +276,7 @@
 
 ## 3. Деплой
 
-1. [Настройка Docker для развёртывания сервисной ВМ](/Solution/3.1.%20Service%20VM%20Docker%20setup.md "Docker setup for deploying a service VM")
+1. [Настройка Docker для развёртывания сервисной ВМ](/Solution/3.1.%20service_vm_docker_setup.md "Docker setup for deploying a service VM")
     
     <!-- START SERVICE VM DOCKER SETUP -->
 	<!-- # Настройка [Docker](https://www.docker.com/ "Официальный сайт Docker") для развёртывания сервисной ВМ -->
@@ -310,50 +310,45 @@
 2. Клонирование git-репозитория на созданную ВМ (в каталог ~)
 
 
-3. Установка переменных окружения 
+3. [Подготовительная работа](/Solution/3.4.%20preparatory_tasks.md)
 
-	<!-- START ADD_ENV_VAR -->
+	<!-- START PREPARATORY TASKS -->
 	<!-- Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения -->
-	Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения
-<!-- END ADD_ENV_VAR --> 	
+	
+	<details>
+	<summary>Развернуть</summary>  
+	
+	1. Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения
+	2. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
+	
+	       В ~/<имя репозитория>/credentials создать yc_meta.json и наполнить его данными из web-консоли Yandex Cloud
+	       
+	       Для примера использовать ~/<имя репозитория>/credentials/templates/yc_meta_EXAMPLE.json
+	
+	3. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — **.terraformrc**
+	
+	       В ~/<имя репозитория>/credentials создать .terraformrc и наполнить его данными из документации Yandex Cloud
+	
+	       Для примера можно использовать ~/<имя репозитория>/credentials/templates/.terraformrc_EXAMPLE
+	
+	    [Ссылка на документацию](https://yandex.cloud/ru/docs/ydb/terraform/install)
+	
+	4. Настройка профиля Yandex Cloud CLI  (если не был настроен ранее)
+	
+	       # Начало настройки профиля
+	       yc init
+	
+	       # Продолжение настройки согласно сообщениям командной строки
+	
+	       # Проверка настроек профиля Yandex Cloud CLI
+	       yc config list
+	
+	</details>
+<!-- END PREPARATORY TASKS --> 	
 
-4. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/3.3.%20YC%20provider%20setup%20for%20Terraform.md)
+4. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/4.3.%20YC%20provider%20setup%20for%20Terraform.md)
 
 	<!-- START YC PROVIDER SETUP FOR TERRAFORM -->
-	<!-- # [Установка Yandex Cloud CLI](https://yandex.cloud/en-ru/docs/cli/quickstart#install)
-	Интерфейс командной строки Yandex Cloud (CLI) — скачиваемое программное обеспечение для управления облачными ресурсами через командную строку.  -->
-	
-	- #### [Установка и настройка Yandex Cloud CLI](# "Интерфейс командной строки Yandex Cloud (CLI) — скачиваемое ПО для управления облачными ресурсами через командную строку.")
-	
-	
-	  <details>
-	  <summary>Развернуть</summary>   
-	
-	  #### Автоматическая настройка Yandex Cloud CLI
-	
-	  <details>
-	  <summary>Развернуть</summary>   
-	
-	  1. Установка Yandex Cloud CLI  
-	      - Ничего дополнительно устанавливать не нужно. Установка произошла на этапе сборки Docker image
-	
-	  2. Настройка профиля Yandex Cloud CLI  
-	
-	         # Начало настройки профиля
-	         yc init
-	
-	         # Продолжение настройки согласно сообщениям командной строки
-	
-	         # Проверка настроек профиля Yandex Cloud CLI
-	         yc config list
-	  </details>
-	
-	  #### Ручная настройка Yandex Cloud CLI
-	  Если по каким-то причинам Yandex Cloud CLI не был добавлен в Docker image  
-	  [Ссылка на инструкцию с официального сайта Yandex Cloud](https://yandex.cloud/ru/docs/cli/operations/install-cli)
-	
-	  </details>
-	
 	<!-- # [Настройка сервисного аккаунта Yandex Cloud](https://yandex.cloud/ru/docs/ydb/terraform/credentials)
 	
 	Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud -->
@@ -369,28 +364,12 @@
 	  <details>
 	  <summary>Развернуть</summary>   
 	
-	  1. Создание файла с данными для аутентификации в Yandex Cloud
-	        
-	         # В ~/<имя репозитория>/credentials создать yc_meta.json и наполнить его данными из web-консоли Yandex Cloud
-	         # Для примера использовать ~/<имя репозитория>/credentials/templates/yc_meta_EXAMPLE.json
+	  1. Запуск Python-скрипта [**yc_service_account_configuration.py**](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
 	
-	  2. Запуск Python-скрипта [**yc_service_account_configuration.py**](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
-	
-	  3. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — .terraformrc
-	
-	         # В ~/<имя репозитория>/credentials создать .terraformrc и наполнить его данными из документации Yandex Cloud
-	         # Для примера можно использовать ~/<имя репозитория>/credentials/templates/.terraformrc_EXAMPLE
-	
-	       [Ссылка на документацию](https://yandex.cloud/ru/docs/ydb/terraform/install)
-	  
-	  4. Запуск Python-скрипта [**terraform_init.py**](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB  
+	  2. Запуск Python-скрипта [**terraform_init.py**](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB  
 	        
 	
 	  </details>
-	
-	  #### Ручная настройка сервисного аккаунта Yandex Cloud
-	  Если по каким-то причинам сервисный аккаунт Yandex Cloud не получается настроить с помощью скрипта  
-	  [Ссылка на инструкцию с официального сайта Yandex Cloud](https://yandex.cloud/ru/docs/ydb/terraform/credentials#bash_1)
 	
 	
 	
