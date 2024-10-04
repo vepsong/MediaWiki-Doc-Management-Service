@@ -354,11 +354,12 @@
 	<details>
 	<summary>Развернуть</summary>  
 	
-	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py) для автоматического и динамического формирования inventory.yaml
+	1. Запуск Python-скрипта [**yc_and_terraform_provider_init.py**](python-scripts/update_ansible_inventory.py)
 	
 	- Cкрипт содержит в себе вызовы скриптов: 
-	  - [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) 
-	  - [update_ansible_meta.py](python-scripts/update_ansible_meta.py)
+	  - [yc_service_account_configuration.py](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
+	
+	  - [terraform_init.py](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB  
 	
 	
 	
