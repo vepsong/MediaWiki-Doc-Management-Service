@@ -349,27 +349,22 @@
 4. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/4.3.%20YC%20provider%20setup%20for%20Terraform.md)
 
 	<!-- START YC PROVIDER SETUP FOR TERRAFORM -->
-	<!-- # [Настройка сервисного аккаунта Yandex Cloud](https://yandex.cloud/ru/docs/ydb/terraform/credentials)
+	<!-- [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/4.3.%20YC%20provider%20setup%20for%20Terraform.md) -->
 	
-	Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud -->
+	<details>
+	<summary>Развернуть</summary>  
 	
-	- #### [Настройка сервисного аккаунта Yandex Cloud](# "Сервисный аккаунт необходим для аутентификации и управления ресурсами Yandex Cloud")
+	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py) для автоматического и динамического формирования inventory.yaml
+	
+	- Cкрипт содержит в себе вызовы скриптов: 
+	  - [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) 
+	  - [update_ansible_meta.py](python-scripts/update_ansible_meta.py)
 	
 	
-	  <details>
-	  <summary>Развернуть</summary>   
 	
-	  #### Автоматическая настройка сервисного аккаунта Yandex Cloud
-	
-	  <details>
-	  <summary>Развернуть</summary>   
-	
-	  1. Запуск Python-скрипта [**yc_service_account_configuration.py**](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
-	
-	  2. Запуск Python-скрипта [**terraform_init.py**](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB  
 	        
 	
-	  </details>
+	</details>
 	
 	
 	
@@ -441,18 +436,21 @@ Ansible — инструмент для автоматической конфи�
 	<summary>Развернуть</summary>   
 	
 	
-	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py)  
-	Cкрипт содержит в себе вызовы скриптов: [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) и [update_ansible_meta.py](python-scripts/update_ansible_meta.py) для автоматического и динамического формирования inventory.yaml
+	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py) для автоматического и динамического формирования inventory.yaml
+	
+	- Cкрипт содержит в себе вызовы скриптов: 
+	  - [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) 
+	  - [update_ansible_meta.py](python-scripts/update_ansible_meta.py)
 	       
-	       # update_ansible_inventory.py содержит словарь dynamic_groups
-	       # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
-	       # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
+	        # update_ansible_inventory.py содержит словарь dynamic_groups
+	        # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
+	        # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
 	
-	       # Просмотреть список созданных через Terraform ВМ      
-	       ~/<имя репозитория>/<папка Terraform> terraform output
+	        # Просмотреть список созданных через Terraform ВМ      
+	        ~/<имя репозитория>/<папка Terraform> terraform output
 	
-	       напр.:
-	       ~/YP-sp13_MediaWiki/Terraform_MediaWiki# terraform output
+	        напр.:
+	        ~/YP-sp13_MediaWiki/Terraform_MediaWiki# terraform output
 	
 	
 	2. dsadsadsadsa
