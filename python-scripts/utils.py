@@ -2,6 +2,7 @@ import subprocess
 import os
 import re
 import json
+import yaml
 
 # Функция для получения имени репозитория и путей
 def get_git_repo_info():
@@ -128,6 +129,27 @@ def write_txt_to_file(data, file_path):
         print(f"Файл {file_path} успешно создан.")
     except (OSError, IOError) as e:
         print(f"Ошибка при записи в файл {file_path}: {e}")
+
+# # Универсальная функция для записи данных в YAML файл
+# def write_yaml_to_file(data, file_path):
+#     """Записывает данные в YAML файл."""
+#     try:
+#         with open(file_path, 'w') as yaml_file:
+#             yaml.dump(data, yaml_file, default_flow_style=False, allow_unicode=True)
+#         print(f"Файл {file_path} успешно создан.")
+#     except (OSError, IOError) as e:
+#         print(f"Ошибка при записи в файл {file_path}: {e}")
+
+# Универсальная функция для записи данных в yaml-файл
+def write_yaml_to_file(data, file_path):
+    """Записывает данные в YAML файл."""
+    try:
+        with open(file_path, 'w') as yaml_file:
+            yaml.dump(data, yaml_file, default_flow_style=False, sort_keys=False, Dumper=yaml.SafeDumper)
+        print(f"Файл {file_path} успешно создан.")
+    except (OSError, IOError) as e:
+        print(f"Ошибка при записи в файл {file_path}: {e}")
+
 
 # Универсальная функция для получения пути к файлу
 def get_file_path(repo_name, folder_name, file_name):

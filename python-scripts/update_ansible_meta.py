@@ -23,13 +23,23 @@ def create_ansible_meta_content():
             ansible_user = input("Введите значение для 'ansible_user' (default: root): ") or "root"
             ansible_password = input("Введите значение для 'ansible_password' (default: ""): ") or ""
             connection_protocol = input("Введите значение для 'connection_protocol' (default: ssh): ") or "ssh"
-            ansible_become = input("Введите значение для 'ansible_become' (default: false): ") or "false"
+            # ansible_become = input("Введите значение для 'ansible_become' (default: False): ") or False
+            # Для ansible_become: принимаем только True/False и преобразуем в булевое значение
+
+            while True:
+                ansible_become_input = input("Введите значение для 'ansible_become' (True/False, default: False): ")
+                if ansible_become_input.lower() in ["true", "false", ""]:
+                    ansible_become = ansible_become_input.lower() == "true" if ansible_become_input else False
+                    break
+                else:
+                    print("Ошибка ввода! Введите 'True' или 'False'.")
+                    
         else:
             # Используем значения по умолчанию
             ansible_user = "root"
             ansible_password = ""
             connection_protocol = "ssh"
-            ansible_become = "false"
+            ansible_become = False
 
         data = {
             "ansible_user": ansible_user,

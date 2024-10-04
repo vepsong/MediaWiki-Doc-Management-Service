@@ -13,10 +13,11 @@ def configure_bashrc():
     if repo_path:
         add_env_variable_to_bashrc('REPO_PATH', repo_path)
 
-    # Получаем путь к Terraform, Ansible и credentials папкам
+    # Получаем путь к Terraform, Ansible, python-scripts и credentials папкам
     terraform_folder_name, terraform_folder_relative_path, terraform_folder_absolute_path = find_directory_by_pattern(repo_path, file_extension='.tf')
     ansible_dir_name, ansible_dir_relative_path, ansible_dir_absolute_path = find_directory_by_pattern(repo_path, pattern='Ansible')
     credentials_dir_name, credentials_dir_relative_path, credentials_dir_absolute_path = find_directory_by_pattern(repo_path, pattern='credentials')
+    python_scripts_dir_name, python_scripts_dir_relative_path, python_scripts_dir_absolute_path = find_directory_by_pattern(repo_path, pattern='python-scripts')
 
     if terraform_folder_name:
         add_env_variable_to_bashrc('TERRAFORM_FOLDER_NAME', terraform_folder_name)
@@ -31,6 +32,13 @@ def configure_bashrc():
         add_env_variable_to_bashrc('ANSIBLE_DIR_RELATIVE_PATH', ansible_dir_relative_path)
     if ansible_dir_absolute_path:
         add_env_variable_to_bashrc('ANSIBLE_DIR_ABSOLUTE_PATH', ansible_dir_absolute_path)
+
+    if python_scripts_dir_name:
+        add_env_variable_to_bashrc('PYTHON_SCRIPTS_DIR_NAME', python_scripts_dir_name)
+    if python_scripts_dir_relative_path:
+        add_env_variable_to_bashrc('PYTHON_SCRIPTS_DIR_RELATIVE_PATH', python_scripts_dir_relative_path)
+    if python_scripts_dir_absolute_path:
+        add_env_variable_to_bashrc('PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH', python_scripts_dir_absolute_path)
 
     if credentials_dir_name:
         add_env_variable_to_bashrc('CREDENTIALS_DIR_NAME', credentials_dir_name)
@@ -47,13 +55,7 @@ def configure_bashrc():
 # Шаг 2. Проверка настроек после перезагрузки терминала
 def check_env_variables():
     print("Для проверки переменных окружения перезапусти терминал и введи в командную строку следующие команды:")
-    print("echo $REPO_NAME")
-    print("echo $REPO_RELATIVE_PATH")
-    print("echo $REPO_PATH")
-    print("echo $TERRAFORM_RELATIVE_PATH")
-    print("echo $TERRAFORM_FOLDER_NAME")
-    print("echo $ANSIBLE_RELATIVE_PATH")
-    print("echo $ANSIBLE_FOLDER_NAME")
+    print("echo $<ИМЯ ПЕРЕМЕННОЙ ОКРУЖЕНИЯ>")
 
 
 # Выполнение всех шагов
