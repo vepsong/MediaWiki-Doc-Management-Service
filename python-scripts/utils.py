@@ -119,6 +119,16 @@ def write_json_to_file(data, file_path):
     except (OSError, IOError) as e:
         print(f"Ошибка при записи в файл {file_path}: {e}")
 
+# Универсальная функция для записи данных в txt-файл
+def write_txt_to_file(data, file_path):
+    """Записывает текстовые данные в txt-файл."""
+    try:
+        with open(file_path, 'w') as txt_file:
+            txt_file.write(data)
+        print(f"Файл {file_path} успешно создан.")
+    except (OSError, IOError) as e:
+        print(f"Ошибка при записи в файл {file_path}: {e}")
+
 # Универсальная функция для получения пути к файлу
 def get_file_path(repo_name, folder_name, file_name):
     return os.path.expanduser(f'~/{repo_name}/{folder_name}/{file_name}')

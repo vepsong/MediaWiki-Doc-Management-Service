@@ -1,6 +1,14 @@
 import os
 import json
-from utils import get_git_repo_name, find_directory_by_pattern, run_command, write_json_to_file, get_file_path
+# from utils import get_git_repo_info, find_directory_by_pattern, run_command, write_json_to_file, get_file_path
+
+from utils import load_and_check_env_vars, write_json_to_file, run_command
+
+# Имена переменных, которые нужно загрузить
+env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
+
+# Проверяем наличие переменных окружения и добавляем их в словарь
+env_var_dic = load_and_check_env_vars(env_vars)
 
 
 # Функция для запроса данных у пользователя Ansible
@@ -20,8 +28,8 @@ def create_ansible_meta_json(repo_name, credentials_path):
         if os.path.exists(ansible_meta_json_file_path) and os.path.getsize(ansible_meta_json_file_path) > 0:
             with open(ansible_meta_json_file_path, 'r') as config_file:
                 config = json.load(config_file)
-            ansible_user = config.get('ansible_user')
-            ansible_password = config.get('ansible_password')
+            # ansible_user = config.get('ansible_user')
+            # ansible_password = config.get('ansible_password')
             print(f"Файл {ansible_meta_json_file_path} найден. Параметры загружены.")
 
             # Проверка, хочет ли пользователь заменить данные
@@ -55,10 +63,11 @@ def get_terraform_vm_data(terraform_path, credentials_path):
 
 
 if __name__ == '__main__':
-    repo_name = get_git_repo_name()  # Получаем имя репозитория
-    credentials_path = get_file_path(repo_name, 'credentials', '')  # Путь к папке с credentials
-    _, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf")  # Получаем название папки с файлами Terraform
-    terraform_path = get_file_path(repo_name, terraform_folder_name, '')  # Путь к папке с Terraform
+
+    file_name = "ansible_meta.json" # Имя файла
+    ansible_meta_json_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{file_name}' # Абсолютный путь до файла "ansible_meta.json" в папке "credentials"
+    terraform_path = env_var_dic["TERRAFORM_ABSOLUTE_PATH"] # Абсолютный путь до папки "Terraform"
+
 
     create_ansible_meta_json(repo_name, credentials_path)
     get_terraform_vm_data(terraform_path, credentials_path)

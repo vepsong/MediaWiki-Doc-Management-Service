@@ -31,9 +31,10 @@ credentials_dir = os.path.dirname(json_file)  # Получаем директо�
 key_file_path = os.path.join(credentials_dir, 'key.json')  # Путь для key.json
 
 
-# Шаг 2. Создание SSH-ключа для аутентификации Terraform в Yandex Cloud
-def create_ssh_key():
-    print("Создание SSH-ключа для аутентификации...")
+# Шаг 2. Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)
+def create_service_yc_account_ssh_key():
+    """Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)."""
+
     command = [
         'yc', 'iam', 'key', 'create',
         '--service-account-id', service_account_id,
