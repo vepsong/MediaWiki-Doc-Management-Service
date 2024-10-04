@@ -12,7 +12,7 @@ dynamic_groups = {
     "linux": {
         "nginx": ["vm-2", "vm-3"],
         "database": ["vm-4"],
-        "3": ["vm-5", "vm-6"]
+        "g3": ["vm-5", "vm-6"]
     }
 }
 
