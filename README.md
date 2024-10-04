@@ -318,14 +318,13 @@
 	<details>
 	<summary>Развернуть</summary>  
 	
-	1. Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения
-	2. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
+	1. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
 	
 	       В ~/<имя репозитория>/credentials создать yc_meta.json и наполнить его данными из web-консоли Yandex Cloud
 	       
 	       Для примера использовать ~/<имя репозитория>/credentials/templates/yc_meta_EXAMPLE.json
 	
-	3. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — **.terraformrc**
+	2. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — **.terraformrc**
 	
 	       В ~/<имя репозитория>/credentials создать .terraformrc и наполнить его данными из документации Yandex Cloud
 	
@@ -333,7 +332,7 @@
 	
 	    [Ссылка на документацию](https://yandex.cloud/ru/docs/ydb/terraform/install)
 	
-	4. Настройка профиля Yandex Cloud CLI  (если не был настроен ранее)
+	3. Настройка профиля Yandex Cloud CLI  (если не был настроен ранее)
 	
 	       # Начало настройки профиля
 	       yc init
@@ -346,88 +345,64 @@
 	</details>
 <!-- END PREPARATORY TASKS --> 	
 
-4. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/4.3.%20YC%20provider%20setup%20for%20Terraform.md)
+4. [Запуск конвеера по автоматическому запуску и инициализации всех необходимых процессов ](/Solution/4.3.%20start_pipeline.md)
 
-	<!-- START YC PROVIDER SETUP FOR TERRAFORM -->
-	<!-- [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/4.3.%20YC%20provider%20setup%20for%20Terraform.md) -->
-	
+	<!-- START START PIPELINE -->
 	<details>
 	<summary>Развернуть</summary>  
 	
-	1. Запуск Python-скрипта [**yc_and_terraform_provider_init.py**](python-scripts/update_ansible_inventory.py)
+	1. Запуск Python-скрипта [**start_pipeline.py**](python-scripts/start_pipeline.py.py).
+	Конвеер, автоматически запускающий и инициализирующий все необходимые процессы
 	
 	- Cкрипт содержит в себе вызовы скриптов: 
+	  - [add_env_var.py](python-scripts/add_env_var.py) для автоматической установки переменных окружения
+	
 	  - [yc_service_account_configuration.py](python-scripts/yc_service_account_configuration.py) для автоматической настройки аккаунта Yandex Cloud
 	
-	  - [terraform_init.py](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB  
+	  - [terraform_init.py](python-scripts/terraform_init.py) для автоматической установки провайдера для работы с YDB
 	
+	  - [update_terraform_meta.py](python-scripts/update_terraform_meta.py) для автоматического формирования terraform_meta.txt  
 	
+	      - Файлы с публичными и приватными SSH-ключами создаются в папке ~/.ssh автоматически при сборке образа и запуске нового контейнера
 	
-	        
+	      - Если необходимо использовать те, же ключи, что и на другой, уже развернутой ВМ, то их нужно оттуда вручную скопировать на новую ВМ и запустить скрипт
 	
+	      - Файлы main.tf, output.tf, providers.tf, terraform.tfstate уже сконфигурированы. Ничего менять не нужно
+	
+	      - Основные команды для запуска Terraform  
+	      Выполнять из директории с файлами Terraform
+	      
+	            # Проверка синтаксиса всех файлов формата tf 
+	            terraform validate
+	               
+	            # Планирование и проверка того, что будет сделано Terraform  
+	            terraform plan
+	
+	            # Начало работы и деплоя Terraform. 
+	            terraform apply -auto-approve
+	
+	            # Удаление всех созданных ресурсов
+	            terraform destroy -auto-approve
+	
+	            # Остановка созданных ресурсов
+	            # Получение списка ВМ
+	            yc compute instance list
+	            # Остановка нужной ВМ
+	            yc compute instance stop --id <instance-id> 
+	
+	            # Пересоздание ресурса
+	            # terraform taint помечает ресурс как "поврежденный"
+	            terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
+	
+	    
 	</details>
 	
 	
 	
 	
-<!-- END YC PROVIDER SETUP FOR TERRAFORM -->
+<!-- END START PIPELINE -->
 
-
-
-
-
-
-5. [Настройка Terraform](/Solution/4.%20Terraform%20setup.md) с помощью python-скриптов  
-Terraform - инструмент по автоматизации развертывания облачной инфраструктуры
-
-	<!-- START TERRAFORM SETUP -->
-	<!-- Настройка Terraform с помощью python-скриптов
-	Terraform - инструмент по автоматизации развертывания облачной инфраструктуры -->
-	
-	<details>
-	<summary>Развернуть</summary>   
-	
-	
-	1. Запуск Python-скрипта [**update_terraform_meta.py**](python-scripts/update_terraform_meta.py) для автоматического формирования terraform_meta.txt
-	
-	    - Файлы с публичными и приватными SSH-ключами создаются в папке ~/.ssh автоматически при сборке образа и запуске нового контейнера  
-	
-	      Если необходимо использовать те, же ключи, что и на другой, уже развернутой ВМ, то их нужно оттуда вручную скопировать на новую ВМ и запустить скрипт
-	
-	2. Файлы main.tf, output.tf, providers.tf, terraform.tfstate уже сконфигурированы. Ничего менять не нужно.
-	3. Основные команды для запуска Terraform  
-	
-	       # Проверка синтаксиса всех файлов формата tf  
-	       terraform validate
-	
-	       # Планирование и проверка того, что будет сделано Terraform  
-	       terraform plan
-	
-	       # Начало работы и деплоя Terraform.
-	       # -auto-approve используется для автоматического подтверждения действия  
-	       terraform apply -auto-approve
-	
-	       # Удаление всех созданных ресурсов
-	       terraform destroy -auto-approve
-	
-	       # Остановка созданных ресурсов
-	       # Получение списка ВМ
-	       yc compute instance list
-	       # Остановка нужной ВМ
-	       yc compute instance stop --id <instance-id> 
-	
-	       # Пересоздание ресурса
-	       # terraform taint помечает ресурс как "поврежденный"
-	       terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
-	
-	
-	</details>
-<!-- END TERRAFORM SETUP -->
-
-
-
-
-6. [Настройка Ansible](/Solution/5.%20Ansible%20setup.md) с помощью pyton-скриптов  
+5. [Настройка Ansible](/Solution/5.%20Ansible%20setup.md) с помощью pyton-скриптов  
 Ansible — инструмент для автоматической конфигурации инфраструктуры
     
 	<!-- START ANSIBLE SETUP -->
