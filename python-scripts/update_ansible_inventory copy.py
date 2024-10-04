@@ -33,7 +33,7 @@ def create_inventory_data(ansible_meta, terraform_vm_data):
                     "hosts": {}, # Узлы группы (стандарт)
                 }
             },
-            "vars": {
+            "vars": { # Переменные, доступные или используемые для всех подгрупп
                 "ansible_user": ansible_meta.get("ansible_user"),
                 "ansible_password": ansible_meta.get("ansible_password"),
                 "connection_protocol": ansible_meta.get("connection_protocol"),

@@ -1,16 +1,24 @@
 import json
-import yaml
-import os
-from collections import OrderedDict
 from utils import run_command, load_and_check_env_vars, write_yaml_to_file
 
 # Имена переменных, которые нужно загрузить
 env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", "PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]
 
-
 # Проверяем наличие переменных окружения и добавляем их в словарь
 env_var_dic = load_and_check_env_vars(env_vars)
 
+
+# Заранее определяем структуру групп и подгрупп
+dynamic_groups = {
+    "linux": {
+        "nginx": ["vm-2", "vm-3"],
+        "database": ["vm-4"]
+    },
+    "windows": {
+        "web_servers": ["vm-5"],
+        "app_servers": ["vm-6"]
+    }
+}
 
 # Шаг 1: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
@@ -23,16 +31,13 @@ def load_json_data(file_path):
         data = json.load(file)
     return data
 
-# Шаг 3: Формирование структуры для inventory.yaml
-def create_inventory_data(ansible_meta, terraform_vm_data):
-    # Структура для inventory.yaml
-    inventory_data = {
-        "linux": { # Название группы хостов (можно менять)
-            "children": { # Обозначение, что будет подгруппа хостов (стандарт)
-                "nginx": { # Название подгруппы хостов (можно менять)
-                    "hosts": {}, # Узлы группы (стандарт)
-                }
-            },
+def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
+    inventory_data = {}
+
+    # Добавляем группы и подгруппы из dynamic_groups
+    for group_name, subgroups in dynamic_groups.items():
+        group_data = {
+            "children": {},
             "vars": {
                 "ansible_user": ansible_meta.get("ansible_user"),
                 "ansible_password": ansible_meta.get("ansible_password"),
@@ -40,15 +45,22 @@ def create_inventory_data(ansible_meta, terraform_vm_data):
                 "ansible_become": ansible_meta.get("ansible_become")
             }
         }
-    }
 
-    # Заполнение подгруппы "hosts" данными из terraform_vm_data
-    for key, value in terraform_vm_data.items():
-        if "nat_ip" in key:  # Ищем NAT IP
-            for vm_name, nat_ip in value["value"].items():
-                inventory_data["linux"]["children"]["nginx"]["hosts"][vm_name] = {
-                    "ansible_host": nat_ip
-                }
+        # Создаем подгруппы и добавляем хосты из terraform_vm_data
+        for subgroup_name, vm_names in subgroups.items():
+            subgroup_data = {"hosts": {}}
+
+            # Заполнение подгруппы "hosts" данными из terraform_vm_data
+            for vm_name in vm_names:
+                # Проверяем наличие VM в terraform_vm_data
+                for key, value in terraform_vm_data.items():
+                    if vm_name in value["value"]:  # Убедимся, что имя VM есть в данных
+                        nat_ip = value["value"][vm_name]
+                        subgroup_data["hosts"][vm_name] = {"ansible_host": nat_ip}
+
+            group_data["children"][subgroup_name] = subgroup_data
+
+        inventory_data[group_name] = group_data
 
     return inventory_data
 
@@ -87,7 +99,7 @@ if __name__ == '__main__':
     terraform_vm_data = load_json_data(terraform_vm_data_file_path)
 
     # Формирование данных для inventory.yaml
-    inventory_data = create_inventory_data(ansible_meta, terraform_vm_data)
+    inventory_data = create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups)
 
     # Запись данных в inventory.yaml
     write_yaml_to_file(inventory_data, inventory_output_file_path_ansible)
