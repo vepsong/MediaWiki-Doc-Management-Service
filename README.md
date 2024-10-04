@@ -264,7 +264,7 @@
 	            - Добавление отдельного медиасервера для обработки медиафайлов
 	
 	
-	![Схема развертываемого приложения](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/3.3.%20MediaWiki_app_schema.svg)   
+	![Схема развертываемого приложения](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/3.2.%20MediaWiki_app_schema.svg)   
 	
 	[Ссылка на .drawio-файл](/Solution/Mediafiles/2.1.%20App_deployment_schema_files/3.1.%20MediaWiki_app_schema.drawio)   
 	
