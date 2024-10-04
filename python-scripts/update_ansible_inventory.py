@@ -1,5 +1,5 @@
 import json
-from utils import run_command, load_and_check_env_vars, write_yaml_to_file
+from utils import run_command, load_and_check_env_vars, write_yaml_to_file, load_json_data
 
 # Имена переменных, которые нужно загрузить
 env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", "PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]
@@ -13,25 +13,20 @@ dynamic_groups = {
     "linux": {
         "nginx": ["vm-2", "vm-3"],
         "database": ["vm-4"]
-    },
-    "windows": {
-        "web_servers": ["vm-5"],
-        "app_servers": ["vm-6"]
     }
 }
 
 # Шаг 1: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
+    """Запуск внешних python-скриптов."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
 
-# Шаг 2: Загрузка данных из JSON-файлов
-def load_json_data(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    return data
 
+# Шаг 2: Создание данных для будущего inventory.yaml
 def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
+    """Создание данных для будущего inventory.yaml"""
+
     inventory_data = {}
 
     # Добавляем группы и подгруппы из dynamic_groups

@@ -1,61 +1,49 @@
-import json
-import os
-# Импортируем функцию получения имени репозитория и универсальная функцию для выполнения команд с проверкой результата
-from utils import get_git_repo_info, run_command, add_env_variable_to_bashrc
+from utils import run_command, add_env_variable_to_bashrc, load_and_check_env_vars, load_json_data
 
+# Имена переменных, которые нужно загрузить
+env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
 
-# Шаг 1. Получение имени репозитория и построение пути
-repo_name, _, _ = get_git_repo_info()  # Получаем имя репозитория с помощью utils.py
-if not repo_name:
-    print("Не удалось получить имя репозитория.")
-    exit(1)
+# Проверяем наличие переменных окружения и добавляем их в словарь
+env_var_dic = load_and_check_env_vars(env_vars)
 
-# Строим путь к файлу yc_meta.json
-json_file = os.path.expanduser(f"~/{repo_name}/credentials/yc_meta.json")
-
-if os.path.exists(json_file):
-    with open(json_file, 'r') as f:
-        data = json.load(f)
-else:
-    print(f"Файл {json_file} не найден. Пожалуйста, убедитесь, что он существует.")
-    exit(1)  # Завершаем выполнение программы
-
-# Извлечение нужных данных из JSON-файла
-service_account_id = data.get('service_account_id')
-cloud_id = data.get('cloud-id')
-folder_id = data.get('folder-id')
-profile_name = data.get('profile-name')
-
-# Определяем директорию, где находится yc_meta.json, для сохранения key.json
-credentials_dir = os.path.dirname(json_file)  # Получаем директорию файла yc_meta.json
-key_file_path = os.path.join(credentials_dir, 'key.json')  # Путь для key.json
-
-
-# Шаг 2. Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)
-def create_service_yc_account_ssh_key():
+# Шаг 1. Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)
+def create_service_yc_account_ssh_key(yc_meta_file_data, yc_meta_key_file_path):
     """Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)."""
+    
+    service_account_id = yc_meta_file_data['service_account_id']
 
     command = [
         'yc', 'iam', 'key', 'create',
         '--service-account-id', service_account_id,
         '--folder-name', 'default',
-        '--output', key_file_path
+        '--output', yc_meta_key_file_path
     ]
     run_command(command)
 
 
-# Шаг 3. Создание локального профиля yc
-def create_yc_profile():
+# Шаг 2. Создание локального профиля yc
+def create_yc_profile(yc_meta_file_data):
+    """Создание локального профиля yc."""
+
+    profile_name = yc_meta_file_data['profile-name']
+
     print(f"Создание профиля {profile_name}...")
     command = ['yc', 'config', 'profile', 'create', profile_name]
     run_command(command)
 
 
-# Настройка конфигурации профиля
-def configure_yc_profile():
-    print("Настройка профиля...")
-    command_profile = ['yc', 'config', 'set', 'service-account-key', key_file_path]
-    # Настройка ключа сервисного аккаунта
+# Шаг 3. Настройка локального профиля yc
+def configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path):
+    """Настройка локального профиля yc."""
+    
+    profile_name = yc_meta_file_data['profile-name']
+    cloud_id = yc_meta_file_data['cloud-id']
+    folder_id = yc_meta_file_data['folder-id']
+
+    print(f"Настройка профиля {profile_name}...")
+
+    # Настройка ssh-ключа сервисного аккаунта
+    command_profile = ['yc', 'config', 'set', 'service-account-key', yc_meta_key_file_path]
     run_command(command_profile)
 
     # Настройка cloud-id и folder-id
@@ -74,19 +62,27 @@ def configure_bashrc():
     command = ['bash', '-c', f"source ~/.bashrc"]
     run_command(command)
 
-
-# Шаг 5. Проверка настроек после перезагрузки терминала
-def check_env_variables():
-    print("Для проверки переменных окружения перезапусти терминал и введи в командную строку следующие команды:")
-    print("echo $YC_TOKEN")
-    print("echo $YC_CLOUD_ID")
-    print("echo $YC_FOLDER_ID")
+    print("Для проверки переменных окружения перезапустить терминал и ввести: echo $<переменная окружения>")
 
 
 # Выполнение всех шагов
 if __name__ == "__main__":
-    create_service_yc_account_ssh_key()
-    create_yc_profile()
-    configure_yc_profile()
-    configure_bashrc()
-    check_env_variables()
+
+    # Название файла с данными
+    yc_meta_file = "yc_meta.json"
+
+    # Название файла вывода с данными
+    yc_meta_key_file = "key.json"
+
+    # Абсолютный путь к файлам данных
+    yc_meta_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{yc_meta_file}'
+    yc_meta_key_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{yc_meta_key_file}'
+
+    # Получение данных из "yc_meta.json"
+    yc_meta_file_data = load_json_data(yc_meta_file_path)
+    # Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)
+    create_service_yc_account_ssh_key(yc_meta_file_data, yc_meta_key_file_path)
+    # Создание локального профиля yc
+    create_yc_profile(yc_meta_file_data)
+    # Настройка локального профиля yc
+    configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path)

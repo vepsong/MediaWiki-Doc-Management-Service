@@ -127,15 +127,6 @@ def write_txt_to_file(data, file_path):
     except (OSError, IOError) as e:
         print(f"Ошибка при записи в файл {file_path}: {e}")
 
-# # Универсальная функция для записи данных в YAML файл
-# def write_yaml_to_file(data, file_path):
-#     """Записывает данные в YAML файл."""
-#     try:
-#         with open(file_path, 'w') as yaml_file:
-#             yaml.dump(data, yaml_file, default_flow_style=False, allow_unicode=True)
-#         print(f"Файл {file_path} успешно создан.")
-#     except (OSError, IOError) as e:
-#         print(f"Ошибка при записи в файл {file_path}: {e}")
 
 # Универсальная функция для записи данных в yaml-файл
 def write_yaml_to_file(data, file_path, default_flow_style=False, indent=2):
@@ -146,6 +137,14 @@ def write_yaml_to_file(data, file_path, default_flow_style=False, indent=2):
         print(f"Файл {file_path} успешно создан.")
     except (OSError, IOError) as e:
         print(f"Ошибка при записи в файл {file_path}: {e}")
+
+
+# Универсальная функция для чтения данных из JSON-файла
+def load_json_data(file_path):
+    """Загрузка данных из JSON-файла."""
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    return data
 
 
 # Универсальная функция для получения пути к файлу

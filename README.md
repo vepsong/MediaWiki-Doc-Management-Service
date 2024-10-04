@@ -457,6 +457,17 @@ Ansible — инструмент для автоматической конфи�
 	
 	1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py)  
 	Cкрипт содержит в себе вызовы скриптов: [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) и [update_ansible_meta.py](python-scripts/update_ansible_meta.py) для автоматического и динамического формирования inventory.yaml
+	       
+	       # update_ansible_inventory.py содержит словарь dynamic_groups
+	       # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
+	       # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
+	
+	       # Просмотреть список созданных через Terraform ВМ      
+	       ~/<имя репозитория>/<папка Terraform> terraform output
+	
+	       напр.:
+	       ~/YP-sp13_MediaWiki/Terraform_MediaWiki# terraform output
+	
 	
 	2. dsadsadsadsa
 	
