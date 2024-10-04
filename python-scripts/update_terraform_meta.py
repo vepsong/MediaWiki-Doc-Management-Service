@@ -26,7 +26,7 @@ def create_terraform_meta_content(ssh_key):
     """Создает содержимое для файла terraform_meta.txt с переданным SSH-ключом."""
     try:
         # Спрашиваем у пользователя, хочет ли он оставить данные по умолчанию или изменить их
-        choice = input("Нажмите enter, чтобы оставить текущие данные, или введите 'change', чтобы изменить их: ").strip().lower()
+        choice = input("Нажмите enter, чтобы оставить данные по умолчанию, или введите 'change', чтобы изменить их: ").strip().lower()
 
         if choice == 'change':
             # Запрашиваем пользовательские значения
@@ -57,11 +57,11 @@ users:
         exit(1)
 
 if __name__ == "__main__":
-
-    file_name = "terraform_meta.txt" # Имя файла
-    meta_file_in_credentials = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{file_name}' # Абсолютный путь до файла "terraform_meta.txt" в папке "credentials"
-    meta_file_in_terraform = f'{env_var_dic["TERRAFORM_ABSOLUTE_PATH"]}/{file_name}' # Абсолютный путь до файла "terraform_meta.txt" в папке "Terrafprm"
-    ssh_public_key_path = os.path.expanduser('~/.ssh/id_ed25519.pub') # Путь к файлу с SSH-ключом
+    # Определение абсолютных путей к файлам и папкам
+    file_name = "terraform_meta.txt"
+    meta_file_in_credentials = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{file_name}'
+    meta_file_in_terraform = f'{env_var_dic["TERRAFORM_ABSOLUTE_PATH"]}/{file_name}'
+    ssh_public_key_path = os.path.expanduser('~/.ssh/id_ed25519.pub')
 
     ssh_key = check_ssh_public_key(ssh_public_key_path) # Проверка файла с публичным SSH-ключом
     terraform_meta_content = create_terraform_meta_content(ssh_key) # Формирование данных для записи в файл

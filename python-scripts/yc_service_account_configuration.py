@@ -85,7 +85,7 @@ def check_env_variables():
 
 # Выполнение всех шагов
 if __name__ == "__main__":
-    create_ssh_key()
+    create_service_yc_account_ssh_key()
     create_yc_profile()
     configure_yc_profile()
     configure_bashrc()
