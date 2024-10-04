@@ -314,7 +314,8 @@
 
 	<!-- START ADD_ENV_VAR -->
 	<!-- Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения -->
-	Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения
+	Запуск Python-скрипта [**add_env_var.py**](python-scripts/add_env_var.py) для автоматической установки переменных окружения  
+	test
 <!-- END ADD_ENV_VAR --> 	
 
 4. [Настройка облачного провайдера Yandex Cloud для работы с Terraform](/Solution/3.3.%20YC%20provider%20setup%20for%20Terraform.md)

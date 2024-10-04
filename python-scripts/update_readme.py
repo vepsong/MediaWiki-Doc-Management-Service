@@ -1,9 +1,14 @@
 import re
 import os
-# Импортируем функцию получения имени репозитория
-# from utils import get_git_repo_name  
+# Импортируем функцию загрузки и проверки необходимых переменных окружения
+from utils import load_and_check_env_vars  
 
-repo_name = os.getenv('REPO_NAME')
+# Имена переменных, которые нужно загрузить
+env_vars = ["REPO_PATH"]
+
+# Проверяем наличие переменных окружения и добавляем их в словарь
+env_var_dic = load_and_check_env_vars(env_vars)
+
 
 def add_indentation(text, indent='\t'):
     """Добавляем отступ (табуляцию) в начало каждой строки."""
@@ -43,14 +48,10 @@ def update_readme(content_files, readme_file, indent='\t'):
 
 if __name__ == "__main__":    
    
-    repo_name = get_git_repo_name()  # Получаем имя репозитория с помощью utils.py
-    if not repo_name:
-        print("Не удалось получить имя репозитория.")
-        exit(1)
-    base_dir = os.path.expanduser(f"~/{repo_name}/")  
+    base_dir = env_var_dic["REPO_PATH"]
+    readme_file = os.path.join(base_dir, 'README.md')  # Относительный путь к файлу README
 
-
-    # Используем относительные пути для файлов
+    # Ссылки на файлы для подстановки в README.md
     content_files = [
         (os.path.join(base_dir, 'Solution', '2.1. App deployment schema.md'), '<!-- START APP DEPLOYMENT SCHEMA -->', '<!-- END APP DEPLOYMENT SCHEMA -->'),
         (os.path.join(base_dir, 'Solution', '3. Add_env_var.md'), '<!-- START ADD_ENV_VAR -->', '<!-- END ADD_ENV_VAR -->'),
@@ -61,5 +62,4 @@ if __name__ == "__main__":
 
     ]
 
-    readme_file = os.path.join(base_dir, 'README.md')  # Относительный путь к файлу README
     update_readme(content_files, readme_file, indent='\t')  # Можно использовать '\t' для табуляции или '    ' для пробелов

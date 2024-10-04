@@ -13,9 +13,10 @@ def configure_bashrc():
     if repo_path:
         add_env_variable_to_bashrc('REPO_PATH', repo_path)
 
-    # Получаем путь к Terraform и Ansible папкам
+    # Получаем путь к Terraform, Ansible и credentials папкам
     terraform_folder_name, terraform_folder_relative_path, terraform_folder_absolute_path = find_directory_by_pattern(repo_path, file_extension='.tf')
     ansible_dir_name, ansible_dir_relative_path, ansible_dir_absolute_path = find_directory_by_pattern(repo_path, pattern='Ansible')
+    credentials_dir_name, credentials_dir_relative_path, credentials_dir_absolute_path = find_directory_by_pattern(repo_path, pattern='credentials')
 
     if terraform_folder_name:
         add_env_variable_to_bashrc('TERRAFORM_FOLDER_NAME', terraform_folder_name)
@@ -31,6 +32,13 @@ def configure_bashrc():
     if ansible_dir_absolute_path:
         add_env_variable_to_bashrc('ANSIBLE_DIR_ABSOLUTE_PATH', ansible_dir_absolute_path)
 
+    if credentials_dir_name:
+        add_env_variable_to_bashrc('CREDENTIALS_DIR_NAME', credentials_dir_name)
+    if credentials_dir_relative_path:
+        add_env_variable_to_bashrc('CREDENTIALS_DIR_RELATIVE_PATH', credentials_dir_relative_path)
+    if credentials_dir_absolute_path:
+        add_env_variable_to_bashrc('CREDENTIALS_DIR_ABSOLUTE_PATH', credentials_dir_absolute_path)
+        
     # Применяем изменения
     command = ['bash', '-c', f"source ~/.bashrc"]
     run_command(command)

@@ -123,15 +123,6 @@ def write_json_to_file(data, file_path):
 def get_file_path(repo_name, folder_name, file_name):
     return os.path.expanduser(f'~/{repo_name}/{folder_name}/{file_name}')
 
-
-# # Универсальная функция для добавления переменной в bashrc
-# def add_env_variable_to_bashrc(variable_name, value):
-#     bashrc_path = os.path.expanduser('~/.bashrc')
-#     with open(bashrc_path, 'a') as bashrc_file:
-#         bashrc_file.write(f'export {variable_name}="{value}"\n')
-#     print(f"Переменная окружения {variable_name} добавлена в {bashrc_path}.")
-
-
 # Универсальная функция для добавления переменной в bashrc
 def add_env_variable_to_bashrc(variable_name, value):
     bashrc_path = os.path.expanduser('~/.bashrc')
@@ -156,3 +147,22 @@ def add_env_variable_to_bashrc(variable_name, value):
         if not variable_found:
             bashrc_file.write(f'export {variable_name}="{value}"\n')
             print(f"Переменная окружения {variable_name} добавлена в {bashrc_path}.")
+
+
+# Универсальная функция загрузки и проверки переменных окружения в python-скрипте
+# Args: var_names (list): Список имен переменных окружения (напр.: env_vars = ["REPO_NAME", "REPO_PATH"])
+# Returns: env_var_dic: Словарь с переменными окружения и их значениями.
+
+def load_and_check_env_vars(var_names):
+
+    # Загрузка переменных окружения в словарь
+    env_var_dic = {var: os.environ.get(var) for var in var_names}
+    
+    # Проверка значений переменных окружения
+    for var, value in env_var_dic.items():
+        if value is None:
+            print(f"Переменная окружения {var} не установлена.")
+        else:
+            print(f"{var}: {value}")
+    
+    return env_var_dic
