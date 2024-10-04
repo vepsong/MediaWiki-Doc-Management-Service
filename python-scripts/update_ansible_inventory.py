@@ -27,10 +27,10 @@ def load_json_data(file_path):
 def create_inventory_data(ansible_meta, terraform_vm_data):
     # Структура для inventory.yaml
     inventory_data = {
-        "linux": {
-            "children": {
-                "nginx": {
-                    "hosts": {},
+        "linux": { # Название группы хостов (можно менять)
+            "children": { # Обозначение, что будет подгруппа хостов (стандарт)
+                "nginx": { # Название подгруппы хостов (можно менять)
+                    "hosts": {}, # Узлы группы (стандарт)
                 }
             },
             "vars": {
