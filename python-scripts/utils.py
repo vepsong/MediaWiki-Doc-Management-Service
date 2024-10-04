@@ -98,7 +98,7 @@ def find_directory_by_pattern(repo_path=None, pattern=None, file_extension=None)
 
 
 # Универсальная функция для выполнения команд с проверкой результата
-def run_command(command, cwd=None, capture_output=True):
+def run_command(command, cwd=None, capture_output=False):
     try:
         result = subprocess.run(command, check=True, capture_output=capture_output, text=True, cwd=cwd)
         print(f"Команда '{' '.join(command)}' успешно выполнена.")
@@ -194,3 +194,11 @@ def load_and_check_env_vars(var_names):
             print(f"{var}: {value}")
     
     return env_var_dic
+
+
+# Универсальная функция для копирования файлов из одной директории в другую
+def copy_file(source_path, destination_path):
+    """Копирование файлов из одной директории в другую."""
+
+    command = ['cp', source_path, destination_path]
+    run_command(command)

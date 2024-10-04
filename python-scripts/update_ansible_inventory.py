@@ -1,4 +1,3 @@
-import json
 from utils import run_command, load_and_check_env_vars, write_yaml_to_file, load_json_data
 
 # Имена переменных, которые нужно загрузить
@@ -12,7 +11,8 @@ env_var_dic = load_and_check_env_vars(env_vars)
 dynamic_groups = {
     "linux": {
         "nginx": ["vm-2", "vm-3"],
-        "database": ["vm-4"]
+        "database": ["vm-4"],
+        "3": ["vm-5", "vm-6"]
     }
 }
 

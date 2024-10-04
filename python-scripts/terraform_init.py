@@ -1,43 +1,29 @@
 import os
-# Импортируем функцию получения названия репозитория, названия папки Terraform,
-# универсальную функцию для выполнения команд с проверкой результата
-from utils import get_git_repo_name, find_directory_by_pattern, run_command
+from utils import run_command, load_and_check_env_vars, copy_file
+
+# Имена переменных, которые нужно загрузить
+env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
+
+# Проверяем наличие переменных окружения и добавляем их в словарь
+env_var_dic = load_and_check_env_vars(env_vars)
 
 
-def copy_terraform_config(repo_name):
+# Шаг 1: Инициализация Terraform
+def terraform_init(terraform_folder_path):
+    """Инициализация Terraform."""
 
-    # Преобразуем пути
-    # source_path - Изначальное место хранения ".terraformrc"
-    # destination_path - местоназначение для ".terraformrc"
-    source_path = os.path.expanduser(f'~/{repo_name}/credentials/{file_name}')
-    destination_path = os.path.expanduser('~/')
-
-    # Выполняем команду копирования файла .terraformrc в домашнюю директорию
-    command = ['cp', source_path, destination_path]
-    result = run_command(command)
-
-    if result == 0:
-        print(f"Файл конфигурации {file_name} скопирован в {destination_path}.")
-    else:
-        print("Ошибка копирования файла конфигурации.")
-
-
-def init_terraform(repo_name):
     # Выполняем команды перехода в директорию и инициализации Terraform
-    command = f'cd ~/{repo_name}/{terraform_folder_name} && terraform init'
-    result = os.system(command)
-
-    if result == 0:
-        print("Terraform инициализирован успешно.")
-    else:
-        print("Ошибка инициализации Terraform.")
+    command = ['terraform', 'init']
+    run_command(command, cwd=terraform_folder_path, capture_output=False)
 
 
 if __name__ == "__main__":
-    repo_name = get_git_repo_name()  # Получаем имя репозитория
-    file_name = ".terraformrc"
-    _, terraform_folder_name = find_directory_by_pattern(repo_name, file_extension=".tf")
+    user_home_path = os.path.expanduser('~/')
+    provider_conf_file_name = ".terraformrc"
+    provider_conf_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{provider_conf_file_name}'
+    terraform_folder_path = f'{env_var_dic["TERRAFORM_ABSOLUTE_PATH"]}'
 
-    if repo_name:
-        copy_terraform_config(repo_name)  # Копируем конфигурацию Terraform
-        init_terraform(repo_name)  # Инициализируем Terraform
+    # Копируем конфигурацию провайдера
+    copy_file(provider_conf_file_path, user_home_path)
+    # Инициализация Terraform
+    terraform_init(terraform_folder_path)

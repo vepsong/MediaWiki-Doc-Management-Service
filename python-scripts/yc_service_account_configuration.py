@@ -54,9 +54,9 @@ def configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path):
 
 # Шаг 4. Добавление переменных окружения в ~/.bashrc
 def configure_bashrc():
-    add_env_variable_to_bashrc('YC_TOKEN', 'yc iam create-token')
-    add_env_variable_to_bashrc('YC_CLOUD_ID', 'yc config get cloud-id')
-    add_env_variable_to_bashrc('YC_FOLDER_ID', 'yc config get folder-id')
+    add_env_variable_to_bashrc('YC_TOKEN', '$(yc iam create-token)')
+    add_env_variable_to_bashrc('YC_CLOUD_ID', '$(yc config get cloud-id)')
+    add_env_variable_to_bashrc('YC_FOLDER_ID', '$(yc config get folder-id)')
 
     # Используем bash для выполнения source
     command = ['bash', '-c', f"source ~/.bashrc"]
@@ -86,3 +86,5 @@ if __name__ == "__main__":
     create_yc_profile(yc_meta_file_data)
     # Настройка локального профиля yc
     configure_yc_profile(yc_meta_file_data, yc_meta_key_file_path)
+    # Добавление переменных окружения в ~/.bashrc
+    configure_bashrc()

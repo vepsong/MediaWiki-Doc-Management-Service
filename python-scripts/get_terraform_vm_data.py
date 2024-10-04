@@ -12,7 +12,7 @@ env_var_dic = load_and_check_env_vars(env_vars)
 def get_terraform_vm_data(terraform_folder_path):
     """Получение данных ВМ (имя, ip, ip-nat и пр.), созданных через Terraform"""
     command = ['terraform', 'output', '-json']
-    output = run_command(command, cwd=terraform_folder_path)
+    output = run_command(command, cwd=terraform_folder_path, capture_output=True)
     data = json.loads(output)
     return data
 
