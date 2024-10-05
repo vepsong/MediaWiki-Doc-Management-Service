@@ -1,6 +1,8 @@
 # Используем базовый образ Ubuntu
 FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Обновляем пакеты и устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
     git \
