@@ -1,29 +1,41 @@
 from utils import run_command, load_and_check_env_vars, write_yaml_to_file, load_json_data
 
 # Имена переменных, которые нужно загрузить
-env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", "PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]
+env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", \
+            "PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
 
 # Проверяем наличие переменных окружения и добавляем их в словарь
 env_var_dic = load_and_check_env_vars(env_vars)
 
 
-# Заранее определяем структуру групп и подгрупп
+# Шаг 1: Заранее определяем структуру групп и подгрупп
 dynamic_groups = {
     "linux": {
-        "nginx": ["vm-2", "vm-3"],
-        "database": ["vm-4"],
-        "g3": ["vm-5", "vm-6"]
+        "proxy_and_monitoring": ["vm-2", "vm-3"],
+        "mediawiki_main": ["vm-4"],
+        "mediawiki_helper1_and_postgresqlprimary": ["vm-5"],
+        "mediawiki_helper2_and_postgresqlstandby": ["vm-6"]
     }
 }
 
-# Шаг 1: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
+
+# Шаг 2: Cинхронизация состояния ресурсов с облачным провайдером
+def terraform_data_refresh(terraform_folder_path):
+    """Cинхронизация состояния ресурсов с облачным провайдером."""
+
+    # Выполняем команды перехода в директорию и инициализации Terraform
+    command = ['terraform', 'refresh']
+    run_command(command, cwd=terraform_folder_path, capture_output=False)
+
+
+# Шаг 3: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
     """Запуск внешних python-скриптов."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
 
 
-# Шаг 2: Создание данных для будущего inventory.yaml
+# Шаг 4: Создание данных для будущего inventory.yaml
 def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
     """Создание данных для будущего inventory.yaml"""
 
@@ -80,14 +92,19 @@ if __name__ == '__main__':
     # Абсолютные пути к файлам данных
     ansible_meta_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_file}'
     terraform_vm_data_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_file}'
+    terraform_folder_path = env_var_dic["TERRAFORM_ABSOLUTE_PATH"]
     
     # Абсолютный путь к файлу вывода данных
     inventory_output_file_path_ansible =f'{env_var_dic["ANSIBLE_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
     inventory_output_file_path_credentials =f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
 
+    # Cинхронизация состояния ресурсов с облачным провайдером
+    terraform_data_refresh(terraform_folder_path)
+    
     # Запуск python-скриптов для генерации файлов "ansible_meta.json" и "terraform_vm_data.json"
     generate_files(ansible_meta_script_path)
     generate_files(terraform_vm_data_script_path)
+
 
     # Загрузка данных из JSON-файлов
     ansible_meta = load_json_data(ansible_meta_file_path)

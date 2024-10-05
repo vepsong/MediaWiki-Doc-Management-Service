@@ -382,6 +382,10 @@
 	            # Начало работы и деплоя Terraform. 
 	            terraform apply -auto-approve
 	
+	            # Cинхронизация состояния ресурсов с облачным провайдером (обновится файл terraform.tfstate)
+	            
+	            terraform refresh
+	
 	            # Удаление всех созданных ресурсов
 	            terraform destroy -auto-approve
 	
