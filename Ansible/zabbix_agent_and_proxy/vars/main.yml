@@ -1,0 +1,11 @@
+--- 
+# vars file for default_packages
+packages_to_install:
+  - zabbix-server-pgsql
+  - zabbix-frontend-php
+  - php8.1-pgsql
+  - zabbix-sql-scripts
+  - zabbix-nginx-conf
+  - zabbix-proxy-pgsql
+  - zabbix-agent
+  - keepalived

@@ -1,17 +1,6 @@
 ---
 # tasks file for default_packages
 
-- name: Загрузка Zabbix репозитория
-  get_url:
-    url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu22.04_all.deb
-    dest: /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
-  become: yes
-
-- name: Установка Zabbix репозитория
-  apt:
-    deb: /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
-  become: yes
-
 - name: Обновление списка пакетов
   apt:
     update_cache: yes
@@ -24,13 +13,23 @@
   loop:
     - "{{ packages_to_install }}" #Цикл будет перебирать все значения из переменной "packages"
 
-- name: Configuring zabbix-agent
+- name: Настройка keepalived_master
   ansible.builtin.template:
-    src: zabbix_agentd.j2
-    dest: /etc/zabbix/zabbix_agentd.conf
+    src: keepalived_master.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  when: inventory_hostname == 'vm-2'  # Условие для выполнения на vm-2
 
-- name: Restarting and enabling zabbix-agent
+- name: Настройка keepalived_backup
+  ansible.builtin.template:
+    src: keepalived_backup.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  when: inventory_hostname == 'vm-3'  # Условие для выполнения на vm-3
+
+- name: Restarting and enabling keepalived
   ansible.builtin.service:
-    name: zabbix-agent
+    name: keepalived
     state: restarted
     enabled: yes 
+
+
+    
