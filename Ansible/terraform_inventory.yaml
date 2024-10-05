@@ -1,2 +1,2 @@
-plugin: cloud.terraform
+plugin: cloud.terraform.terraform_provider
 path: /root/YP-sp13_MediaWiki/Terraform_MediaWiki/terraform.tfstate
