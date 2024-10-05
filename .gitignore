@@ -22,3 +22,5 @@ inventory.yaml
 # Служебные файлы Terraform
 .terraform.lock.hcl
 .terraform/
+terraform.tfstate
+terraform.tfstate.backup
