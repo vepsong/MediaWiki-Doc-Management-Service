@@ -1,0 +1,25 @@
+linux:
+  children:
+    proxy_and_monitoring:
+      hosts:
+        vm-2:
+          ansible_host: 89.169.132.200
+        vm-3:
+          ansible_host: 89.169.152.10
+    mediawiki_main:
+      hosts:
+        vm-4:
+          ansible_host: 84.201.156.244
+    mediawiki_helper1_and_postgresqlprimary:
+      hosts:
+        vm-5:
+          ansible_host: 89.169.157.7
+    mediawiki_helper2_and_postgresqlstandby:
+      hosts:
+        vm-6:
+          ansible_host: 62.84.117.139
+  vars:
+    ansible_user: root
+    ansible_password: ''
+    connection_protocol: ssh
+    ansible_become: false
