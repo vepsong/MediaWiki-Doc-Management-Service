@@ -7,7 +7,12 @@
 group1_vm_cpu    = 2  # Количество ядер процессора
 group1_ram       = 4  # Объем оперативной памяти (в ГБ)
 group1_disk_size = 21 # Объем диска (в ГБ)
-group1_OC_template  = "fd85bll745cg76f707mq" # Ubuntu 22.04
+
+# ID образа ОС для использования.
+# При необходимости, id всех образов доступны по команде:
+# yc compute image list --folder-id standard-images
+group1_OC_template  = "fd8903kfblsnlo483hoj" # Ubuntu 22.04
+
 group1_preemptible = true  # Прерываемость ВМ
 group1_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group1_description = "Ubuntu 22.04, Nginx, Zabbix, Keepalived, ZooKeeper, HAProxy"
@@ -36,7 +41,7 @@ group1_network = {
 group2_vm_cpu    = 2  # Количество ядер процессора
 group2_ram       = 4  # Объем оперативной памяти (в ГБ)
 group2_disk_size = 22 # Объем диска (в ГБ)
-group2_OC_template  = "fd85bll745cg76f707mq" # Ubuntu 22.04
+group2_OC_template  = "fd8903kfblsnlo483hoj" # Ubuntu 22.04
 group2_preemptible = true  # Прерываемость ВМ
 group2_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group2_description = "Ubuntu-22.04, MediaWiki"
@@ -63,7 +68,7 @@ group2_network = {
 group3_vm_cpu    = 2  # Количество ядер процессора
 group3_ram       = 8  # Объем оперативной памяти (в ГБ)
 group3_disk_size = 23 # Объем диска (в ГБ)
-group3_OC_template  = "fd85bll745cg76f707mq" # Ubuntu 22.04
+group3_OC_template  = "fd8903kfblsnlo483hoj" # Ubuntu 22.04
 group3_preemptible = true  # Прерываемость ВМ
 group3_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group3_description = "Ubuntu-22.04, MediaWiki, PostgreSQL"
@@ -90,7 +95,7 @@ group3_network = {
 group4_vm_cpu    = 2  # Количество ядер процессора
 group4_ram       = 8  # Объем оперативной памяти (в ГБ)
 group4_disk_size = 23 # Объем диска (в ГБ)
-group4_OC_template  = "fd85bll745cg76f707mq" # Ubuntu 22.04
+group4_OC_template  = "fd8903kfblsnlo483hoj" # Ubuntu 22.04
 group4_preemptible = true  # Прерываемость ВМ
 group4_zone = "ru-central1-a"  # Зона, где будет создана ВМ
 group4_description = "Ubuntu-22.04, MediaWiki, PostgreSQL"

@@ -5,10 +5,3 @@
     - role: default_packages
   tags:
     - install_packages
-
-- name: Установка и настройка nginx c кастомной страницей
-  hosts: nginx # Будет работать на узлах в группе nginx
-  roles:
-    - role: nginx_custom
-  tags:
-    - nginx_custom 

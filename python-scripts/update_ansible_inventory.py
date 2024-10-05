@@ -13,8 +13,8 @@ dynamic_groups = {
     "linux": {
         "proxy_and_monitoring": ["vm-2", "vm-3"],
         "mediawiki_main": ["vm-4"],
-        "mediawiki_helper1_and_postgresqlprimary": ["vm-5"],
-        "mediawiki_helper2_and_postgresqlstandby": ["vm-6"]
+        "mediawiki_helper1_and_postgresql_primary": ["vm-5"],
+        "mediawiki_helper2_and_postgresql_standby": ["vm-6"]
     }
 }
 

@@ -3,21 +3,21 @@ linux:
     proxy_and_monitoring:
       hosts:
         vm-2:
-          ansible_host: 89.169.132.200
+          ansible_host: 84.201.173.75
         vm-3:
-          ansible_host: 89.169.152.10
+          ansible_host: 89.169.146.4
     mediawiki_main:
       hosts:
         vm-4:
-          ansible_host: 84.201.156.244
-    mediawiki_helper1_and_postgresqlprimary:
+          ansible_host: 89.169.151.240
+    mediawiki_helper1_and_postgresql_primary:
       hosts:
         vm-5:
-          ansible_host: 89.169.157.7
-    mediawiki_helper2_and_postgresqlstandby:
+          ansible_host: 89.169.133.72
+    mediawiki_helper2_and_postgresql_standby:
       hosts:
         vm-6:
-          ansible_host: 62.84.117.139
+          ansible_host: 89.169.158.190
   vars:
     ansible_user: root
     ansible_password: ''

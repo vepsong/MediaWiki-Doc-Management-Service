@@ -1,0 +1,25 @@
+---
+# tasks file for default_packages
+
+- name: Загрузка Zabbix репозитория
+  get_url:
+    url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu22.04_all.deb
+    dest: /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
+  become: yes
+
+- name: Установка Zabbix репозитория
+  apt:
+    deb: /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
+  become: yes
+
+- name: Обновление списка пакетов
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Установка программ #Имя задачи 
+  apt: #Используемый модуль
+    name: "{{ item }}" #Имя пакета из цикла
+    state: present #Параметр действия. present - установить, absent - удалить
+  loop:
+    - "{{ packages_to_install }}" #Цикл будет перебирать все значения из переменной "packages"
