@@ -24,3 +24,8 @@ inventory.yaml
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+
+# Кэш
+**/__pycache__/
+**/__pycache__
+
