@@ -4,4 +4,4 @@
   roles:
     - role: default_packages
   tags:
-    - install_packages
+    - install_default_packages
