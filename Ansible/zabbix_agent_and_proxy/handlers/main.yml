@@ -1,2 +1,8 @@
 ---
 # handlers file for zabbix_agent_and_proxy
+
+- name: restart_PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+  become: yes

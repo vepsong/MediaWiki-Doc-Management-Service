@@ -23,14 +23,3 @@
     state: present #Параметр действия. present - установить, absent - удалить
   loop:
     - "{{ packages_to_install }}" #Цикл будет перебирать все значения из переменной "packages"
-
-- name: Configuring zabbix-agent
-  ansible.builtin.template:
-    src: zabbix_agentd.j2
-    dest: /etc/zabbix/zabbix_agentd.conf
-
-- name: Restarting and enabling zabbix-agent
-  ansible.builtin.service:
-    name: zabbix-agent
-    state: restarted
-    enabled: yes 

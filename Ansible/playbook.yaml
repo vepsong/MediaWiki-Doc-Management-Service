@@ -1,14 +1,15 @@
 --- 
-- name: Установка стандартных пакетов
+- name: Установка стандартных пакетов на все ВМ
   hosts: all
   roles:
     - role: default_packages
   tags:
     - install_default_packages
 
-- name: Установка zabbix-server, zabbix-proxy, keepalived
+- name: Установка и настройка zabbix-server, zabbix-proxy, keepalived
   hosts: proxy_and_monitoring
   roles:
     - role: zabbix_agent_and_proxy
   tags:
-    - install_zabbix_agent_and_proxy
+    - install_zabbix-server
+
