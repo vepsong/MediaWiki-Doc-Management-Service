@@ -117,7 +117,7 @@ Standby БД получает реплицированные данные с Pri
 <details>
 <summary>Развернуть</summary> 
 
-### 1. Настройка сервисной ВМ с помощью Docker
+### 5.1. Настройка сервисной ВМ с помощью Docker
 
 <details>
 <summary>Развернуть</summary>   
@@ -155,25 +155,25 @@ Standby БД получает реплицированные данные с Pri
 <!-- END_5.1. service_vm_docker_setup.md -->
 </details> 
 
-### 2. Клонирование git-репозитория на созданную ВМ (в каталог ~)
-
-### 3. Подготовительная работа
+### 5.2. Подготовительная работа
 
 <details>
 <summary>Развернуть</summary> 
 
-<!-- START_5.3. preparatory_tasks.md -->
+<!-- START_5.2. preparatory_tasks.md -->
 <!-- Подготовительная работа -->
 
 #### Подготовительная работа
 
-1. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
+1. Клонирование git-репозитория на созданную ВМ (в каталог ~)
+
+2. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
 
        В ~/<имя репозитория>/credentials создать yc_meta.json и наполнить его данными из web-консоли Yandex Cloud
        
        Для примера использовать ~/<имя репозитория>/credentials/templates/yc_meta_EXAMPLE.json
 
-2. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — **.terraformrc**
+3. [Создание файла конфигурации провайдера](https://yandex.cloud/ru/docs/ydb/terraform/install "Провайдер устанавливает соединение с YDB и предоставляет API-методы.") — **.terraformrc**
 
        В ~/<имя репозитория>/credentials создать .terraformrc и наполнить его данными из документации Yandex Cloud
 
@@ -181,7 +181,7 @@ Standby БД получает реплицированные данные с Pri
 
     [Ссылка на документацию](https://yandex.cloud/ru/docs/ydb/terraform/install)
 
-3. Настройка профиля Yandex Cloud CLI  (если не был настроен ранее)
+4. Настройка профиля Yandex Cloud CLI  (если не был настроен ранее)
 
        # Начало настройки профиля
        yc init
@@ -190,18 +190,18 @@ Standby БД получает реплицированные данные с Pri
 
        # Проверка настроек профиля Yandex Cloud CLI
        yc config list
-<!-- END_5.3. preparatory_tasks.md -->
+<!-- END_5.2. preparatory_tasks.md -->
 
 </details> 
 
 
 
-### 4. Запуск конвеера. Автоматический запуск и инициализация Yandex Cloud, Terrraform
+### 5.3. Запуск конвеера. Автоматический запуск и инициализация Yandex Cloud, Terrraform
 
 <details>
 <summary>Развернуть</summary> 
 
-<!-- START_5.4. start_pipeline.md -->
+<!-- START_5.3. start_pipeline.md -->
 <!-- Запуск конвеера -->
 
 #### Запуск конвеера
@@ -259,16 +259,20 @@ Standby БД получает реплицированные данные с Pri
       # terraform taint помечает ресурс как "поврежденный"
       terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
   </details>
-<!-- END_5.4. start_pipeline.md -->
+
+
+
+
+<!-- END_5.3. start_pipeline.md -->
 </details>
 
 
-### 5. Настройка Ansible
+### 5.4 Настройка Ansible
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_5.5. ansible_setup.md -->
+<!-- START_5.4. ansible_setup.md -->
 <!-- # Настройка Ansible для автоматической конфигурации сервиса -->
 
 #### Настройка Ansible для автоматической конфигурации сервиса
@@ -325,7 +329,7 @@ Standby БД получает реплицированные данные с Pri
 
   </details> 
 
-<!-- END_5.5. ansible_setup.md -->
+<!-- END_5.4. ansible_setup.md -->
 
 </details>
 </details>
