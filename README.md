@@ -259,13 +259,8 @@ Standby БД получает реплицированные данные с Pri
       # terraform taint помечает ресурс как "поврежденный"
       terraform taint 'yandex_compute_instance.group<НОМЕР ГРУППЫ>["vm-<НОМЕР ВМ>"]'
   </details>
-
-
-
-
 <!-- END_5.4. start_pipeline.md -->
-
-</detail>
+</details>
 
 
 ### 5. Настройка Ansible
@@ -332,5 +327,5 @@ Standby БД получает реплицированные данные с Pri
 
 <!-- END_5.5. ansible_setup.md -->
 
-</detail>
-</detail>
+</details>
+</details>
