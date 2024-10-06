@@ -19,12 +19,14 @@ def get_file_names_in_directory(documentation_folder_path):
     return list_of_file_names
 
 
-def add_indentation(text, indent='\t'):
+def add_indentation(text, indent=None):
     """Добавляем отступ (табуляцию) в начало каждой строки."""
+    if indent is None:
+        return text
     return '\n'.join(indent + line for line in text.splitlines())
 
 
-def update_readme(content_files, readme_file, indent='\t'):
+def update_readme(content_files, readme_file, indent=None):
     """Обновление файла README.md"""
     with open(readme_file, 'r', encoding='utf-8') as f:
         readme_content = f.read()
@@ -74,4 +76,5 @@ if __name__ == "__main__":
             (f'{documentation_folder_path}/{name}', f'<!-- START_{name} -->', f'<!-- END_{name} -->'),
         ]
 
-        update_readme(content_files, readme_file_path, indent='\t')
+        # update_readme(content_files, readme_file_path, indent='\t')
+        update_readme(content_files, readme_file_path, indent=None)
