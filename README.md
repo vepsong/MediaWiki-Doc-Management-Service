@@ -23,11 +23,12 @@
 <!-- END_1. project_technical_description.md -->
 </details>
 
-## 2. Задачи
+## 2. Задачи проекта
+<!-- # Задачи проекта -->
+<!-- START_2. project_objectives.md -->
 
-1. [Создание схемы развертываемого приложения](Solution/2.1.%20App%20deployment%20schema.md "App deployment schema"). 
-2. Создание руководства по развертыванию и восстановлению инфраструктуры в случае аварии
-3. Проверка отказоустойчивости системы
+
+<!-- END_2. project_objectives.md -->
 
 ## 3. Схема приложения 
 
