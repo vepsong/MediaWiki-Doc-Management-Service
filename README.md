@@ -276,7 +276,7 @@ Standby БД получает реплицированные данные с Pri
 <!-- START_5.5. ansible_setup.md -->
 <!-- # Настройка Ansible для автоматической конфигурации сервиса -->
 
-### Настройка Ansible для автоматической конфигурации сервиса
+#### Настройка Ansible для автоматической конфигурации сервиса
 
 1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py) для автоматического и динамического формирования inventory.yaml
 
@@ -332,4 +332,5 @@ Standby БД получает реплицированные данные с Pri
 
 <!-- END_5.5. ansible_setup.md -->
 
+</detail>
 </detail>
