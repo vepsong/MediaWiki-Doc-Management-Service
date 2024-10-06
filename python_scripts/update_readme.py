@@ -1,6 +1,5 @@
-import re
 import os
-# Импортируем функцию загрузки и проверки необходимых переменных окружения
+import re
 from utils import load_and_check_env_vars  
 
 # Имена переменных, которые нужно загрузить
@@ -10,12 +9,23 @@ env_vars = ["REPO_PATH"]
 env_var_dic = load_and_check_env_vars(env_vars)
 
 
+def get_file_names_in_directory(documentation_folder_path):
+    """Получение списка всех файлов в директории."""
+    # Получаем список всех файлов в директории
+    list_of_file_names = [
+        file_name for file_name in os.listdir(documentation_folder_path)
+        if os.path.isfile(os.path.join(documentation_folder_path, file_name))
+    ]
+    return list_of_file_names
+
+
 def add_indentation(text, indent='\t'):
     """Добавляем отступ (табуляцию) в начало каждой строки."""
     return '\n'.join(indent + line for line in text.splitlines())
 
+
 def update_readme(content_files, readme_file, indent='\t'):
-    # Читаем текущий файл README.md
+    """Обновление файла README.md"""
     with open(readme_file, 'r', encoding='utf-8') as f:
         readme_content = f.read()
 
@@ -46,19 +56,22 @@ def update_readme(content_files, readme_file, indent='\t'):
 
     print(f"{readme_file} успешно обновлен.")
 
-if __name__ == "__main__":    
-   
-    base_dir = env_var_dic["REPO_PATH"]
-    readme_file = os.path.join(base_dir, 'README.md')  # Относительный путь к файлу README
 
-    # Ссылки на файлы для подстановки в README.md
-    content_files = [
-        (os.path.join(base_dir, 'Solution', '2.1. App deployment schema.md'), '<!-- START APP DEPLOYMENT SCHEMA -->', '<!-- END APP DEPLOYMENT SCHEMA -->'),
-        (os.path.join(base_dir, 'Solution', '3.1. service_vm_docker_setup.md'), '<!-- START SERVICE VM DOCKER SETUP -->', '<!-- END SERVICE VM DOCKER SETUP -->'),
-        (os.path.join(base_dir, 'Solution', '3.3. preparatory_tasks.md'), '<!-- START PREPARATORY TASKS -->', '<!-- END PREPARATORY TASKS -->'),
-        (os.path.join(base_dir, 'Solution', '4.3. start_pipeline.md'), '<!-- START START PIPELINE -->', '<!-- END START PIPELINE -->'),
-        (os.path.join(base_dir, 'Solution', '5. ansible_setup.md'), '<!-- START ANSIBLE SETUP -->', '<!-- END ANSIBLE SETUP -->')
+if __name__ == "__main__":
 
-    ]
+    repo_dir = f'{env_var_dic["REPO_PATH"]}'
 
-    update_readme(content_files, readme_file, indent='\t')  # Можно использовать '\t' для табуляции или '    ' для пробелов
+    documentation_folder_name = "project_documentation"
+    documentation_folder_path = f'{repo_dir}/{documentation_folder_name}'
+
+    readme_file_name = 'README.md'
+    readme_file_path = f'{repo_dir}/{readme_file_name}'
+
+    list_of_file_names = get_file_names_in_directory(documentation_folder_path)
+
+    for name in list_of_file_names:
+        content_files = [
+            (f'{documentation_folder_path}/{name}', f'<!-- START_{name} -->', f'<!-- END_{name} -->'),
+        ]
+
+        update_readme(content_files, readme_file_path, indent='\t')

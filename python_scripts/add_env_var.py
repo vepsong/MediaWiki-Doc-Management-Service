@@ -52,15 +52,15 @@ def configure_bashrc_ansible(repo_path):
         add_env_variable_to_bashrc('ANSIBLE_DIR_ABSOLUTE_PATH', ansible_dir_absolute_path)
 
 
-# Шаг 4. Добавление данных папки python-scripts в переменные окружения (~/.bashrc)
+# Шаг 4. Добавление данных папки python_scripts в переменные окружения (~/.bashrc)
 def configure_bashrc_python_scripts(repo_path):
-    """Добавление данных папки python-scripts в переменные окружения (~/.bashrc)."""
+    """Добавление данных папки python_scripts в переменные окружения (~/.bashrc)."""
 
-    # Получаем путь к папке python-scripts
+    # Получаем путь к папке python_scripts
     python_scripts_dir_name, \
         python_scripts_dir_relative_path, \
         python_scripts_dir_absolute_path = \
-            find_directory_by_pattern(repo_path, pattern='python-scripts')
+            find_directory_by_pattern(repo_path, pattern='python_scripts')
 
     if python_scripts_dir_name:
         add_env_variable_to_bashrc('PYTHON_SCRIPTS_DIR_NAME', python_scripts_dir_name)
