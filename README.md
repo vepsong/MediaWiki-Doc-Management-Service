@@ -65,7 +65,7 @@
 
 ### Компоненты:
 1. **VM-0** — Сервисная ВМ (Администрирование и деплой)
-   - Стек: Alpine Linux, Docker, GitHub, Terraform, Ansible, Python.
+   - Стек: Alpine Linux v3.20, Docker, GitHub, Terraform, Ansible, Python.
 2. **VM-1 + VHDD-1** — Система мониторинга (Zabbix + PostgreSQL)
    - Стек: Ubuntu 22.04, Zabbix-Server, PostgreSQL.
 3. **VM-2** — Прокси-сервер для запросов пользователей
@@ -128,7 +128,7 @@ Standby БД получает реплицированные данные с Pri
 
 1. Скачивание и установка [Docker-desktop](https://www.docker.com/products/docker-desktop/ "Скачать Docker-desktop")
 2. Установка расширения [vscode Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-3. Скачивание Dockerfile из репозитория GitHub
+3. Скачивание Dockerfile из репозитория [GitHub](https://github.com/vepsong/YP-sp13_MediaWiki)
 4. Создание образа ОС Alpine Linux с необходимыми пакетами и зависимостями из инструкций [Dockerfile](/Dockerfile "Ссылка на Dockerfile")
     
        docker build -t mediawiki_service_alpine .
@@ -165,7 +165,7 @@ Standby БД получает реплицированные данные с Pri
 
 #### Подготовительная работа
 
-1. Клонирование git-репозитория на созданную ВМ (в каталог ~)
+1. Клонирование [git-репозитория](https://github.com/vepsong/YP-sp13_MediaWiki) на созданную ВМ (в каталог ~)
 
 2. Создание файла с данными для аутентификации в Yandex Cloud — **yc_meta.json**
 
@@ -332,4 +332,46 @@ Standby БД получает реплицированные данные с Pri
 <!-- END_5.4. ansible_setup.md -->
 
 </details>
+</details>
+
+## 6. Краткое описание python-скриптов
+
+<details>
+<summary>Развернуть</summary>
+
+
+<!-- START_10. python_scripts_short_description.md -->
+#### Краткое описание python-скриптов
+
+#### Основные
+1. add_env_var.py - Добавление переменных окружения **(после выполнения обязательно перезапустить терминал)**
+   - Добавленные переменные окружения используются во всех последующих скриптах
+   - Содержит вызовы:
+      - utils.py - Хранилище общих и частоиспользуемых функций 
+
+2. start_pipeline.py - Конвеер автоматического запуска и инициализации Yandex Cloud, Terrraform
+   - Содержит вызовы:
+      - utils.py - Хранилище общих и частоиспользуемых функций 
+      - yc_service_account_configuration.py - Создание и настройка сервисного аккаунта Yandex Cloud
+      - terraform_init.py - Инициализация Terraform
+      - update_terraform_meta.py - Актуализация meta-данных Terraform для передачи на создаваемые ВМ
+3. update_ansible_inventory.py - Автоматическое формирование inventory.yaml для Ansible
+
+       # update_ansible_inventory.py содержит словарь dynamic_groups
+       # Он предназначен для выстраивания и изменения структуры групп, подгрупп и входящих в них ВМ.
+
+       # Просмотреть список созданных через Terraform ВМ      
+       ~/<имя репозитория>/<папка Terraform> terraform output 
+       # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
+
+   - Содержит вызовы:
+      - get_terraform_vm_data.py - Загружает актуальные данные о состоянии ВМ в Yandex Cloud и создает файл "terraform_vm_data.json"
+      - update_ansible_meta.py - Создание файла "ansible_meta.json" с мета-данными Ansible
+
+#### Вспомогательные
+
+1. utils.py - Хранилище общих и частоиспользуемых функций
+2. update_readme.py - Загрузка данных из /project_documentation и обновление README.md
+
+<!-- END_10. python_scripts_short_description.md -->
 </details>
