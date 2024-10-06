@@ -33,10 +33,6 @@ RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
 # Копируем бинарные файлы Yandex Cloud CLI в /usr/bin/
 RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
 
-# Устанавливаем имя хоста
-RUN echo "vm-1" > /etc/hostname
-
-
 # Активируем bash-completion
 RUN echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
 
