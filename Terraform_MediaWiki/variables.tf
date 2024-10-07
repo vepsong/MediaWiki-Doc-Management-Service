@@ -1,4 +1,6 @@
-# Общие переменные для всех групп ВМ
+# Переменные по-умолчанию, используемые всеми группами
+
+
 variable "vm_cpu" {
   description = "Количество ядер процессора для ВМ по умолчанию"
   type        = number
@@ -11,11 +13,6 @@ variable "core_fraction" {
 
 variable "ram" {
   description = "Объем оперативной памяти для ВМ по умолчанию"
-  type        = number
-}
-
-variable "disk_size" {
-  description = "Размер диска для ВМ по умолчанию"
   type        = number
 }
 
@@ -49,16 +46,51 @@ variable "nat" {
   type        = bool
 }
 
+variable "description" {
+  description = "Описание"
+  type        = string
+}
 
-# Одна переменная для всех групп
+variable "vm_names" {
+  description = "Имена виртуальных машин"
+  type        = map(string)
+}
+
+variable "disk_names" {
+  description = "Имена внешних дисков"
+  type        = map(string)
+}
+
+variable "disk_type" {
+  description = "Тип внешних жестких дисков"
+  type        = optional(string)
+}
+
+variable "disk_size" {
+  description = "Размер диска для ВМ по умолчанию"
+  type        = number
+}
+
 variable "vm_groups" {
   description = "Параметры для всех групп ВМ"
-  type = map(object({
-    description = string
-    ram         = number
-    vm_names    = map(string)
-    disks       = map(string)
-    disk_type   = optional(string)
-    disk_size   = optional(number)
-  }))
+  type = map(any)
 }
+
+variable "external_disk_groups" {
+  description = "Параметры для всех групп дисков"
+  type = map(any)
+}
+
+
+# variable "vm_groups" {
+#   description = "Параметры для всех групп ВМ"
+#   type = map(any)
+#   type = map(object({
+#     description = string
+#     ram         = number
+#     vm_names    = map(string)
+#     disks       = map(string)
+#     disk_type   = optional(string)
+#     disk_size   = optional(number)
+#   }))
+# }
