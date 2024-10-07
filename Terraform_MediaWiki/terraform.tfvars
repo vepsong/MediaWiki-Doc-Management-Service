@@ -1,63 +1,86 @@
-# Переменные по-умолчанию, используемые всеми группами
-
-vm_cpu        = 2  # Количество ядер процессора по умолчанию
-core_fraction = 50 # Гарантированная доля vCPU (%)
-ram           = 2  # Объем оперативной памяти по умолчанию
-disk_type     = "network-hdd" # Тип диска по умолчанию
-disk_size     = 20 # Объем диска по умолчанию
-OC_template   = "fd8903kfblsnlo483hoj" # Ubuntu 22.04
-preemptible   = true  # Прерываемость ВМ по умолчанию
-zone          = "ru-central1-a"  # Зона для всех ВМ
+vm_cpu        = 2                        # Кол-во ядер процессора по-умолчанию
+core_fraction = 20                       # Базовый уровень производительности vCPU (%)
+ram           = 2                        # Оперативная память в ГБ
+image_id      = "fd8903kfblsnlo483hoj"   # Ubuntu 22.04
+preemptible   = "true"                   # Прерываемость
+zone          = "ru-central1-a"
 network_id    = "enpq8hrot41agq9ug68l"
 subnet_id     = "e9bsdtj7vme4iddaq7qb"
-nat           = true
-description   = "Описание"
+nat           = "true"
+disk_size     = 15                       # Объём диска в ГБ
+disk_type     = "network-hdd"            # Тип диска
+      
 
-# Специцикация параметров для каждой группы ВМ
-# У каждой группы уникальные имена ВМ, описание и пр.
 
-vm_groups = {
-  group1_monitoring_system = {
-    description = "Система мониторинга Zabbix-Server"
-    vm_names    = { "vm-1" = "vm-01" }
-    disk_names  = { "vm-1" = "vm-01-disk" }
-    disk_size   = 21
-  },
-  group2_nginx_proxy_servers = {
-    description = "Proxy-серверы Nginx для перераспределения пользовательских запросов между серверами MediaWiki"
-    vm_names    = { "vm-2" = "vm-02", "vm-5" = "vm-05" }
-    disk_names  = { "vm-2" = "vm-02-disk", "vm-5" = "vm-05-disk",}
-    disk_size   = 22
-  },
-  group3_mediawiki_servers = {
-    description = "Серверы MediaWiki"
-    vm_names    = { "vm-3" = "vm-03", "vm-4" = "vm-04" }
-    disk_names  = { "vm-3" = "vm-03-disk", "vm-4" = "vm-04-disk" }
-    disk_size   = 23
-  },
-  group4_haproxy_proxy_servers = {
-    description = "Прокси-серверы Haproxy для перераспределения запросов с серверов MediaWiki между БД"
-    vm_names    = { "vm-5" = "vm-05" }
-    disk_names  = { "vm-5" = "vm-05-disk" }
-    disk_size   = 24
-  }
-}
+virtual_machines = {
+    "vm-1" = {
+      vm_name       = "vm-1-monitoring-system"             # Имя ВМ
+      vm_desc       = "Система мониторинга Zabbix-Server"  # Описание
+      disk_name     = "vm-1-disk"                          # Название диска
+      disk_size     = 21                                   # Объём диска в ГБ
+      external_disk = ["vhdd-1"]
+    },
+    "vm-2" = {
+      vm_name       = "vm-2-proxy-server"                  # Имя ВМ
+      vm_desc       = "Nginx proxy server"                 # Описание
+      disk_name     = "vm-2-disk"                          # Название диска
+      disk_size     = 22                                   # Объём диска в ГБ
+    },
+    "vm-3" = {
+      vm_name       = "vm-3-mediawiki-server-1"            # Имя ВМ
+      vm_desc       = "MediaWiki server-1"                 # Описание
+      disk_name     = "vm-3-disk"                          # Название диска
+      disk_size     = 23                                   # Объём диска в ГБ
+    },
+    "vm-4" = {
+      vm_name       = "vm-4-mediawiki-server-2"            # Имя ВМ
+      vm_desc       = "MediaWiki server-2"                 # Описание
+      disk_name     = "vm-4-disk"                          # Название диска
+      disk_size     = 24                                   # Объём диска в ГБ
+    },
+    "vm-5" = {
+      vm_name       = "vm-5-proxy-server"                  # Имя ВМ
+      vm_desc       = "Haproxy proxy server-2"             # Описание
+      disk_name     = "vm-5-disk"                          # Название диска
+      disk_size     = 25                                   # Объём диска в ГБ
+    },
+    "vm-6" = {
+      vm_name       = "vm-6-primary-db"                    # Имя ВМ
+      vm_desc       = "PostgreSQL Primary db"              # Описание
+      disk_name     = "vm-6-disk"                          # Название диска
+      disk_size     = 26                                   # Объём диска в ГБ
+      external_disk = ["vssd-1"]
+    },
+    "vm-7" = {
+      vm_name       = "vm-7-standby-db"                    # Имя ВМ
+      vm_desc       = "PostgreSQL Standby db"              # Описание
+      disk_name     = "vm-7-disk"                          # Название диска
+      disk_size     = 27                                   # Объём диска в ГБ
+      external_disk = ["vhdd-2", "vhdd-3"]
+    }
+} 
 
-external_disk_groups = {
-  group1_external_vhdd_1 = {
-    description = "Внешние магнитные жесткие диски для системы мониторинга"
-    disk_names  = { "vhdd-1" = "vhdd-01-disk" }
-    disk_size   = 25
-  },
-  group2_external_vhdd_2 = {
-    description = "Внешние магнитные жесткие диски для standby БД"
-    disk_names  = { "vhdd-2" = "vhdd-02-disk" }
-    disk_size   = 26
-  },
-  group3_external_vssd_1 = {
-    description = "Внешние твердотельные жесткие диски для Primary БД"
-    disk_names   = { "vssd-1" = "vssd-01-disk" }
-    disk_type   = "network-ssd"
-    disk_size   = 27
-  }
+
+external_disks = {
+    "vhdd-1" = {
+      disk_name     = "vhdd-1-monitoring-system-db"        # Имя ВМ
+      disk_desc     = "Хранилище БД Zabbix-Server"         # Описание
+      disk_size     = 28                                   # Объём диска в ГБ
+    },
+    "vhdd-2" = {
+      disk_name     = "vhdd-2-standby-db"                  # Имя ВМ
+      disk_desc     = "Хранилище PostgreSQL Standby db"    # Описание
+      disk_size     = 29                                   # Объём диска в ГБ
+    },
+    "vhdd-3" = {
+      disk_name     = "vhdd-3-dump-db"                     # Имя ВМ
+      disk_desc     = "Хранилище db_dump"                  # Описание
+      disk_size     = 30                                   # Объём диска в ГБ
+    },
+    "vssd-1" = {
+      disk_name     = "vssd-1-primary-db"                  # Имя ВМ
+      disk_desc     = "Хранилище PostgreSQL Primary db"    # Описание
+      disk_size     = 31                                   # Объём диска в ГБ
+      disk_type     = "network-ssd"                        # Тип диска
+    }
 }

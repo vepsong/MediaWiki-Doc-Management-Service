@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram name="Page-1" id="8NoAi405iV9w-lXr4pfd">
-        <mxGraphModel dx="1562" dy="809" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
+        <mxGraphModel dx="1140" dy="571" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -76,7 +76,7 @@
                 <mxCell id="262" value="" style="group" parent="1" vertex="1" connectable="0">
                     <mxGeometry x="305.89" y="478" width="98" height="64" as="geometry"/>
                 </mxCell>
-                <mxCell id="238" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-4&lt;br&gt;PostgreSQL-Primary&lt;/b&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;imageBackground=none;labelBackgroundColor=none;" parent="262" vertex="1">
+                <mxCell id="238" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-6&lt;br&gt;PostgreSQL-Primary&lt;/b&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;imageBackground=none;labelBackgroundColor=none;" parent="262" vertex="1">
                     <mxGeometry x="50" width="48" height="64" as="geometry"/>
                 </mxCell>
                 <mxCell id="203" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VSSD - 1&lt;/b&gt;" style="shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.2d.hard_drive;" parent="262" vertex="1">
@@ -94,7 +94,7 @@
                 <mxCell id="50" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VHDD-2&lt;/b&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.vhd;pointerEvents=1;" parent="267" vertex="1">
                     <mxGeometry y="8.002399999999966" width="37.5609756097561" height="48" as="geometry"/>
                 </mxCell>
-                <mxCell id="252" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-5&lt;br&gt;PostgreSQL-Standby&lt;/b&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;imageBackground=none;labelBackgroundColor=none;" parent="267" vertex="1">
+                <mxCell id="252" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-7&lt;br&gt;PostgreSQL-Standby&lt;/b&gt;" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg;imageBackground=none;labelBackgroundColor=none;" parent="267" vertex="1">
                     <mxGeometry x="48.35626016260164" width="48" height="64" as="geometry"/>
                 </mxCell>
                 <mxCell id="268" value="" style="group" parent="1" vertex="1" connectable="0">
@@ -142,22 +142,22 @@
                         <mxPoint x="379.57" y="348" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="287" value="" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;gradientColor=#CCFFCC;" vertex="1" parent="1">
+                <mxCell id="287" value="" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;gradientColor=#CCFFCC;" parent="1" vertex="1">
                     <mxGeometry x="174.31" y="87.53999999999999" width="170.26" height="150" as="geometry"/>
                 </mxCell>
-                <mxCell id="286" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-0&lt;br&gt;Service VM&lt;br&gt;&lt;/b&gt;" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=top;verticalAlign=bottom;outlineConnect=0;align=center;shape=mxgraph.office.servers.physical_host;fillColor=#2072B8;fontSize=13;" vertex="1" parent="1">
+                <mxCell id="286" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-0&lt;br&gt;Service VM&lt;br&gt;&lt;/b&gt;" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=top;verticalAlign=bottom;outlineConnect=0;align=center;shape=mxgraph.office.servers.physical_host;fillColor=#2072B8;fontSize=13;" parent="1" vertex="1">
                     <mxGeometry x="229.44" y="150" width="60" height="52" as="geometry"/>
                 </mxCell>
-                <mxCell id="289" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-5&lt;br&gt;Proxy-server&lt;/b&gt;" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.servers.physical_host;fillColor=#2072B8;fontSize=13;" vertex="1" parent="1">
+                <mxCell id="289" value="&lt;b style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;VM-5&lt;br&gt;Proxy-server&lt;/b&gt;" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.servers.physical_host;fillColor=#2072B8;fontSize=13;" parent="1" vertex="1">
                     <mxGeometry x="506" y="490" width="60" height="52" as="geometry"/>
                 </mxCell>
-                <mxCell id="290" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+                <mxCell id="290" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;strokeColor=#000000;strokeWidth=2;" parent="1" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="519" y="480" as="targetPoint"/>
                         <mxPoint x="513" y="438" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="291" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+                <mxCell id="291" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;strokeColor=#000000;strokeWidth=2;" parent="1" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="460" y="581" as="targetPoint"/>
                         <mxPoint x="496" y="551" as="sourcePoint"/>

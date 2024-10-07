@@ -1,54 +1,50 @@
-resource "yandex_compute_instance" "vm" {
-  # Внешний цикл - по группам
-  for_each = var.vm_groups
+resource "yandex_compute_disk" "external_disks" {
+  for_each = var.external_disks
+  name     = each.value["disk_name"]
+  type     = lookup(each.value, "disk_type", var.disk_type)
+  size     = each.value["disk_size"]
+}
+
+resource "yandex_compute_disk" "boot-disk" {
+  for_each = var.virtual_machines
+  name     = each.value["disk_name"]
+  size     = each.value["disk_size"]
+  image_id = var.image_id
+}
+
+resource "yandex_compute_instance" "virtual_machine" {
+  for_each        = var.virtual_machines
+  name = each.value["vm_name"]
+
+  resources {
+    cores  = var.vm_cpu
+    memory = var.ram
+    core_fraction = var.core_fraction
+  }
+
+  boot_disk {
+    disk_id = yandex_compute_disk.boot-disk[each.key].id
+  }
+
+  network_interface {
+    subnet_id = var.subnet_id
+    nat       = var.nat
+  }
+
+  scheduling_policy {
+    preemptible = var.preemptible
+  }
 
 
-  for_each = { for group_name, group_data in var.vm_groups : 
-                group_name => group_data }
+  # Подключаем внешние диски, если они указаны в external_disk
+  dynamic "secondary_disk" {
+    for_each = try(each.value["external_disk"], [])
 
-  # Внутренний цикл - по виртуальным машинам внутри каждой группы
-  dynamic "instance" {
-    for_each = each.value.vm_names
     content {
-      name        = instance.key  # Имя виртуальной машины
-      description = each.value.description
-
-      resources {
-        cores         = var.vm_cpu
-        core_fraction = var.core_fraction
-        memory        = var.ram
-      }
-
-      boot_disk {
-        initialize_params {
-          image_id = var.OC_template
-          size     = each.value.disk_size
-          name     = each.value.disk_names[instance.key] # Имя диска для ВМ
-        }
-      }
-
-      scheduling_policy {
-        preemptible = var.preemptible
-      }
-
-      network_interface {
-        subnet_id = var.subnet_id
-        nat       = var.nat
-      }
-
-      zone = var.zone
-
-      metadata = {
-        user-data = <<-EOF
-          ${file("${path.module}/terraform_meta.txt")}
-
-          hostname: ${instance.key}
-
-          runcmd:
-            - echo ${instance.key} > /etc/hostname
-            - hostnamectl set-hostname ${instance.key}
-        EOF
-      }
+      disk_id = yandex_compute_disk.external_disks[secondary_disk.value].id
     }
   }
-}
+
+
+} 
+
