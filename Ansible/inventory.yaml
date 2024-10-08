@@ -1,45 +1,45 @@
-linux_vm:
+linuxVM:
   children:
-    monitoring-system:
+    monitoringSystem:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: 89.169.153.37
-    nginx-proxy-server:
+          ansible_host: 62.84.112.14
+    nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.136.207
-    mediawiki-server:
+          ansible_host: 89.169.159.219
+    mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.159.223
+          ansible_host: 89.169.147.167
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.136.63
-    haproxy-proxy-server:
+          ansible_host: 89.169.128.20
+    haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 89.169.147.183
-    primary-db:
+          ansible_host: 89.169.154.89
+    primaryDb:
       hosts:
         vm-6-primary-db:
-          ansible_host: 89.169.131.255
-    standby-db:
+          ansible_host: 89.169.149.47
+    standbyDb:
       hosts:
         vm-7-standby-db:
-          ansible_host: 89.169.132.148
+          ansible_host: 89.169.147.183
   vars:
     ansible_user: root
     ansible_password: ''
     connection_protocol: ssh
     ansible_become: false
-external_storage:
+externalStorage:
   children:
-    storage-monitoring-system-db:
+    storageMonitoringSystemDb:
       hosts: {}
-    storage-standby-db:
+    storageStandbyDb:
       hosts: {}
-    storage-dump-db:
+    storageDumpDb:
       hosts: {}
-    storage-primary-db:
+    storagePrimaryDb:
       hosts: {}
   vars:
     ansible_user: root

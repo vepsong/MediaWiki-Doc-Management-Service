@@ -9,6 +9,7 @@ resource "yandex_compute_disk" "boot-disk" {
   for_each = var.virtual_machines
   name     = each.value["disk_name"]
   size     = each.value["disk_size"]
+  image_id = lookup(each.value, "image_id", var.image_id)
 }
 
 resource "yandex_compute_instance" "virtual_machine" {

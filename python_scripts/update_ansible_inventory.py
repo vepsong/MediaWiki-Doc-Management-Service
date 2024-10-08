@@ -10,21 +10,21 @@ env_var_dic = load_and_check_env_vars(env_vars)
 
 # Шаг 1: Заранее определяем структуру групп и подгрупп
 dynamic_groups = {
-    "linux_vm": {
-        "monitoring-system": ["vm-1-monitoring-system"],
-        "nginx-proxy-server": ["vm-2-nginx-proxy-server"],
-        "mediawiki-server": ["vm-3-mediawiki-server-1",
+    "linuxVM": {
+        "monitoringSystem": ["vm-1-monitoring-system"],
+        "nginxProxyServer": ["vm-2-nginx-proxy-server"],
+        "mediawikiServer": ["vm-3-mediawiki-server-1",
                             "vm-4-mediawiki-server-2"],
-        "haproxy-proxy-server": ["vm-5-haproxy-proxy-server"],
-        "primary-db": ["vm-6-primary-db"],
-        "standby-db": ["vm-7-standby-db"]
+        "haproxyProxyServer": ["vm-5-haproxy-proxy-server"],
+        "primaryDb": ["vm-6-primary-db"],
+        "standbyDb": ["vm-7-standby-db"]
     },
 
-    "external_storage": {
-        "storage-monitoring-system-db": ["vhdd-1-monitoring-system-db"],
-        "storage-standby-db": ["vhdd-2-standby-db"],
-        "storage-dump-db": ["vhdd-3-dump-db"],
-        "storage-primary-db": ["vssd-1-primary-db"]
+    "externalStorage": {
+        "storageMonitoringSystemDb": ["vhdd-1-monitoring-system-db"],
+        "storageStandbyDb": ["vhdd-2-standby-db"],
+        "storageDumpDb": ["vhdd-3-dump-db"],
+        "storagePrimaryDb": ["vssd-1-primary-db"]
     }
 }
 

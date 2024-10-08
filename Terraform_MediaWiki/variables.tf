@@ -15,7 +15,7 @@ variable "vm_cpu" {
 variable "core_fraction" {
   description = "Гарантированная доля vCPU (%)"
   type        = number
-  default     = 20
+  default     = 100
 }
 
 variable "ram" {
