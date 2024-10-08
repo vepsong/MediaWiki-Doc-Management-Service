@@ -11,8 +11,8 @@ env_var_dic = load_and_check_env_vars(env_vars)
 # Шаг 1: Заранее определяем структуру групп и подгрупп
 dynamic_groups = {
     "linux_vm": {
-        "monitoring-system": ["vm-1-monitoring-system", "vm-1"],
-        "nginx-proxy-server": ["vm-2-proxy-server"],
+        "monitoring-system": ["vm-1-monitoring-system"],
+        "nginx-proxy-server": ["vm-2-nginx-proxy-server"],
         "mediawiki-server": ["vm-3-mediawiki-server-1",
                             "vm-4-mediawiki-server-2"],
         "haproxy-proxy-server": ["vm-5-haproxy-proxy-server"],
@@ -29,6 +29,7 @@ dynamic_groups = {
 }
 
 
+
 # Шаг 2: Cинхронизация состояния ресурсов с облачным провайдером
 def terraform_data_refresh(terraform_folder_path):
     """Cинхронизация состояния ресурсов с облачным провайдером."""
@@ -38,27 +39,11 @@ def terraform_data_refresh(terraform_folder_path):
     run_command(command, cwd=terraform_folder_path, capture_output=False)
 
 
-# Шаг 3: Запуск скриптов update_ansible_meta.py
+# Шаг 3: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
     """Запуск внешних python-скриптов."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
-
-
-def parse_terraform_state(tfstate):
-    """Извлекает информацию о VM из terraform.tfstate"""
-    vm_data = {}
-    for resource in tfstate['resources']:
-        if resource['type'] == 'yandex_compute_instance':  # проверьте нужный тип ресурса
-            for instance in resource['instances']:
-                attributes = instance['attributes']
-                name = attributes.get('name')
-                if name:
-                    network_interfaces = attributes.get('network_interface', [{}])
-                    nat_ip = network_interfaces[0].get('nat_ip_address')
-                    if nat_ip:
-                        vm_data[name] = {"nat_ip_address": nat_ip}
-    return vm_data
 
 
 # Шаг 4: Создание данных для будущего inventory.yaml
@@ -67,6 +52,7 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
 
     inventory_data = {}
 
+    # Добавляем группы и подгруппы из dynamic_groups
     for group_name, subgroups in dynamic_groups.items():
         group_data = {
             "children": {},
@@ -78,16 +64,17 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
             }
         }
 
+        # Создаем подгруппы и добавляем хосты из terraform_vm_data
         for subgroup_name, vm_names in subgroups.items():
             subgroup_data = {"hosts": {}}
 
+            # Заполнение подгруппы "hosts" данными из terraform_vm_data
             for vm_name in vm_names:
-                # Поиск VM в terraform_vm_data по имени и добавление её IP или пустого значения
-                vm_info = terraform_vm_data.get(vm_name)
-                nat_ip = vm_info["nat_ip_address"] if vm_info and "nat_ip_address" in vm_info else ""
-                
-                # Добавляем виртуальную машину с NAT IP или пустым значением
-                subgroup_data["hosts"][vm_name] = {"ansible_host": nat_ip}
+                # Проверяем наличие VM в terraform_vm_data
+                for key, value in terraform_vm_data.items():
+                    if vm_name in value["value"]:  # Убедимся, что имя VM есть в данных
+                        nat_ip = value["value"][vm_name]
+                        subgroup_data["hosts"][vm_name] = {"ansible_host": nat_ip}
 
             group_data["children"][subgroup_name] = subgroup_data
 
@@ -96,25 +83,26 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
     return inventory_data
 
 
-
 if __name__ == '__main__':
 
     # Имена python-скриптов
     ansible_meta_script = "update_ansible_meta.py"
+    terraform_vm_data_script = "get_terraform_vm_data.py"
 
     # Имена файлов с данными
     ansible_meta_file = "ansible_meta.json"
-    terraform_tfstate_file = "terraform.tfstate"
+    terraform_vm_data_file = "terraform_vm_data.json"
     
     # Имя файла вывода с данными
     inventory_output_file = "inventory.yaml"
 
     # Абсолютные пути к python-скриптам
     ansible_meta_script_path = f'{env_var_dic["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_script}'
+    terraform_vm_data_script_path = f'{env_var_dic["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_script}'
 
     # Абсолютные пути к файлам данных
     ansible_meta_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_file}'
-    terraform_vm_data_file_path = f'{env_var_dic["TERRAFORM_ABSOLUTE_PATH"]}/{terraform_tfstate_file}'
+    terraform_vm_data_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_file}'
     terraform_folder_path = env_var_dic["TERRAFORM_ABSOLUTE_PATH"]
     
     # Абсолютный путь к файлу вывода данных
@@ -124,18 +112,17 @@ if __name__ == '__main__':
     # Cинхронизация состояния ресурсов с облачным провайдером
     terraform_data_refresh(terraform_folder_path)
     
-    # Запуск python-скриптов для генерации файлов "ansible_meta.json"
+    # Запуск python-скриптов для генерации файлов "ansible_meta.json" и "terraform_vm_data.json"
     generate_files(ansible_meta_script_path)
+    generate_files(terraform_vm_data_script_path)
 
 
     # Загрузка данных из JSON-файлов
     ansible_meta = load_json_data(ansible_meta_file_path)
     terraform_vm_data = load_json_data(terraform_vm_data_file_path)
 
-
     # Формирование данных для inventory.yaml
     inventory_data = create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups)
-
 
     # Запись данных в inventory.yaml
     write_yaml_to_file(inventory_data, inventory_output_file_path_ansible)

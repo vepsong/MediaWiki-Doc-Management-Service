@@ -3,31 +3,29 @@ linux_vm:
     monitoring-system:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: ''
-        vm-1:
-          ansible_host: ''
+          ansible_host: 89.169.153.37
     nginx-proxy-server:
       hosts:
-        vm-2-proxy-server:
-          ansible_host: ''
+        vm-2-nginx-proxy-server:
+          ansible_host: 89.169.136.207
     mediawiki-server:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: ''
+          ansible_host: 89.169.159.223
         vm-4-mediawiki-server-2:
-          ansible_host: ''
+          ansible_host: 89.169.136.63
     haproxy-proxy-server:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: ''
+          ansible_host: 89.169.147.183
     primary-db:
       hosts:
         vm-6-primary-db:
-          ansible_host: ''
+          ansible_host: 89.169.131.255
     standby-db:
       hosts:
         vm-7-standby-db:
-          ansible_host: ''
+          ansible_host: 89.169.132.148
   vars:
     ansible_user: root
     ansible_password: ''
@@ -36,21 +34,13 @@ linux_vm:
 external_storage:
   children:
     storage-monitoring-system-db:
-      hosts:
-        vhdd-1-monitoring-system-db:
-          ansible_host: ''
+      hosts: {}
     storage-standby-db:
-      hosts:
-        vhdd-2-standby-db:
-          ansible_host: ''
+      hosts: {}
     storage-dump-db:
-      hosts:
-        vhdd-3-dump-db:
-          ansible_host: ''
+      hosts: {}
     storage-primary-db:
-      hosts:
-        vssd-1-primary-db:
-          ansible_host: ''
+      hosts: {}
   vars:
     ansible_user: root
     ansible_password: ''

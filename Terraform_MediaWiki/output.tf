@@ -2,9 +2,13 @@ output "vm_ip" {
   value = { for k, v in  yandex_compute_instance.virtual_machine : k => v.network_interface.0.ip_address }
 }
 
+# output "vm_nat_ip" {
+#   value = { for k, v in  yandex_compute_instance.virtual_machine : k => v.network_interface.0.nat_ip_address}
+# } 
+
 output "vm_nat_ip" {
-  value = { for k, v in  yandex_compute_instance.virtual_machine : k => v.network_interface.0.nat_ip_address}
-} 
+  value = { for k, v in yandex_compute_instance.virtual_machine : v.name => v.network_interface.0.nat_ip_address }
+}
 
 output "external_disk_types" {
   value = { for k, v in yandex_compute_disk.external_disks : k => v.type }
