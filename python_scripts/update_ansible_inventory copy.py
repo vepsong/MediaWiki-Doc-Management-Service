@@ -98,39 +98,39 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
         for subgroup_name, subgroup_info in subgroups.items():
             subgroup_data = {"hosts": {}}
 
-            # Извлечение списка хостов и информации о дисках из подгруппы
+            # Проверка на структуру данных (hosts, external_disks, mount_point и filesystem)
             vm_names = subgroup_info.get("hosts", [])
             external_disks = subgroup_info.get("external_disks", [])
+            mount_points = subgroup_info.get("mount_point", None)  # None, если отсутствует
+            filesystem = subgroup_info.get("filesystem", None)     # None, если отсутствует
 
             # Заполнение подгруппы "hosts" данными из terraform_vm_data
             for vm_name in vm_names:
                 # Проверяем наличие VM в terraform_vm_data
-                if vm_name in terraform_vm_data.get("vm_ip", {}):
-                    nat_ip = terraform_vm_data["vm_nat_ip"].get(vm_name)
-                    vm_info = {
-                        "ansible_host": nat_ip
-                    }
-                    
-                    # Проверяем и добавляем данные для каждого external_disk, если он определен
-                    if external_disks and isinstance(external_disks, list):
-                        vm_info["external_disks"] = []
-                        for disk in external_disks:
-                            if isinstance(disk, dict):  # Убедимся, что disk — это словарь с параметрами
-                                disk_info = {
-                                    "disk_id": disk.get("disk_id"),
-                                    "mount_point": disk.get("mount_point"),
-                                    "filesystem": disk.get("filesystem")
-                                }
-                                vm_info["external_disks"].append(disk_info)
-                    
-                    subgroup_data["hosts"][vm_name] = vm_info
+                for key, value in terraform_vm_data.items():
+                    if vm_name in value["value"]:  # Убедимся, что имя VM есть в данных
+                        nat_ip = value["value"][vm_name]
+                        vm_data = {
+                            "ansible_host": nat_ip
+                        }
+                        
+                        # Добавляем external_disks, если они указаны
+                        if external_disks:
+                            vm_data["external_disks"] = external_disks
+                        
+                        # Добавляем mount_points и filesystem, если они указаны
+                        if mount_points:
+                            vm_data["mount_point"] = mount_points
+                        if filesystem:
+                            vm_data["filesystem"] = filesystem
+                        
+                        subgroup_data["hosts"][vm_name] = vm_data
 
             group_data["children"][subgroup_name] = subgroup_data
 
         inventory_data[group_name] = group_data
 
     return inventory_data
-
 
 
 

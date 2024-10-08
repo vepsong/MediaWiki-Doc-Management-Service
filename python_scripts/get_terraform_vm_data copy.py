@@ -9,26 +9,13 @@ env_var_dic = load_and_check_env_vars(env_vars)
 
 
 # Шаг 1. Получение данных ВМ, созданных через Terraform
-# def get_terraform_vm_data(terraform_folder_path):
-#     """Получение данных ВМ (имя, ip, ip-nat и пр.), созданных через Terraform"""
-#     command = ['terraform', 'output', '-json']
-#     output = run_command(command, cwd=terraform_folder_path, capture_output=True)
-#     data = json.loads(output)
-#     print(data)
-#     return data
-
-# # Шаг 1. Получение данных ВМ, созданных через Terraform
 def get_terraform_vm_data(terraform_folder_path):
     """Получение данных ВМ (имя, ip, ip-nat и пр.), созданных через Terraform"""
     command = ['terraform', 'output', '-json']
     output = run_command(command, cwd=terraform_folder_path, capture_output=True)
     data = json.loads(output)
-
-    # Оставляем только необходимые данные
-    required_keys = ["vm_ip", "vm_nat_ip"]
-    filtered_data = {key: value["value"] for key, value in data.items() if key in required_keys}
-    return filtered_data
-
+    print(data)
+    return data
 
 
 if __name__ == '__main__':
