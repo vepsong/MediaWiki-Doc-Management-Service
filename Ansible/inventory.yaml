@@ -1,15 +1,56 @@
-linux:
+linux_vm:
   children:
-    proxy_and_monitoring:
+    monitoring-system:
       hosts:
+        vm-1-monitoring-system:
+          ansible_host: ''
+        vm-1:
+          ansible_host: ''
+    nginx-proxy-server:
+      hosts:
+        vm-2-proxy-server:
+          ansible_host: ''
+    mediawiki-server:
+      hosts:
+        vm-3-mediawiki-server-1:
+          ansible_host: ''
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.155.28
-    mediawiki_main:
-      hosts: {}
-    mediawiki_helper1_and_postgresql_primary:
-      hosts: {}
-    mediawiki_helper2_and_postgresql_standby:
-      hosts: {}
+          ansible_host: ''
+    haproxy-proxy-server:
+      hosts:
+        vm-5-haproxy-proxy-server:
+          ansible_host: ''
+    primary-db:
+      hosts:
+        vm-6-primary-db:
+          ansible_host: ''
+    standby-db:
+      hosts:
+        vm-7-standby-db:
+          ansible_host: ''
+  vars:
+    ansible_user: root
+    ansible_password: ''
+    connection_protocol: ssh
+    ansible_become: false
+external_storage:
+  children:
+    storage-monitoring-system-db:
+      hosts:
+        vhdd-1-monitoring-system-db:
+          ansible_host: ''
+    storage-standby-db:
+      hosts:
+        vhdd-2-standby-db:
+          ansible_host: ''
+    storage-dump-db:
+      hosts:
+        vhdd-3-dump-db:
+          ansible_host: ''
+    storage-primary-db:
+      hosts:
+        vssd-1-primary-db:
+          ansible_host: ''
   vars:
     ansible_user: root
     ansible_password: ''

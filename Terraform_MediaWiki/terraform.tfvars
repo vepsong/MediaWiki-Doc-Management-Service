@@ -8,7 +8,7 @@ virtual_machines = {
       ip_address    = "192.168.10.11"                      # Cтатичный внутренний IP из данных ВМ
     },
     "vm-2" = {
-      vm_name       = "vm-2-proxy-server"                  # Имя ВМ
+      vm_name       = "vm-2-nginx-proxy-server"                  # Имя ВМ
       vm_desc       = "Nginx proxy server"                 # Описание
       disk_name     = "vm-2-disk"                          # Название диска
       disk_size     = 22                                   # Объём диска в ГБ
@@ -29,7 +29,7 @@ virtual_machines = {
       ip_address    = "192.168.10.14"                      # Cтатичный внутренний IP из данных ВМ
     },
     "vm-5" = {
-      vm_name       = "vm-5-proxy-server"                  # Имя ВМ
+      vm_name       = "vm-5-haproxy-proxy-server"                  # Имя ВМ
       vm_desc       = "Haproxy proxy server-2"             # Описание
       disk_name     = "vm-5-disk"                          # Название диска
       disk_size     = 25                                   # Объём диска в ГБ
