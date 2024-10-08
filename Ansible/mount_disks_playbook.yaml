@@ -1,0 +1,22 @@
+--- 
+- name: Настроить автомонтирование дисков
+  hosts: all
+  tasks:
+    - name: Создать точку монтирования
+      ansible.builtin.file:
+        path: "{{ item.mount_point }}"
+        state: directory
+      loop: "{{ hostvars[inventory_hostname]['external_disks'] }}"
+      when: hostvars[inventory_hostname]['external_disks'] is defined
+
+    
+    - name: Добавить запись в /etc/fstab для автомонтирования
+      ansible.builtin.mount:
+        path: "{{ item.mount_point }}"
+        src: "/dev/disk/by-id/{{ item.disk_id }}"
+        fstype: "{{ item.filesystem }}"
+        opts: defaults
+        state: mounted
+      loop: "{{ hostvars[inventory_hostname]['external_disks'] }}"
+      when: hostvars[inventory_hostname]['external_disks'] is defined
+

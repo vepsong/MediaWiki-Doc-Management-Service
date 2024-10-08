@@ -11,53 +11,23 @@ env_var_dic = load_and_check_env_vars(env_vars)
 # Шаг 1: Заранее определяем структуру групп и подгрупп
 dynamic_groups = {
     "linuxVM": {
-        "monitoringSystem": {
-            "hosts": ["vm-1-monitoring-system"],
-            "external_disks": [
-                {
-                "disk_id": "vhdd-1-monitoring-system-db",
-                "mount_point": "/mnt/vhdd-1-monitoring-system-db",
-                "filesystem": "ext4"
-                }
-            ]
-        },
-        "nginxProxyServer": {
-            "hosts": ["vm-2-nginx-proxy-server"]
-        },
-        "mediawikiServer": {
-            "hosts": ["vm-3-mediawiki-server-1", "vm-4-mediawiki-server-2"]
-        },
-        "haproxyProxyServer": {
-            "hosts": ["vm-5-haproxy-proxy-server"]
-        },
-        "primaryDb": {
-            "hosts": ["vm-6-primary-db"],
-            
-            "external_disks": [
-                {
-                "disk_id": "vssd-1-primary-db",
-                "mount_point": "/mnt/vssd-1-primary-db",
-                "filesystem": "ext4"
-                }
-            ]
-        },
-        "standbyDb": {
-            "hosts": ["vm-7-standby-db"],
-            "external_disks": [
-                {
-                "disk_id": "vhdd-2-standby-db",
-                "mount_point": "/mnt/vhdd-2-standby-db",
-                "filesystem": "ext4"
-                },
-                {
-                "disk_id": "vhdd-3-dump-db",
-                "mount_point": "/mnt/vhdd-3-dump-db",
-                "filesystem": "ext4"
-                }
-            ]
-        }   
+        "monitoringSystem": ["vm-1-monitoring-system"],
+        "nginxProxyServer": ["vm-2-nginx-proxy-server"],
+        "mediawikiServer": ["vm-3-mediawiki-server-1",
+                            "vm-4-mediawiki-server-2"],
+        "haproxyProxyServer": ["vm-5-haproxy-proxy-server"],
+        "primaryDb": ["vm-6-primary-db"],
+        "standbyDb": ["vm-7-standby-db"]
+    },
+
+    "externalStorage": {
+        "storageMonitoringSystemDb": ["vhdd-1-monitoring-system-db"],
+        "storageStandbyDb": ["vhdd-2-standby-db"],
+        "storageDumpDb": ["vhdd-3-dump-db"],
+        "storagePrimaryDb": ["vssd-1-primary-db"]
     }
 }
+
 
 
 # Шаг 2: Cинхронизация состояния ресурсов с облачным провайдером
@@ -95,14 +65,8 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
         }
 
         # Создаем подгруппы и добавляем хосты из terraform_vm_data
-        for subgroup_name, subgroup_info in subgroups.items():
+        for subgroup_name, vm_names in subgroups.items():
             subgroup_data = {"hosts": {}}
-
-            # Проверка на структуру данных (hosts, external_disks, mount_point и filesystem)
-            vm_names = subgroup_info.get("hosts", [])
-            external_disks = subgroup_info.get("external_disks", [])
-            mount_points = subgroup_info.get("mount_point", None)  # None, если отсутствует
-            filesystem = subgroup_info.get("filesystem", None)     # None, если отсутствует
 
             # Заполнение подгруппы "hosts" данными из terraform_vm_data
             for vm_name in vm_names:
@@ -110,28 +74,13 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
                 for key, value in terraform_vm_data.items():
                     if vm_name in value["value"]:  # Убедимся, что имя VM есть в данных
                         nat_ip = value["value"][vm_name]
-                        vm_data = {
-                            "ansible_host": nat_ip
-                        }
-                        
-                        # Добавляем external_disks, если они указаны
-                        if external_disks:
-                            vm_data["external_disks"] = external_disks
-                        
-                        # Добавляем mount_points и filesystem, если они указаны
-                        if mount_points:
-                            vm_data["mount_point"] = mount_points
-                        if filesystem:
-                            vm_data["filesystem"] = filesystem
-                        
-                        subgroup_data["hosts"][vm_name] = vm_data
+                        subgroup_data["hosts"][vm_name] = {"ansible_host": nat_ip}
 
             group_data["children"][subgroup_name] = subgroup_data
 
         inventory_data[group_name] = group_data
 
     return inventory_data
-
 
 
 if __name__ == '__main__':
