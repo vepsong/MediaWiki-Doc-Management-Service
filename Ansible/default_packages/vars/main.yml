@@ -15,6 +15,4 @@ packages_to_install:
   - software-properties-common
   - ca-certificates
   - parted
-  - openssh-server 
-
-zbx_server_addr: 192.168.1.100
+  - openssh-server
