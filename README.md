@@ -281,9 +281,8 @@ Standby БД получает реплицированные данные с Pri
 
 - Cкрипт содержит в себе вызовы скриптов: 
   - [update_ansible_meta.py](python-scripts/update_ansible_meta.py)
+  - [add_env_var.py](python-scripts/add_env_var.py)
 
-- Cкрипт читает данные из автоматически создаваемого Terraform файла: 
-  - terraform.tfstate
 
         # update_ansible_inventory.py содержит словарь dynamic_groups
         # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
@@ -367,10 +366,9 @@ Standby БД получает реплицированные данные с Pri
        # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
    - Содержит вызовы:
-      - update_ansible_meta.py - Создание файла "ansible_meta.json" с мета-данными Ansible
+      - [update_ansible_meta.py](python-scripts/update_ansible_meta.py) - Создание файла "ansible_meta.json" с мета-данными Ansible
+      - [add_env_var.py](python-scripts/add_env_var.py) - Создание файла "terraform_vm_data.json" c данными ВМ
 
-      - Cкрипт читает данные из автоматически создаваемого Terraform файла: 
-         - terraform.tfstate
 
 #### Вспомогательные
 
