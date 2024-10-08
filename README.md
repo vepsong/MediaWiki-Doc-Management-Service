@@ -280,9 +280,11 @@ Standby БД получает реплицированные данные с Pri
 1. Запуск Python-скрипта [**update_ansible_inventory.py**](python-scripts/update_ansible_inventory.py) для автоматического и динамического формирования inventory.yaml
 
 - Cкрипт содержит в себе вызовы скриптов: 
-  - [get_terraform_vm_data.py](python-scripts/get_terraform_vm_data.py) 
   - [update_ansible_meta.py](python-scripts/update_ansible_meta.py)
-       
+
+- Cкрипт читает данные из автоматически создаваемого Terraform файла: 
+  - terraform.tfstate
+
         # update_ansible_inventory.py содержит словарь dynamic_groups
         # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
         # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
@@ -365,8 +367,10 @@ Standby БД получает реплицированные данные с Pri
        # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
    - Содержит вызовы:
-      - get_terraform_vm_data.py - Загружает актуальные данные о состоянии ВМ в Yandex Cloud и создает файл "terraform_vm_data.json"
       - update_ansible_meta.py - Создание файла "ansible_meta.json" с мета-данными Ansible
+
+      - Cкрипт читает данные из автоматически создаваемого Terraform файла: 
+         - terraform.tfstate
 
 #### Вспомогательные
 
