@@ -1,0 +1,45 @@
+---
+- name: Manage external disks
+  hosts: linuxVM
+  become: true
+  tasks:
+    - name: Ensure mount point directory exists
+      file:
+        path: "{{ item.mount_point }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+      when: item.mount_point is defined
+
+    - name: Check if filesystem exists on the disk
+      command: "blkid /dev/disk/by-id/virtio-{{ item.disk_id }}"
+      register: blkid_output
+      changed_when: false
+      failed_when: false
+      loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+      when: item.disk_id is defined
+
+    - name: Debug blkid results for each item
+      debug:
+        var: blkid_output
+      loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+
+    - name: Create filesystem on disk if not present
+      community.general.filesystem:
+        fstype: "{{ item.filesystem }}"
+        dev: "/dev/disk/by-id/virtio-{{ item.disk_id }}"
+      when:
+        - item.filesystem is defined
+        - "'UUID' not in blkid_output.stdout"  # Проверяем, что UUID не найден
+      loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+      ignore_errors: true
+
+    - name: Mount the disk and update /etc/fstab
+      ansible.posix.mount:
+        path: "{{ item.mount_point }}"
+        src: "/dev/disk/by-id/virtio-{{ item.disk_id }}"
+        fstype: "{{ item.filesystem }}"
+        opts: defaults
+        state: mounted
+      loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+      when: item.mount_point is defined

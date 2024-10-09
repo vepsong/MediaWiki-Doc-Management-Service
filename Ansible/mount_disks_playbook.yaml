@@ -1,22 +1,49 @@
---- 
-- name: Настроить автомонтирование дисков
-  hosts: all
-  tasks:
-    - name: Создать точку монтирования
-      ansible.builtin.file:
-        path: "{{ item.mount_point }}"
-        state: directory
-      loop: "{{ hostvars[inventory_hostname]['external_disks'] }}"
-      when: hostvars[inventory_hostname]['external_disks'] is defined
+- name: Find and partition disk
+  hosts: linuxVM
+  become: true
+  vars:
+    disk_id: "{{ inventory_hostname_vars[inventory_hostname]['disk_id'] }}"  # ID диска из inventory.yaml
+    mount_point: "/mnt/new_disk"
 
+  tasks:
+    - name: Find disk path by ID
+      command: "ls -la /dev/disk/by-id"
+      register: disk_output
+
+    - name: Parse disk path
+      set_fact:
+        disk_path: "{{ item.split('->')[1].strip() }}"
+      loop: "{{ disk_output.stdout_lines }}"
+      when: "'{{ disk_id }}' in item and 'part' not in item"
     
-    - name: Добавить запись в /etc/fstab для автомонтирования
-      ansible.builtin.mount:
-        path: "{{ item.mount_point }}"
-        src: "/dev/disk/by-id/{{ item.disk_id }}"
-        fstype: "{{ item.filesystem }}"
+    - name: Create partition on disk
+      shell: |
+        echo -e "n\np\n1\n\n\nw" | fdisk /dev/{{ disk_path | basename }}
+      when: disk_path is defined
+
+    - name: Format the partition
+      shell: "mkfs.ext4 /dev/{{ disk_path | basename }}1"
+      when: disk_path is defined
+
+    - name: Create mount point
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: Mount the partition
+      mount:
+        path: "{{ mount_point }}"
+        src: "/dev/{{ disk_path | basename }}1"
+        fstype: ext4
         opts: defaults
         state: mounted
-      loop: "{{ hostvars[inventory_hostname]['external_disks'] }}"
-      when: hostvars[inventory_hostname]['external_disks'] is defined
 
+    - name: Get UUID of the partition
+      command: "blkid -s UUID -o value /dev/{{ disk_path | basename }}1"
+      register: uuid_output
+
+    - name: Add entry to fstab
+      lineinfile:
+        path: /etc/fstab
+        line: "UUID={{ uuid_output.stdout }} {{ mount_point }} ext4 defaults 0 2"
+        state: present
