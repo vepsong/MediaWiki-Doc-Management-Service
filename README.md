@@ -375,13 +375,13 @@ Standby БД получает реплицированные данные с Pri
         - [from data_handler_update_ansible_inventory](python-scripts/data_handler_update_ansible_inventory.py) import create_group_vars, get_vm_info - Обработка данных из "ansible_meta.json" и "terraform_vm_data.json"
     - **from [ansible_structure](python-scripts/ansible_structure.py) import dynamic_groups**
 
-        # ansible_structure.py содержит словарь dynamic_groups
-        # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
-        # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
+          # ansible_structure.py содержит словарь dynamic_groups
+          # Он предназначен для выстраивания структуры групп, подгрупп и входящих в них ВМ.
+          # Он уже настроен. Но, при необходимости, можно менять структуру файла inventory.yaml
 
-        # Просмотреть список созданных через Terraform ВМ      
-        ~/<имя репозитория>/<папка Terraform> terraform output 
-        # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
+          # Просмотреть список созданных через Terraform ВМ      
+          ~/<имя репозитория>/<папка Terraform> terraform output 
+          # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
 #### Вспомогательные
 
