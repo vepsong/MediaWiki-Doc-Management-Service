@@ -1,49 +1,27 @@
-- name: Find and partition disk
-  hosts: linuxVM
+---
+- name: test
+  hosts: vm-1-monitoring-system
   become: true
-  vars:
-    disk_id: "{{ inventory_hostname_vars[inventory_hostname]['disk_id'] }}"  # ID диска из inventory.yaml
-    mount_point: "/mnt/new_disk"
-
   tasks:
-    - name: Find disk path by ID
-      command: "ls -la /dev/disk/by-id"
-      register: disk_output
 
-    - name: Parse disk path
-      set_fact:
-        disk_path: "{{ item.split('->')[1].strip() }}"
-      loop: "{{ disk_output.stdout_lines }}"
-      when: "'{{ disk_id }}' in item and 'part' not in item"
-    
-    - name: Create partition on disk
-      shell: |
-        echo -e "n\np\n1\n\n\nw" | fdisk /dev/{{ disk_path | basename }}
-      when: disk_path is defined
 
-    - name: Format the partition
-      shell: "mkfs.ext4 /dev/{{ disk_path | basename }}1"
-      when: disk_path is defined
-
-    - name: Create mount point
-      file:
-        path: "{{ mount_point }}"
-        state: directory
-
-    - name: Mount the partition
-      mount:
-        path: "{{ mount_point }}"
-        src: "/dev/{{ disk_path | basename }}1"
-        fstype: ext4
-        opts: defaults
-        state: mounted
-
-    - name: Get UUID of the partition
-      command: "blkid -s UUID -o value /dev/{{ disk_path | basename }}1"
-      register: uuid_output
-
-    - name: Add entry to fstab
-      lineinfile:
-        path: /etc/fstab
-        line: "UUID={{ uuid_output.stdout }} {{ mount_point }} ext4 defaults 0 2"
+    - name: Create a new ext4 primary partition
+      community.general.parted:
+        device: /dev/disk/by-id/virtio-fhm9pe2fdj53cr0r4gut
+        number: 1
         state: present
+        fs_type: ext4
+        part_start: '0%'
+        part_end: '100%'
+
+
+    # - name: Remove partition number 1
+    #   community.general.parted:
+    #     device: /dev/disk/by-id/virtio-fhm9pe2fdj53cr0r4gut
+    #     number: 1
+    #     state: absent
+
+
+    # ls -la /dev/disk/by-id
+    # lsblk
+    # lsblk -f
