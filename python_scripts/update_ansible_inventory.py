@@ -1,4 +1,7 @@
 from utils import run_command, load_and_check_env_vars, write_yaml_to_file, load_json_data
+from data_handler_update_ansible_inventory import create_group_vars, get_vm_info
+from ansible_structure import dynamic_groups
+
 
 # Имена переменных, которые нужно загрузить
 env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", \
@@ -7,60 +10,7 @@ env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", \
 # Проверяем наличие переменных окружения и добавляем их в словарь
 env_var_dic = load_and_check_env_vars(env_vars)
 
-
-# Шаг 1: Заранее определяем структуру групп и подгрупп
-dynamic_groups = {
-    "linuxVM": {
-        "monitoringSystem": {
-            "hosts": ["vm-1-monitoring-system"],
-            "external_disks": [
-                {
-                "disk_id": "vhdd-1-monitoring-system-db",
-                "mount_point": "/mnt/vhdd-1-monitoring-system-db",
-                "filesystem": "ext4"
-                }
-            ]
-        },
-        "nginxProxyServer": {
-            "hosts": ["vm-2-nginx-proxy-server"]
-        },
-        "mediawikiServer": {
-            "hosts": ["vm-3-mediawiki-server-1", "vm-4-mediawiki-server-2"]
-        },
-        "haproxyProxyServer": {
-            "hosts": ["vm-5-haproxy-proxy-server"]
-        },
-        "primaryDb": {
-            "hosts": ["vm-6-primary-db"],
-            
-            "external_disks": [
-                {
-                "disk_id": "vssd-1-primary-db",
-                "mount_point": "/mnt/vssd-1-primary-db",
-                "filesystem": "ext4"
-                }
-            ]
-        },
-        "standbyDb": {
-            "hosts": ["vm-7-standby-db"],
-            "external_disks": [
-                {
-                "disk_id": "vhdd-2-standby-db",
-                "mount_point": "/mnt/vhdd-2-standby-db",
-                "filesystem": "ext4"
-                },
-                {
-                "disk_id": "vhdd-3-dump-db",
-                "mount_point": "/mnt/vhdd-3-dump-db",
-                "filesystem": "ext4"
-                }
-            ]
-        }   
-    }
-}
-
-
-# Шаг 2: Cинхронизация состояния ресурсов с облачным провайдером
+# Шаг 1: Cинхронизация состояния ресурсов с облачным провайдером
 def terraform_data_refresh(terraform_folder_path):
     """Cинхронизация состояния ресурсов с облачным провайдером."""
 
@@ -69,60 +19,32 @@ def terraform_data_refresh(terraform_folder_path):
     run_command(command, cwd=terraform_folder_path, capture_output=False)
 
 
-# Шаг 3: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
+# Шаг 2: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
     """Запуск внешних python-скриптов."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
 
 
-# Шаг 4: Создание данных для будущего inventory.yaml
+# Шаг 3: Создание данных для будущего inventory.yaml
 def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
-    """Создание данных для будущего inventory.yaml"""
-
+    """Создание данных для будущего inventory.yaml."""
     inventory_data = {}
 
-    # Добавляем группы и подгруппы из dynamic_groups
     for group_name, subgroups in dynamic_groups.items():
         group_data = {
             "children": {},
-            "vars": {
-                "ansible_user": ansible_meta.get("ansible_user"),
-                "ansible_password": ansible_meta.get("ansible_password"),
-                "connection_protocol": ansible_meta.get("connection_protocol"),
-                "ansible_become": ansible_meta.get("ansible_become")
-            }
+            "vars": create_group_vars(ansible_meta)
         }
 
-        # Создаем подгруппы и добавляем хосты из terraform_vm_data
         for subgroup_name, subgroup_info in subgroups.items():
             subgroup_data = {"hosts": {}}
-
-            # Извлечение списка хостов и информации о дисках из подгруппы
             vm_names = subgroup_info.get("hosts", [])
             external_disks = subgroup_info.get("external_disks", [])
 
-            # Заполнение подгруппы "hosts" данными из terraform_vm_data
             for vm_name in vm_names:
-                # Проверяем наличие VM в terraform_vm_data
                 if vm_name in terraform_vm_data.get("vm_ip", {}):
-                    nat_ip = terraform_vm_data["vm_nat_ip"].get(vm_name)
-                    vm_info = {
-                        "ansible_host": nat_ip
-                    }
-                    
-                    # Проверяем и добавляем данные для каждого external_disk, если он определен
-                    if external_disks and isinstance(external_disks, list):
-                        vm_info["external_disks"] = []
-                        for disk in external_disks:
-                            if isinstance(disk, dict):  # Убедимся, что disk — это словарь с параметрами
-                                disk_info = {
-                                    "disk_id": disk.get("disk_id"),
-                                    "mount_point": disk.get("mount_point"),
-                                    "filesystem": disk.get("filesystem")
-                                }
-                                vm_info["external_disks"].append(disk_info)
-                    
+                    vm_info = get_vm_info(vm_name, terraform_vm_data, external_disks)
                     subgroup_data["hosts"][vm_name] = vm_info
 
             group_data["children"][subgroup_name] = subgroup_data
@@ -130,7 +52,6 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
         inventory_data[group_name] = group_data
 
     return inventory_data
-
 
 
 
@@ -155,7 +76,7 @@ if __name__ == '__main__':
     ansible_meta_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_file}'
     terraform_vm_data_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_file}'
     terraform_folder_path = env_var_dic["TERRAFORM_ABSOLUTE_PATH"]
-    
+
     # Абсолютный путь к файлу вывода данных
     inventory_output_file_path_ansible =f'{env_var_dic["ANSIBLE_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
     inventory_output_file_path_credentials =f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
