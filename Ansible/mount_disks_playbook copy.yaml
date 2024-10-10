@@ -55,3 +55,26 @@
         fstype: ext4
         state: mounted
 
+
+
+# Для инфо:
+
+# 1. Размонтирование директории: 
+# 1.1. Просмотреть path точки монтирования: lsblk -f
+# 1.2. Размонтировать директорию: umount <path>
+# umount /opt/vhdd-1-monitoring-system-db/
+
+# 2. Удалить Logical Volume:
+# 2.1. Просмотреть Logical Volume: lvdisplay
+# 2.2. Удалить Logical Volume: lvremove <path>
+# lvremove /dev/vg-db-storage/lv-vhdd-1-monitoring-system-db
+
+# 3. Удалить Volume Group:
+# 3.1. Просмотреть Volume Group: vgdisplay
+# 3.2. Удалить Volume Group: vgremove <name>
+# vgremove vg-db-storage
+
+# 4. Удалить partition:
+# 4.1. Просмотреть partition: fdisk -l -a или lsblk -f
+# 4.2. Удалить Volume Group: fdisk <path> 
+# fdisk /dev/vdb далее p (просмотр сущ. разделов) далее d (удалить раздел) далее выбрать номер раздела далее w (сохранить изменения)
