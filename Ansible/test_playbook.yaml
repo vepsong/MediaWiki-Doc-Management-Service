@@ -1,0 +1,13 @@
+---
+- name: Cleanup LVM and partitions
+  hosts: vm-1-monitoring-system
+  become: true
+  vars:
+    disk_id: "{{ hostvars[inventory_hostname]['external_disks'][0]['disk_id'] }}"
+  tasks:
+    - name: Display device links IDs
+      debug:
+        msg: "Device: {{ item.key }} - ID: {{ item.value }}"
+      loop: "{{ ansible_facts.device_links.ids | dict2items }}"
+      when: item.value | regex_search(disk_id)
+

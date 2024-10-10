@@ -7,7 +7,7 @@ linuxVM:
           external_disks:
           - disk_id: fhm1aq44cfv9vld5knvs
             disk_name: vhdd-1-monitoring-system-db
-            mount_point: /mnt/vhdd-1-monitoring-system-db
+            mount_point: /opt/vhdd-1-monitoring-system-db
             filesystem: ext4
     nginxProxyServer:
       hosts:
@@ -30,7 +30,7 @@ linuxVM:
           external_disks:
           - disk_id: fhmbq1cm76admlinktsj
             disk_name: vssd-1-primary-db
-            mount_point: /mnt/vssd-1-primary-db
+            mount_point: /opt/vssd-1-primary-db
             filesystem: ext4
     standbyDb:
       hosts:
@@ -39,11 +39,11 @@ linuxVM:
           external_disks:
           - disk_id: fhmabmtv27rpr2jb1bkd
             disk_name: vhdd-2-standby-db
-            mount_point: /mnt/vhdd-2-standby-db
+            mount_point: /opt/vhdd-2-standby-db
             filesystem: ext4
           - disk_id: fhmie6bbemudjadv49np
             disk_name: vhdd-3-dump-db
-            mount_point: /mnt/vhdd-3-dump-db
+            mount_point: /opt/vhdd-3-dump-db
             filesystem: ext4
   vars:
     ansible_user: root

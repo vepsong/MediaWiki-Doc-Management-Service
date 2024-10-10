@@ -5,7 +5,7 @@ dynamic_groups = {
             "external_disks": [
                 {
                     "disk_name": "vhdd-1-monitoring-system-db",
-                    "mount_point": "/mnt/vhdd-1-monitoring-system-db",
+                    "mount_point": "/opt/vhdd-1-monitoring-system-db",
                     "filesystem": "ext4"
                 }
             ]
@@ -24,7 +24,7 @@ dynamic_groups = {
             "external_disks": [
                 {
                     "disk_name": "vssd-1-primary-db",
-                    "mount_point": "/mnt/vssd-1-primary-db",
+                    "mount_point": "/opt/vssd-1-primary-db",
                     "filesystem": "ext4"
                 }
             ]
@@ -34,12 +34,12 @@ dynamic_groups = {
             "external_disks": [
                 {
                     "disk_name": "vhdd-2-standby-db",
-                    "mount_point": "/mnt/vhdd-2-standby-db",
+                    "mount_point": "/opt/vhdd-2-standby-db",
                     "filesystem": "ext4"
                 },
                 {
                     "disk_name": "vhdd-3-dump-db",
-                    "mount_point": "/mnt/vhdd-3-dump-db",
+                    "mount_point": "/opt/vhdd-3-dump-db",
                     "filesystem": "ext4"
                 }
             ]
