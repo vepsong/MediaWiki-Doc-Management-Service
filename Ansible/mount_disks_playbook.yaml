@@ -1,23 +1,74 @@
 ---
+
 - name: test
   hosts: vm-1-monitoring-system
   become: true
   tasks:
+    # - name: Get device partitions using lsblk
+    #   ansible.builtin.command: "bash -c 'lsblk -o NAME -nr | grep -q \"^vdb[0-9]\" && echo true || echo false'"
+    #   register: lsblk_partition_output
 
+    # - name: Display lsblk output
+    #   debug:
+    #     var: lsblk_partition_output.stdout_lines
+
+    
+    # - name: Set device volume label
+    #   set_fact:
+    #     volume_label: "{{ ansible_facts['device_links']['ids'] | dict2items | selectattr('value', 'search', hostvars[inventory_hostname]['external_disks'][0]['disk_id']) | map(attribute='key') | first }}"
+  
+    - name: Set device disk_id
+      set_fact:
+        disk_id: "{{ hostvars[inventory_hostname]['external_disks'][0]['disk_id'] }}"
+    
+    - name: Set device variable full path
+      set_fact:
+        device_full_path: "/dev/disk/by-id/virtio-{{ disk_id }}"
+   
+    - name: Set device_partitions full path
+      set_fact:
+        device_partitions_full_path: "{{ device_full_path }}-part1"
+
+    - name: Check if disk has partitions
+      ansible.builtin.command: "lsblk -o NAME -nr /dev/disk/by-id/virtio-fhmrbv9egls7ihaed23l"
+      register: lsblk_output
+
+    - name: Display lsblk output
+      debug:
+        var: lsblk_output.stdout_lines
 
     - name: Create a new ext4 primary partition
       community.general.parted:
-        device: /dev/disk/by-id/virtio-fhm9pe2fdj53cr0r4gut
+        device: "{{ device_full_path }}"
         number: 1
         state: present
         fs_type: ext4
         part_start: '0%'
         part_end: '100%'
+      when: lsblk_output.stdout_lines | select('search', '^vdb[0-9]+') | list | length == 0
+      register: create_partition_output
+
+    - name: Format partition with ext4 filesystem
+      community.general.filesystem:
+        fstype: ext4
+        dev: "{{ device_partitions_full_path }}"
+      when: create_partition_output.changed
+      register: format_partition_result
+
+
+    # - name: Create a new ext4 primary partition
+    #   community.general.parted:
+    #     device: /dev/disk/by-id/virtio-fhmrbv9egls7ihaed23l
+    #     number: 1
+    #     state: present
+    #     fs_type: ext4
+    #     part_start: '0%'
+    #     part_end: '100%'
 
 
     # - name: Remove partition number 1
     #   community.general.parted:
-    #     device: /dev/disk/by-id/virtio-fhm9pe2fdj53cr0r4gut
+    #     device: /dev/disk/by-id/virtio-fhmrbv9egls7ihaed23l
     #     number: 1
     #     state: absent
 
@@ -25,3 +76,5 @@
     # ls -la /dev/disk/by-id
     # lsblk
     # lsblk -f
+    # {{ ansible_facts['devices']['vdb']['model'] }}
+    # {{ hostvars[inventory_hostname]['your_variable'] }}
