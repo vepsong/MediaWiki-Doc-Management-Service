@@ -1,13 +1,102 @@
+# Инфо:
+# 
+# 1. Отобразить инфо о дисках и разделах: lsblk -f
+# 2. Разметка диска новыми разделами (partition): fdisk /dev/<название устройства>
+# 2.1. fdisk /dev/vdb далее g (создание таблицы разделов gpt) далее w (сохр. изменения и выйти)
+# 3. Создание раздела диска (partition) и physical volume вместе с ним: fdisk /dev/<название устройства>
+# 3.1. fdisk /dev/vdb далее n (создание раздела) далее 1 (номер раздела) далее enter (вопрос про секторы) далее w (сохр. изменения и выйти)
+# 4. Инициализация Physical Volume: pvcreate /dev/<название раздела>
+# 4.1. pvcreate /dev/vdb1 
+# 5. Создание Volume Group: vgcreate <имя группы томов> /dev/<имя раздела>
+# 5.1. vgcreate vg-db-storage /dev/vdb1 (vgs - проверка, что VG создан)
+# 6. Cоздание Logical Volume: lvcreate -n <имя LV> -l <кол-во extents (можно посмотреть vgdisplay <имя VG>)> <имя VG>
+# lvcreate -n lv-vhdd-1-monitoring-system-db -l 7167 vg-db-storage (lvs - проверка, что LV создан)
+# 7. Форматирование LV и создание файловой системы ext4
+# mkfs.ext4 /dev/vg-db-storage/lv-vhdd-1-monitoring-system-db
+# 8. Создание точки монтирования
+# mkdir /opt/vhdd-1-monitoring-system-db/
+# 9. Монтирование LV
+# mount /dev/vg-db-storage/lv-vhdd-1-monitoring-system-db /opt/vhdd-1-monitoring-system-db/
+# 10. Добавить LV в автомонтирование /etc/fstab (проверка автомонтирования cat /etc/fstab или mount -a)
+# echo "/dev/vg-db-storage/lv-vhdd-1-monitoring-system-db /opt/vhdd-1-monitoring-system-db/ ext4 defaults 0 0" | sudo tee -a /etc/fstab
+
+
+
 ---
-- name: Cleanup LVM and partitions
-  hosts: vm-1-monitoring-system
+- name: Get device_name
+  hosts: all
   become: true
   vars:
     disk_id: "{{ hostvars[inventory_hostname]['external_disks'][0]['disk_id'] }}"
   tasks:
-    - name: Display device links IDs
-      debug:
-        msg: "Device: {{ item.key }} - ID: {{ item.value }}"
+    - name: Set device_name based on disk_id
+      set_fact:
+        device_name: "{{ item.key }}"
       loop: "{{ ansible_facts.device_links.ids | dict2items }}"
       when: item.value | regex_search(disk_id)
 
+
+- name: set up LVM
+  hosts: all
+  become: true
+  vars:
+    origin_path: dev
+    device_path: "/{{ origin_path }}/{{ device_name }}"
+    volume_group: vg-db-storage  # Определение переменной для группы томов
+    logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Определение переменной для логического тома
+    physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
+    vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
+    file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point'] }}"
+
+  tasks:
+    # Создание раздела
+    # Проверка создания раздела "lsblk"
+    - name: Partition "{{ device_path }}" disk
+      community.general.parted:
+        device: "{{ device_path }}"
+        number: 1
+        flags: [ lvm ]
+        label: "gpt"
+        state: present
+        part_end: "100%"
+
+    # Создание Volume Group
+    # Проверка: "vgs"
+    - name: Task for PV and VG
+      community.general.lvg:
+          vg: "{{ volume_group }}"
+          pvs: "{{ physical_volume }}"
+
+    # Создание Logical Volume
+    # Проверка: "lvs"
+    - name: Logical volume - {{ logical_volume }} - with size
+      community.general.lvol:
+        vg: "{{ volume_group }}"
+        lv: "{{ logical_volume }}"
+        size: 100%FREE
+    
+    # Форматирование раздела и создание файловой системы
+    # Проверка: "lsblk -f"
+    - name: Format the volume with "{{ file_system }}" fs
+      community.general.filesystem:
+        fstype: "{{ file_system }}"
+        dev: "{{ vg_lv_path }}"
+    
+    # Создание директории для монтирования жеского диска
+    - name: Target directory under /opt/
+      ansible.builtin.file:
+        path: "{{ mount_point }}"
+        state: directory
+        mode: '0755'
+    
+    # Монтирование жеского диска
+    # Проверка, что жеский диск смонтирован "lsblk -f" 
+    # Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
+    # Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
+    - name: mount the lv on "{{ vg_lv_path }}"
+      ansible.posix.mount:
+        path: "{{ mount_point }}"
+        src: "{{ vg_lv_path }}"
+        fstype: "{{ file_system }}"
+        state: mounted

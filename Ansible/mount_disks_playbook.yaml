@@ -23,30 +23,33 @@
 
 
 ---
-- name: Set up LVM on all hosts
-  hosts: vm-1-monitoring-system
+- name: Get device_name
+  hosts: all
   become: true
+  vars:
+    disk_id: "{{ hostvars[inventory_hostname]['external_disks'][0]['disk_id'] }}"
   tasks:
     - name: Set device_name based on disk_id
       set_fact:
         device_name: "{{ item.key }}"
       loop: "{{ ansible_facts.device_links.ids | dict2items }}"
-      when: item.value | regex_search(hostvars[inventory_hostname]['external_disks'][0]['disk_id'])
-      register: device_name 
+      when: item.value | regex_search(disk_id)
 
-    - name: Set up variables for LVM
-      set_fact:
-        # origin_path: dev
-        # device_path: "/{{ origin_path }}/{{ device_name }}"
-        device_path: "/dev/{{ device_name }}"
-        volume_group: vg-db-storage  # Определение переменной для группы томов
-        logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Определение переменной для логического тома
-        physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
-        # vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
-        vg_lv_path: "/dev/{{ volume_group }}/{{ logical_volume }}"
-        file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"
-        mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point'] }}"
 
+- name: set up LVM
+  hosts: all
+  become: true
+  vars:
+    origin_path: dev
+    device_path: "/{{ origin_path }}/{{ device_name }}"
+    volume_group: vg-db-storage  # Определение переменной для группы томов
+    logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Определение переменной для логического тома
+    physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
+    vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
+    file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point'] }}"
+
+  tasks:
     # Создание раздела
     # Проверка создания раздела "lsblk"
     - name: Partition "{{ device_path }}" disk
