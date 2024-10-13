@@ -31,7 +31,10 @@
       set_fact:
         device_name: "{{ item.key }}"
       loop: "{{ ansible_facts.device_links.ids | dict2items }}"
-      when: item.value | regex_search(disk_id)
+      when: 
+        - hostvars[inventory_hostname]['external_disks'] is defined
+        - hostvars[inventory_hostname]['external_disks'] | length > 0
+        - item.value | regex_search(disk_id)
 
 - name: set down LVM
   hosts: all
@@ -52,6 +55,7 @@
       ansible.posix.mount:
         path: "{{ mount_point }}"
         state: unmounted
+      when: device_name is defined
 
     # 2. Remove the Logical Volume
     - name: Remove logical volume - "{{ logical_volume }}"
@@ -60,12 +64,14 @@
         lv: "{{ logical_volume }}"
         state: absent
         force: true
+      when: device_name is defined
 
     # 3. Remove the Volume Group
     - name: Remove volume group
       community.general.lvg:
         vg: "{{ volume_group }}"
         state: absent
+      when: device_name is defined
 
     # 4. Remove the partition using fdisk
     - name: Partition "{{ device_path }}" disk
@@ -73,6 +79,7 @@
         device: "{{ device_path }}"
         number: 1
         state: absent
+      when: device_name is defined
 
 
 

@@ -33,7 +33,10 @@
       set_fact:
         device_name: "{{ item.key }}"
       loop: "{{ ansible_facts.device_links.ids | dict2items }}"
-      when: item.value | regex_search(disk_id)
+      when: 
+        - hostvars[inventory_hostname]['external_disks'] is defined
+        - hostvars[inventory_hostname]['external_disks'] | length > 0
+        - item.value | regex_search(disk_id)
 
 
 - name: set up LVM
@@ -60,6 +63,7 @@
         label: "gpt"
         state: present
         part_end: "100%"
+      when: device_name is defined
 
     # Создание Volume Group
     # Проверка: "vgs"
@@ -67,6 +71,7 @@
       community.general.lvg:
           vg: "{{ volume_group }}"
           pvs: "{{ physical_volume }}"
+      when: device_name is defined
 
     # Создание Logical Volume
     # Проверка: "lvs"
@@ -75,6 +80,7 @@
         vg: "{{ volume_group }}"
         lv: "{{ logical_volume }}"
         size: 100%FREE
+      when: device_name is defined
     
     # Форматирование раздела и создание файловой системы
     # Проверка: "lsblk -f"
@@ -82,6 +88,7 @@
       community.general.filesystem:
         fstype: "{{ file_system }}"
         dev: "{{ vg_lv_path }}"
+      when: device_name is defined
     
     # Создание директории для монтирования жеского диска
     - name: Target directory under /opt/
@@ -89,6 +96,7 @@
         path: "{{ mount_point }}"
         state: directory
         mode: '0755'
+      when: device_name is defined
     
     # Монтирование жеского диска
     # Проверка, что жеский диск смонтирован "lsblk -f" 
@@ -100,3 +108,4 @@
         src: "{{ vg_lv_path }}"
         fstype: "{{ file_system }}"
         state: mounted
+      when: device_name is defined
