@@ -348,7 +348,7 @@ Standby БД получает реплицированные данные с Pri
 <!-- END_5.4. ansible_setup.md -->
 
 </details>
-</details>
+
 
 ### 5.5 Настройка PostgreSQL
 
