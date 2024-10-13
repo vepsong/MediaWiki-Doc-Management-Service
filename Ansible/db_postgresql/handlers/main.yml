@@ -1,0 +1,8 @@
+---
+# handlers file for db_postgresql
+- name: Postgresql Reloader
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+    enabled: yes
+  listen: "reload_postgresql"

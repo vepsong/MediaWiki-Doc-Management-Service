@@ -1,0 +1,5 @@
+---
+# defaults file for db_postgresql
+target_groups:
+  - primaryDb
+  - standbyDb

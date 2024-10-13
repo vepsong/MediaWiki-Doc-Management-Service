@@ -297,14 +297,20 @@ Standby БД получает реплицированные данные с Pri
         # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
 2. Pipeline по запуску playbook'ов playbook
+   - Изменение имени хостов всех ВМ
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
+
    - Монтирование внешних жестких дисков, инициализация LVM.  
       - Будут созданы: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt, запись в /etc/fstab для автомонтирования диска после перезапуска ВМ
 
-            ansible-playbook mount_disks_playbook.yaml -i inventory.yaml
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
 
-   - Установка и настройка zabbix-server, zabbix-agent, keepalived в группe хостов "proxy_and_monitoring" (vm-2, vm-3)
+   - Размонтирование внешних жестких дисков, деинициализация LVM.  
 
-         ansible-playbook playbook.yaml -i inventory.yaml --tags="install_zabbix_agent_and_proxy"  
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_disks"
+
+   - Установка пакетов для postgresql  
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_db_postgresql"
 
 
 3. Дополнительная информация
@@ -331,7 +337,7 @@ Standby БД получает реплицированные данные с Pri
       ansible-galaxy role list  
 
       # Запуск playbook
-      ansible-playbook <название playbook>.yaml -i <название файла с inventory>.yaml --tags="<указать тэг>"
+      ansible-playbook <название playbook>.yaml -i <название файла с inventory>.yaml --tags="<указать тег>"
 
         Пример:
         ansible-playbook mount_disks_playbook.yaml -i inventory.yaml --tags="moint_dir"
@@ -343,6 +349,40 @@ Standby БД получает реплицированные данные с Pri
 
 </details>
 </details>
+
+### 5.5 Настройка PostgreSQL
+
+<details>
+<summary>Развернуть</summary>  
+
+<!-- START_5.5. postgresql_setup.md -->
+<!-- # Настройка Ansible для автоматической конфигурации сервиса -->
+
+#### Настройка PostgreSQL
+
+1. Запуск test
+
+- тестовая инфа
+
+
+2. Дополнительная информация
+
+- Основные команды для работы с PostgreSQL  
+
+  
+  <details>
+  <summary>Развернуть</summary>  
+      
+      # test
+      test
+
+  </details> 
+
+<!-- END_5.5. postgresql_setup.md -->
+
+</details>
+</details>
+
 
 ## 6. Краткое описание python-скриптов
 

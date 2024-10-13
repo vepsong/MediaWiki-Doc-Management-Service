@@ -1,0 +1,139 @@
+---
+# tasks file for db_postgresql
+
+# Обновление пакетного репозитория 
+- name: Update list of packages
+  apt:
+    update_cache: yes
+  become: yes
+  tags:
+    - db_postgresql_apt_update
+
+
+# Установка пакетов
+- name: Packet installing
+  apt:
+    name: "{{ item }}" 
+    state: present
+  loop:
+    - "{{ packages_to_install }}"
+  tags:
+    - db_postgresql_install_packages 
+
+# 
+- name: "Start and enable services"
+  service: 
+    name=postgresql
+    state=started 
+    enabled=yes
+  tags:
+    - db_postgresql_start_enable_service
+
+# - name: "Allow md5 connection for the db user"
+#   postgresql_pg_hba:
+#     dest: "/etc/postgresql/14/main/pg_hba.conf"
+#     contype: host
+#     databases: all
+#     method: md5
+#     # users: "{{ postgres_vars.db_user }}"
+#     users: postgres
+#     address: 0.0.0.0/0
+#     create: true
+#   become: yes
+#   become_user: postgres
+#   notify: reload_postgresql
+#   tags:
+#   - db_postgresql_allow_md5_connection_db_user
+
+
+- name: Создание пользователя БД PostgresSQL
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_vars.db_user }}"
+    password: "{{ postgres_vars.db_password }}"
+    role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
+    encrypted: true
+    state: present
+  tags:
+    - db_postgresql_create_postgres_user
+  become: true
+  become_user: postgres
+
+
+
+
+
+
+
+
+
+# - name: Create the databases
+#   community.postgresql.postgresql_db:
+#     name: "{{ postgres_vars.db_name  }}"
+#     encoding: "UTF-8"
+#   become: true
+#   become_user: postgres
+#   tags:
+#     - db_postgresql_create_db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # Cоздание приложения 
+# - name: "Create app database"
+#   postgresql_db:
+#     state: present
+#     name: "{{ postgres_vars.db_name  }}"
+#   become: yes
+#   become_user: postgres
+#   tags:
+#   - db_postgresql_create_app
+
+# # Создание пользователя БД
+# - name: "Create db user"
+#   postgresql_user:
+#     state: present
+#     name: "{{ postgres_vars.db_user }}"
+#     password: "{{ postgres_vars.db_password }}"
+#   become: yes
+#   become_user: postgres
+#   tags:
+#   - db_postgresql_create_db_user
+
+
+# - name: "Grant db user access to app db"
+#   postgresql_privs:
+#     type: database
+#     database: "{{ postgres_vars.db_name }}"
+#     roles: "{{ postgres_vars.db_user }}"
+#     grant_option: no
+#     privs: all
+#   become: yes
+#   become_user: postgres
+#   tags:
+#   - db_postgresql_add_access_db_user
+
+
+
+
+
+# # - name: Создание пользователя БД PostgresSQL
+# #   community.postgresql.postgresql_user:
+# #     name: "{{ postgres_vars.db_user }}"
+# #     password: "{{ postgres_vars.db_password }}"
+# #     role_attr_flags: "{{ postgres_vars.attr | join(',') }}"  # Преобразуем список в строку
+# #     encrypted: true
+# #     state: present
+# #   tags:
+# #     - db_postgresql_create_postgres_user

@@ -27,26 +27,11 @@
     - unmount_external_disks
 
 
-# - name: Set up mediawiki
-#   hosts: "{{ target_groups }}"
-#   become: true
-#   roles:
-#     - role: mediawiki
-#   tags:
-#     - setup_mediawiki
-
-- name: Set up mediawiki
-  hosts: vm-3-mediawiki-server-1
+- name: Set up db_postgresql
+  hosts: "{{ target_groups }}"
   become: true
-  tasks:
-    - name: Создание пользователя БД PostgresSQL
-      community.postgresql.postgresql_user:
-        login_user: postgres
-        name: "{{ postgres_vars.db_user }}"
-        password: "{{ postgres_vars.db_password }}"
-        role_attr_flags: "{{ postgres_vars.attr | join(',') }}"  # Преобразуем список в строку
-        encrypted: true
-        state: present
-      tags:
-        - mediawiki_create_postgres_user
+  roles:
+    - role: db_postgresql
+  tags:
+    - setup_db_postgresql
 
