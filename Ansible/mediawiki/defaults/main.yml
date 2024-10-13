@@ -1,2 +1,5 @@
 ---
 # defaults file for mediawiki
+
+target_groups:
+  - mediawikiServer

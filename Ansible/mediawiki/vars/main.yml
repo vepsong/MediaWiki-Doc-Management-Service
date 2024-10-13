@@ -1,2 +1,24 @@
 ---
 # vars file for mediawiki
+packages_to_install:
+  - nginx
+  - php 
+  - php-intl
+  - php-mbstring
+  - php-xml
+  - php-apcu 
+  - php-curl
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+
+postgres_vars:
+  db_user: wikiuser
+  db_name: my_wiki
+  db_password: your_password 
+  attr: 
+    - S
+    - D
+    - R
+    - P
+    - E

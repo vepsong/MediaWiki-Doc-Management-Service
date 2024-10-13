@@ -26,6 +26,15 @@
 
 
 ---
+
+# Меняем имя ВМ, если имя в inventory.yaml отличается от фактического
+- name: Change VM hostname
+  shell: "echo {{ inventory_hostname }} > /etc/hostname"
+  when: "inventory_hostname != ansible_hostname" 
+  tags:
+    - mount_external_disks_change_vm_hostname
+
+
 # Получить имя диска по его id
 - name: Get device_name based by disk_id
   set_fact:
@@ -114,3 +123,5 @@
   when: device_name is defined
   tags:
     - mount_external_disks_add_automount
+
+

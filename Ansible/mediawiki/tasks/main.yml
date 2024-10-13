@@ -1,2 +1,32 @@
 ---
 # tasks file for mediawiki
+
+- name: Обновление списка пакетов
+  apt:
+    update_cache: yes
+  become: yes
+  tags:
+    - mediawiki_apt_update
+
+
+- name: Установка программ #Имя задачи 
+  apt: #Используемый модуль
+    name: "{{ item }}" #Имя пакета из цикла
+    state: present #Параметр действия. present - установить, absent - удалить
+  loop:
+    - "{{ packages_to_install }}" #Цикл будет перебирать все значения из переменной "packages_to_install"
+  tags:
+    - mediawiki_install_packages 
+
+
+- name: Создание пользователя БД PostgresSQL
+  community.postgresql.postgresql_user:
+    login_user: postgres
+    name: "{{ postgres_vars.db_user }}"
+    password: "{{ postgres_vars.db_password }}"
+    role_attr_flags: "{{ postgres_vars.attr | join(',') }}"  # Преобразуем список в строку
+    encrypted: true
+    state: present
+  become: true  # Добавьте эту строку
+  tags:
+    - mediawiki_create_postgres_user

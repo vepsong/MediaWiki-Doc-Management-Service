@@ -12,17 +12,17 @@ linuxVM:
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.152.217
+          ansible_host: 89.169.147.34
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.140.84
+          ansible_host: 89.169.145.222
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.146.4
+          ansible_host: 89.169.152.195
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 84.252.131.64
+          ansible_host: 89.169.131.202
     primaryDb:
       hosts:
         vm-6-primary-db:

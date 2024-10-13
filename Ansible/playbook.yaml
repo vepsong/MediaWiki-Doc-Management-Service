@@ -1,4 +1,14 @@
 --- 
+
+# Меняем имя ВМ, если имя в inventory.yaml отличается от фактического
+- name: Change VM hostname
+  hosts: all
+  roles:
+    - role: change_hostname
+  tags:
+    - change_hostname
+
+# Монтирование и инициализация внешних жестких дисков
 - name: Mount external disks 
   # hosts: vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
   hosts: "{{ target_groups }}"
@@ -8,6 +18,7 @@
   tags:
     - mount_external_disks
 
+# Размонтирование и деинициализация внешних жестких дисков
 - name: Unmount external disks 
   hosts: "{{ target_groups }}"
   roles:
@@ -15,9 +26,27 @@
   tags:
     - unmount_external_disks
 
-- name: Unmount external disks 
-  hosts: "{{ target_groups }}"
-  roles:
-    - role: unmount_disk
-  tags:
-    - unmount_external_disks
+
+# - name: Set up mediawiki
+#   hosts: "{{ target_groups }}"
+#   become: true
+#   roles:
+#     - role: mediawiki
+#   tags:
+#     - setup_mediawiki
+
+- name: Set up mediawiki
+  hosts: vm-3-mediawiki-server-1
+  become: true
+  tasks:
+    - name: Создание пользователя БД PostgresSQL
+      community.postgresql.postgresql_user:
+        login_user: postgres
+        name: "{{ postgres_vars.db_user }}"
+        password: "{{ postgres_vars.db_password }}"
+        role_attr_flags: "{{ postgres_vars.attr | join(',') }}"  # Преобразуем список в строку
+        encrypted: true
+        state: present
+      tags:
+        - mediawiki_create_postgres_user
+
