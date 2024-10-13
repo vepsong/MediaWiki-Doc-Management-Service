@@ -296,10 +296,11 @@ Standby БД получает реплицированные данные с Pri
         ~/<имя репозитория>/<папка Terraform> terraform output 
         # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
-2. Запуск playbook
-   - Установка стандартных пакетов на все ВМ
+2. Pipeline по запуску playbook'ов playbook
+   - Монтирование внешних жестких дисков, инициализация LVM.  
+      - Будут созданы: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt, запись в /etc/fstab для автомонтирования диска после перезапуска ВМ
 
-         ansible-playbook playbook.yaml -i inventory.yaml --tags="install_default_packages" 
+            ansible-playbook mount_disks_playbook.yaml -i inventory.yaml
 
    - Установка и настройка zabbix-server, zabbix-agent, keepalived в группe хостов "proxy_and_monitoring" (vm-2, vm-3)
 
@@ -330,7 +331,11 @@ Standby БД получает реплицированные данные с Pri
       ansible-galaxy role list  
 
       # Запуск playbook
-      ansible-playbook playbook.yaml -i inventory.yaml --tags="<указать тэг>>"  
+      ansible-playbook <название playbook>.yaml -i <название файла с inventory>.yaml --tags="<указать тэг>"
+
+        Пример:
+        ansible-playbook mount_disks_playbook.yaml -i inventory.yaml --tags="moint_dir"
+
 
   </details> 
 
