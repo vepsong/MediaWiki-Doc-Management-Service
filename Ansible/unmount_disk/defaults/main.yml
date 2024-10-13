@@ -1,0 +1,6 @@
+---
+# defaults file for unmount_disk
+target_groups:
+  - vm-1-monitoring-system
+  - vm-6-primary-db
+  - vm-7-standby-db

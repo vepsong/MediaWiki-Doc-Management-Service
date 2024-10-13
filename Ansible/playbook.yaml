@@ -1,0 +1,23 @@
+--- 
+- name: Mount external disks 
+  # hosts: vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
+  hosts: "{{ target_groups }}"
+  # hosts: all
+  roles:
+    - role: mount_disk
+  tags:
+    - mount_external_disks
+
+- name: Unmount external disks 
+  hosts: "{{ target_groups }}"
+  roles:
+    - role: unmount_disk
+  tags:
+    - unmount_external_disks
+
+- name: Unmount external disks 
+  hosts: "{{ target_groups }}"
+  roles:
+    - role: unmount_disk
+  tags:
+    - unmount_external_disks

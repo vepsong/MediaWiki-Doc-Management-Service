@@ -1,0 +1,16 @@
+---
+# defaults file for mount_disk
+target_groups:
+#   - "{{ hostvars['vm-1-monitoring-system'] }}"
+#   - "{{ hostvars[host]['vm-6-primary-db'] }}"
+#   - "{{ hostvars[host]['vm-7-standby-db'] }}"
+  - vm-1-monitoring-system
+  - vm-6-primary-db
+  - vm-7-standby-db
+
+# Получаем все хосты из указанных групп
+# target_groups:
+#   - "{{ groups['monitoringSystem'] }}"
+#   - "{{ groups['primaryDb'] }}"
+#   - "{{ groups['standbyDb'] }}"
+
