@@ -27,6 +27,38 @@
 
 ---
 
+# # Получение устройства для каждого диска
+# - name: Get device_name based on disk_id
+#   set_fact:
+#     device_name: "{{ item.disk_name }}"  # Предполагается, что disk_name хранит имя устройства
+#   loop: "{{ hostvars[inventory_hostname]['external_disks'] }}"
+#   when: 
+#     - hostvars[inventory_hostname]['external_disks'] is defined
+#     - hostvars[inventory_hostname]['external_disks'] | length > 0
+#     - item.disk_id | regex_search(item.value[1])  # Здесь вы можете адаптировать логику под ваши нужды
+#   tags:
+#     - mount_external_disks_get_device_name_by_disk_id
+
+# # Отладка имени устройства
+# - name: Debug device_name
+#   debug:
+#     msg: "Current device_name: {{ device_name }}"
+
+
+
+
+- name: Collect all disk IDs
+  set_fact:
+    disk_ids: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_id') | list }}"
+  when:
+    - hostvars[inventory_hostname]['external_disks'] is defined
+    - hostvars[inventory_hostname]['external_disks'] | length > 0
+
+- name: Debug all disk IDs
+  debug:
+    var: disk_ids
+
+
 # Получить имя диска по его id
 - name: Get device_name based by disk_id
   set_fact:
@@ -35,85 +67,142 @@
   when: 
     - hostvars[inventory_hostname]['external_disks'] is defined
     - hostvars[inventory_hostname]['external_disks'] | length > 0
-    - item.value | regex_search(disk_id)
-  tags:
-    - mount_external_disks_get_device_name_by_disk_id
-    - mount_external_disks_create_disk_partition
-    - mount_external_disks_create_pv_vg
-    - mount_external_disks_create_lv
-    - mount_external_disks_create_file_system
-    - mount_external_disks_create_mount_dir
-    - mount_external_disks_add_automount
+
+    - item.value | length > 1  # Убедитесь, что item.value содержит более 1 элемента
+    - item.value[1] | regex_search(disk_id)  # Используйте элемент с индексом [1], если он существует
+  vars:
+      disk_id: "{{ item.value[1] }}"  # Здесь предполагается, что disk_id - это второй элемент из value
+      
+- name: Debug device_name
+  debug:
+    msg: 
+      - "Current device_name: {{ device_name }}"
 
 
 
-# Создание раздела
-# Проверка создания раздела "lsblk"
-- name: Partition "{{ device_path }}" disk
-  community.general.parted:
-    device: "{{ device_path }}"
-    number: 1
-    flags: [ lvm ]
-    label: "gpt"
-    state: present
-    part_end: "100%"
-  when: device_name is defined
-  tags:
-    - mount_external_disks_create_disk_partition
 
-# Создание Volume Group
-# Проверка: "vgs"
-- name: Task for PV and VG
-  community.general.lvg:
-      vg: "{{ volume_group }}"
-      pvs: "{{ physical_volume }}"
-  when: device_name is defined
-  tags:
-    - mount_external_disks_create_pv_vg
 
-# Создание Logical Volume
-# Проверка: "lvs"
-- name: Logical volume - {{ logical_volume }} - with size
-  community.general.lvol:
-    vg: "{{ volume_group }}"
-    lv: "{{ logical_volume }}"
-    size: 100%FREE
-  when: device_name is defined
-  tags:
-    - mount_external_disks_create_lv
+# # Получить имя диска по его id
+# - name: Get device_name based by disk_id
+#   set_fact:
+  
+#     device_name: "{{ item.key }}"
+#     disk_id: "{{ item.disk_id }}"
+#     origin_path: "dev"
+#     device_path: "/{{ origin_path }}/{{ item.disk_name }}"
+#     volume_group: "vg-db-storage"
+#     logical_volume: "lv-{{ item.disk_name }}"
+#     physical_volume: "{{ device_path }}1"
+#     vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
+#     file_system: "{{ item.filesystem }}"
+#     mount_point: "{{ item.mount_point }}"
 
-# Форматирование раздела и создание файловой системы
-# Проверка: "lsblk -f"
-- name: Format the volume with "{{ file_system }}" fs
-  community.general.filesystem:
-    fstype: "{{ file_system }}"
-    dev: "{{ vg_lv_path }}"
-  when: device_name is defined
-  tags:
-    - mount_external_disks_create_file_system
+#   loop: "{{ ansible_facts.device_links.ids | dict2items }}"
+#   when: 
+#     - hostvars[inventory_hostname]['external_disks'] is defined
+#     - hostvars[inventory_hostname]['external_disks'] | length > 0
+#     - item.value | regex_search(disk_id)
+#   tags:
+#     - mount_external_disks_get_device_name_by_disk_id
+#     - mount_external_disks_create_disk_partition
+#     - mount_external_disks_create_pv_vg
+#     - mount_external_disks_create_lv
+#     - mount_external_disks_create_file_system
+#     - mount_external_disks_create_mount_dir
+#     - mount_external_disks_add_automount
 
-# Создание директории для монтирования жеского диска
-- name: Target directory under /opt/
-  ansible.builtin.file:
-    path: "{{ mount_point }}"
-    state: directory
-    mode: '0755'
-  when: device_name is defined
-  tags:
-    - mount_external_disks_create_mount_dir
+# - name: Debug device_name
+#   debug:
+#     msg: 
+#       - "Current device_name: {{ device_name }}"
+#       - "Current disk_id: {{ disk_id }}"
+#       - "Current origin_path: {{ origin_path }}"
+#       - "Current device_path: {{ device_path }}"
+#       - "Current volume_group: {{ volume_group }}"
+#       - "Current logical_volume: {{ logical_volume }}"
+#       - "Current physical_volume: {{ physical_volume }}"
+#       - "Current vg_lv_path: {{ vg_lv_path }}"
+#       - "Current file_system: {{ file_system }}"
+#       - "Current mount_point: {{ mount_point }}"
 
-# Монтирование жеского диска
-# Проверка, что жеский диск смонтирован "lsblk -f" 
-# Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
-# Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
-- name: mount the lv on "{{ vg_lv_path }}"
-  ansible.posix.mount:
-    path: "{{ mount_point }}"
-    src: "{{ vg_lv_path }}"
-    fstype: "{{ file_system }}"
-    state: mounted
-  when: device_name is defined
-  tags:
-    - mount_external_disks_add_automount
+
+# - name: Get device_name based on disk_id
+#   set_fact:
+#     device_name: "{{ item.disk_name }}"
+#   with_items: "{{ hostvars[inventory_hostname]['external_disks'] }}"
+#   when: 
+#     - item.disk_id is defined
+#   tags:
+#     - mount_external_disks_get_device_name_by_disk_id
+    
+
+# # Создание раздела
+# # Проверка создания раздела "lsblk"
+# - name: Partition "{{ device_path }}" disk
+#   community.general.parted:
+#     device: "{{ device_path }}"
+#     number: 1
+#     flags: [ lvm ]
+#     label: "gpt"
+#     state: present
+#     part_end: "100%"
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_create_disk_partition
+
+# # Создание Volume Group
+# # Проверка: "vgs"
+# - name: Task for PV and VG
+#   community.general.lvg:
+#       vg: "{{ volume_group }}"
+#       pvs: "{{ physical_volume }}"
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_create_pv_vg
+
+# # Создание Logical Volume
+# # Проверка: "lvs"
+# - name: Logical volume - {{ logical_volume }} - with size
+#   community.general.lvol:
+#     vg: "{{ volume_group }}"
+#     lv: "{{ logical_volume }}"
+#     size: 100%FREE
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_create_lv
+
+# # Форматирование раздела и создание файловой системы
+# # Проверка: "lsblk -f"
+# - name: Format the volume with "{{ file_system }}" fs
+#   community.general.filesystem:
+#     fstype: "{{ file_system }}"
+#     dev: "{{ vg_lv_path }}"
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_create_file_system
+
+# # Создание директории для монтирования жеского диска
+# - name: Target directory under /opt/
+#   ansible.builtin.file:
+#     path: "{{ mount_point }}"
+#     state: directory
+#     mode: '0755'
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_create_mount_dir
+
+# # Монтирование жеского диска
+# # Проверка, что жеский диск смонтирован "lsblk -f" 
+# # Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
+# # Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
+# - name: mount the lv on "{{ vg_lv_path }}"
+#   ansible.posix.mount:
+#     path: "{{ mount_point }}"
+#     src: "{{ vg_lv_path }}"
+#     fstype: "{{ file_system }}"
+#     state: mounted
+#   when: device_name is defined
+#   tags:
+#     - mount_external_disks_add_automount
 
 

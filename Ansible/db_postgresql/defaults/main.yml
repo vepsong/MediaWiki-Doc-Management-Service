@@ -3,3 +3,9 @@
 target_groups:
   - primaryDb
   - standbyDb
+
+mediawiki_primary_db_hosts:
+  - vm-6-primary-db
+
+mediawiki_standby_db_hosts:
+  - vm-7-standby-db

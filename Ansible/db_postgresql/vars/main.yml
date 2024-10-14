@@ -18,8 +18,8 @@ postgres_vars:
   db_name: my_wiki
   db_password: your_password 
   attr: 
-    - S
-    - D
-    - R
-    - P
-    - E
+    - SUPERUSER
+    - CREATEDB
+    - CREATEROLE
+    - LOGIN
+    - INHERIT
