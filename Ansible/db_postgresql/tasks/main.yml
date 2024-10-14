@@ -29,6 +29,26 @@
   tags:
     - db_postgresql_start_enable_service
 
+
+- name: Создание пользователя БД PostgreSQL
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+  # postgresql_user:
+    # name: "{{ postgres_vars.db_user }}"
+    name: "wikitest"
+    password: "{{ postgres_vars.db_password }}"
+    # password: "password"
+    # role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
+    role_attr_flags: "CREATEDB,NOSUPERUSER"
+    state: present
+  tags:
+    - db_postgresql_create_postgres_user
+
+
+
+
+
 # - name: "Allow md5 connection for the db user"
 #   postgresql_pg_hba:
 #     dest: "/etc/postgresql/14/main/pg_hba.conf"
@@ -37,7 +57,6 @@
 #     method: md5
 #     # users: "{{ postgres_vars.db_user }}"
 #     users: postgres
-#     address: 0.0.0.0/0
 #     create: true
 #   become: yes
 #   become_user: postgres
@@ -46,17 +65,17 @@
 #   - db_postgresql_allow_md5_connection_db_user
 
 
-- name: Создание пользователя БД PostgresSQL
-  community.postgresql.postgresql_user:
-    name: "{{ postgres_vars.db_user }}"
-    password: "{{ postgres_vars.db_password }}"
-    role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
-    encrypted: true
-    state: present
-  tags:
-    - db_postgresql_create_postgres_user
-  become: true
-  become_user: postgres
+# - name: Создание пользователя БД PostgresSQL
+#   community.postgresql.postgresql_user:
+#     name: "{{ postgres_vars.db_user }}"
+#     password: "{{ postgres_vars.db_password }}"
+#     role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
+#     encrypted: true
+#     state: present
+#   tags:
+#     - db_postgresql_create_postgres_user
+#   become: true
+#   become_user: postgres
 
 
 

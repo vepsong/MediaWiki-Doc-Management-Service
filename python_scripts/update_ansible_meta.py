@@ -39,7 +39,7 @@ def create_ansible_meta_content():
             ansible_user = "root"
             ansible_password = ""
             connection_protocol = "ssh"
-            ansible_become = False
+            # ansible_become = False
 
         data = {
             "ansible_user": ansible_user,
