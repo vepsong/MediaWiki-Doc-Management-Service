@@ -3,45 +3,45 @@ linuxVM:
     monitoringSystem:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: 89.169.144.132
+          ansible_host: 51.250.2.146
           external_disks:
-          - disk_id: fhmllvpar79s9o5ogpce
+          - disk_id: fhm8qiikgnv2n455t9af
             disk_name: vhdd-1-monitoring-system-db
             mount_point: /opt/vhdd-1-monitoring-system-db
             filesystem: ext4
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.150.90
+          ansible_host: 84.201.135.93
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.141.206
+          ansible_host: 89.169.143.12
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.148.188
+          ansible_host: 89.169.145.157
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 89.169.149.91
+          ansible_host: 89.169.142.123
     primaryDb:
       hosts:
         vm-6-primary-db:
-          ansible_host: 89.169.148.52
+          ansible_host: 89.169.157.65
           external_disks:
-          - disk_id: fhmcgqudg69pdukdj9eg
+          - disk_id: fhmn5cr4gi2j5078kfp0
             disk_name: vssd-1-primary-db
             mount_point: /opt/vssd-1-primary-db
             filesystem: ext4
     standbyDb:
       hosts:
         vm-7-standby-db:
-          ansible_host: 89.169.159.168
+          ansible_host: 89.169.150.133
           external_disks:
-          - disk_id: fhmhvhfjbsp6kjrpjoiq
+          - disk_id: fhmvudsoifvi3icqam16
             disk_name: vhdd-2-standby-db
             mount_point: /opt/vhdd-2-standby-db
             filesystem: ext4
-          - disk_id: fhm59r9ik4foh1rlfbd6
+          - disk_id: fhmpagid1slr2i15ptvv
             disk_name: vhdd-3-dump-db
             mount_point: /opt/vhdd-3-dump-db
             filesystem: ext4
@@ -49,3 +49,4 @@ linuxVM:
     ansible_user: root
     ansible_password: ''
     connection_protocol: ssh
+    ansible_become: false

@@ -1,12 +1,12 @@
 ---
 # vars file for mount_disk
-# disk_id: "{{ hostvars[inventory_hostname]['external_disks'][0]['disk_id'] }}"
-# origin_path: dev
-# device_path: "/{{ origin_path }}/{{ device_name }}"
-# volume_group: vg-db-storage  # Определение переменной для группы томов
+device_names: []
+origin_path: dev
+# # device_path: "/{{ origin_path }}/{{ device_names }}"
+volume_group: vg-db-storage  # Определение переменной для группы томов
 # logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Определение переменной для логического тома
-# physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
-# vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
+# # physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
+# # vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
 # file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"
 # mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point'] }}"
 
