@@ -3,9 +3,9 @@
 target_groups:
   - primaryDb
   - standbyDb
+  - monitoringSystem
 
-mediawiki_primary_db_hosts:
-  - vm-6-primary-db
-
-mediawiki_standby_db_hosts:
-  - vm-7-standby-db
+db_hosts:
+  primary: vm-6-primary-db
+  standby: vm-7-standby-db
+  zabbix-serer: vm-1-monitoring-system

@@ -2,7 +2,7 @@
 # tasks file for db_postgresql
 
 # Обновление пакетного репозитория 
-- name: Update list of packages
+- name: Step 1 - Update list of packages
   apt:
     update_cache: yes
   become: yes
@@ -11,7 +11,7 @@
 
 
 # Установка пакетов
-- name: Packet installing
+- name: Step 2 - Packet installing
   apt:
     name: "{{ item }}" 
     state: present
@@ -20,8 +20,8 @@
   tags:
     - db_postgresql_install_packages 
 
-# 
-- name: "Start and enable services"
+# Запуск сервиса и добавление в автозапуск
+- name: "Step 3 - Start and enable services"
   service: 
     name=postgresql
     state=started 
@@ -30,7 +30,52 @@
     - db_postgresql_start_enable_service
 
 
-- name: Создание пользователя PRIMARY БД PostgreSQL
+
+- name: Шаг 5 - Создать динамические переменные
+  set_fact:
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
+
+
+- name: Create a group for PostgreSQL access
+  ansible.builtin.group:
+    name: dbadmin
+    state: present
+
+- name: Add multiple users to dbadmin group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: dbadmin
+    append: yes
+  loop:
+    - postgres
+    - sudo
+    - "{{ postgres_vars.db_user }}"
+
+
+- name: Change group ownership for PostgreSQL directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: dbadmin
+    state: directory
+  # loop: "{{ mount_point }}"
+  loop: 
+  - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
+  - "/opt"  # Указываем на родительскую директорию
+
+
+- name: Set permissions for PostgreSQL directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
+  # loop: "{{ mount_point }}"
+  loop: 
+    - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
+    - "/opt"  # Указываем на родительскую директорию
+
+
+# Создание пользователя для PRIMARY PostgreSQL db
+- name: Step 4 - create user in  PRIMARY PostgreSQL db
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -39,11 +84,41 @@
     role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
     state: present
   tags:
-    - db_postgresql_create_postgres_user
-  when: "'vm-6-primary-db' in inventory_hostname"
+    - db_postgresql_create_primary_postgres_user
+  when: db_hosts.primary in inventory_hostname
+  notify: reload_postgresql
+
+
+- name: Ensure the PostgreSQL database is present
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ postgres_vars.db_name }}"
+    owner: "{{ postgres_vars.db_user }}"
+    state: present
+  when: db_hosts.primary in inventory_hostname
+
+
+# - name: Create tablespace on external disk
+#   become: true
+#   become_user: postgres
+#   community.postgresql.postgresql_tablespace:
+#     name: "{{ postgres_vars.db_tablespace_name }}"
+#     location: "{{ item }}"
+#   loop: "{{ mount_point }}"
+#   when: db_hosts.primary in inventory_hostname
+#   tags:
+#     - db_postgresql_create_tablespace_on_external_disk
 
 
 
+# - name: Create a new database called mydb in tablespace bar
+#   community.postgresql.postgresql_db:
+#     name: "{{ postgres_vars.db_name }}"
+#     tablespace: "{{ postgres_vars.db_tablespace_name }}"
+#     owner: "{{ postgres_vars.db_user }}"
+#     state: present
+#   when: db_hosts.primary in inventory_hostname
 
 
 
