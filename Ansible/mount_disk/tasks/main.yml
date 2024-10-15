@@ -45,36 +45,12 @@
     physical_volume: "{{ physical_volume + ([origin_path + item] | map('regex_replace', '$', '1')) }}"
     volume_group: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_name') | map('regex_replace', '^', 'vg-db-storage-') | list }}"
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
-    # vg_lv_path: "{{ origin_path + volume_group + logical_volume }}"
-
-
-
-
-    # vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
-
-    # physical_volume: "{{ device_path + '1' }}"  # Физический том
-    # physical_volume: "{{ physical_volume + (device_path | map('regex_replace', '$', '1') | list) }}"
-    
-    # physical_volume: "{{ device_path | map('regex_replace', '(.*)', '\\1' + '1') | list }}"
-    # logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Логический том
-    # physical_volume: "{{ device_path + '1' }}"  # Физический том
-    # vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
-    # file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"  # Файловая система
-    # mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point']"
   loop: "{{ device_names }}"
-
-
-- name: Debug output
-  debug:
-    msg: "The dynamic is: {{ item }}"
-  loop: "{{ mount_point }}"
-    
-    
 
 
 # Создание раздела
 # Проверка создания раздела "lsblk"
-- name: Partition "{{ device_path }}" disk
+- name: Шаг 2 - Cоздание partitiion "{{ device_path }}" disk
   community.general.parted:
     device: "{{ item }}"
     number: 1
@@ -87,16 +63,16 @@
   tags:
     - mount_external_disks_create_disk_partition
 
-- name: Get current volume groups
+# Выполнение команды "vgs", чтобы проверить, есть ли в системе VG
+- name: Шаг 3 - Проверка, есть ли в системе Volume Groups
   command: "vgs"
   register: vgs_info
   changed_when: false
 
-- name: Check if vgs output is empty
-  debug:
-    msg: "{{ vgs_info.stdout }}"
 
-- name: Create Volume Groups for each Physical Volume
+# Создание VG для каждого из PV
+# Проверка: "vgs"
+- name: Шаг 4 - Создание Volume Groups для каждого из Physical Volume
   community.general.lvg:
     vg: "{{ volume_group[item] }}"  # Имя группы томов
     pvs: "{{ physical_volume[item] }}"  # Соответствующий физический том
@@ -105,19 +81,8 @@
   tags:
     - mount_external_disks_create_pv_vg
 
-
-# # Создание Volume Group
-# # Проверка: "vgs"
-# - name: Task for PV and VG
-#   community.general.lvg:
-#     vg: "{{ volume_group }}"
-#     pvs: "{{ physical_volume }}"
-#   when: device_names is defined
-#   # loop: "{{ volume_group }}"
-#   tags:
-#     - mount_external_disks_create_pv_vg
-
-- name: Get current logical volumes
+# Выполнение команды "lvs", чтобы проверить, есть ли в системе LV
+- name: Шаг 5 - Проверка, есть ли в системе Logical Volumes
   command: "lvs"
   register: lvs_info
   changed_when: false
@@ -125,7 +90,7 @@
 
 # Создание Logical Volume
 # Проверка: "lvs"
-- name: Logical volume - "{{ logical_volume }}" - with size
+- name: Шаг 6 - Создание Logical Volumes - "{{ logical_volume }}" - с указанием размера
   community.general.lvol:
     vg: "{{ volume_group[item] }}"
     lv: "{{ logical_volume[item] }}"
@@ -137,7 +102,8 @@
     - mount_external_disks_create_lv
 
 
-- name: Combine volume group and logical volume into paths
+# Создание переменной vg_lv_path
+- name: Шаг 7 - Создание переменной vg_lv_path (/dev/volume_group/logical_volume)
   set_fact:
     vg_lv_path: "{{ vg_lv_path + ['/dev/' + volume_group[item] + '/' + logical_volume[item]] }}"
   loop: "{{ range(0, volume_group | length) | list }}"
@@ -150,7 +116,7 @@
 
 # Форматирование раздела и создание файловой системы
 # Проверка: "lsblk -f"
-- name: Format the volume with "{{ file_system }}" fs
+- name: Шаг 8 - Форматирование раздела и создание файловой системы "{{ file_system }}"
   community.general.filesystem:
     fstype: "{{ file_system }}"
     dev: "{{ item }}"
@@ -161,7 +127,7 @@
 
 
 # Создание директории для монтирования жеского диска
-- name: Target directory under /opt/
+- name: Шаг 9 - Создание директории для монтирования жеского диска opt/"{{ mount_point }}"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -172,8 +138,15 @@
     - mount_external_disks_create_mount_dir
 
 
-
-- name: Create mount points and corresponding volume paths
+# Cоздание пары: mount_point - vg_lv_path
+# На входе два списка mount_point и vg_lv_path:
+# mount_point: [/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db]
+# vg_lv_path: [/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db, /dev/vg-db-storage-vhdd-3-dump-db/lv-vhdd-3-dump-db]
+# На выходе один список:
+# mount_pairs: [['/opt/vhdd-2-standby-db', '/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db'], 
+#               ['/opt/vhdd-3-dump-db', '/dev/vg-db-storage-vhdd-3-dump-db/lv-vhdd-3-dump-db']
+#              ]
+- name: Шаг 10 - Создание переменной mount_pairs (cписок из соотв. друг другу mount_point и vg_lv_path)
   set_fact:
     mount_pairs: "{{ mount_pairs + [[mount_point[item], vg_lv_path[item]]] }}"
   loop: "{{ range(0, mount_point | length) | list }}"
@@ -183,11 +156,11 @@
     msg: "Mount pairs: {{ mount_pairs }}"
 
 
-# # Монтирование жеского диска
-# # Проверка, что жеский диск смонтирован "lsblk -f" 
-# # Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
-# # Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
-- name: Mount the logical volumes on "{{ vg_lv_path }}"
+# Монтирование жеского диска
+# Проверка, что жеский диск смонтирован "lsblk -f" 
+# Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
+# Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
+- name: Шаг 11 - Монтирование жесткого диска в "{{ mount_point }}" + автомонтирование
   ansible.posix.mount:
     path: "{{ item[0] }}"  # mount_point
     src: "{{ item[1] }}"   # vg_lv_path
@@ -198,17 +171,3 @@
   tags:
     - mount_external_disks_add_automount
 
-
-# # Монтирование жеского диска
-# # Проверка, что жеский диск смонтирован "lsblk -f" 
-# # Проверка, что жесткий диск добавлен в автозагрузку "cat /etc/fstab"
-# # Проверка, что все файловые системы из "/etc/fstab" корректно монтируются: mount -a
-# - name: mount the lv on "{{ vg_lv_path }}"
-#   ansible.posix.mount:
-#     path: "{{ mount_point }}"
-#     src: "{{ vg_lv_path }}"
-#     fstype: "{{ file_system }}"
-#     state: mounted
-#   when: device_names is defined
-#   tags:
-#     - mount_external_disks_add_automount

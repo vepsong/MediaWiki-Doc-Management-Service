@@ -3,32 +3,32 @@ linuxVM:
     monitoringSystem:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: 51.250.79.161
+          ansible_host: 89.169.159.60
           external_disks:
-          - disk_id: fhm3rsq47ooa0c0kj2sv
+          - disk_id: fhm4qldeonom8qdsq6mu
             disk_name: vhdd-1-monitoring-system-db
             mount_point: /opt/vhdd-1-monitoring-system-db
             filesystem: ext4
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.158.5
+          ansible_host: 89.169.156.215
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.152.4
+          ansible_host: 51.250.93.213
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.140.29
+          ansible_host: 89.169.145.85
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 62.84.116.70
+          ansible_host: 89.169.146.204
     primaryDb:
       hosts:
         vm-6-primary-db:
-          ansible_host: 84.201.174.70
+          ansible_host: 89.169.146.147
           external_disks:
-          - disk_id: fhmqkmd8tpjmmjf9rgh4
+          - disk_id: fhmstmjvpoi2mp8go14l
             disk_name: vssd-1-primary-db
             mount_point: /opt/vssd-1-primary-db
             filesystem: ext4
