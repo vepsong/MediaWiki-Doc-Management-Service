@@ -6,7 +6,7 @@ def create_group_vars(ansible_meta):
         "ansible_user": ansible_meta.get("ansible_user"),
         "ansible_password": ansible_meta.get("ansible_password"),
         "connection_protocol": ansible_meta.get("connection_protocol"),
-        "ansible_become": ansible_meta.get("ansible_become")
+        # "ansible_become": ansible_meta.get("ansible_become")
     }
 
 
