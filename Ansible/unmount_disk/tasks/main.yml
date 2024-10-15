@@ -23,61 +23,90 @@
 
 ---
 
-- name: Set device_name based on disk_id
+- name: Шаг 1 - Получить disk_id и добавить "virtio-"
   set_fact:
-    device_name: "{{ item.key }}"
+    virtio_disk_ids: "{{ virtio_disk_ids | default([]) + ['virtio-' + item.disk_id] }}"
+  loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
+
+- name: Шаг 2 - Сравнить с ansible_facts.device_links.ids
+  set_fact:
+    device_names: "{{ device_names + [item.key] }}"
   loop: "{{ ansible_facts.device_links.ids | dict2items }}"
-  when: 
-    - hostvars[inventory_hostname]['external_disks'] is defined
-    - hostvars[inventory_hostname]['external_disks'] | length > 0
-    - item.value | regex_search(disk_id)
+  when: item.value | intersect(virtio_disk_ids) | length > 0
+
+- name: Шаг 3 - Создать динамические переменные
+  set_fact:
+    device_path: "{{ device_path + [origin_path + item] }}"
+    logical_volume: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_name') | map('regex_replace', '^', 'lv-') | list }}"
+    physical_volume: "{{ physical_volume + ([origin_path + item] | map('regex_replace', '$', '1')) }}"
+    volume_group: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_name') | map('regex_replace', '^', 'vg-db-storage-') | list }}"
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
+  loop: "{{ device_names }}"
+
+
+# Размонтирование жесткого диска
+# Проверка, что жеский диск размонтирован "lsblk -f" 
+- name: Шаг 4 - Размонтирование жесткого диска из "{{ mount_point }}"
+  ansible.posix.mount:
+    path: "{{ item }}"  # mount_point
+    state: unmounted
+  loop: "{{ mount_point }}"
+  when: device_names is defined
   tags:
     - unmount_external_disks_remove_automount
-    - unmount_external_disks_remove_lv
-    - unmount_external_disks_remove_vg
-    - unmount_external_disks_remove_disk_partition
 
 
-
-# 1. Unmount the logical volume if mounted
-- name: Unmount the logical volume - "{{ logical_volume }}"
-  ansible.posix.mount:
-    path: "{{ mount_point }}"
-    state: unmounted
-  when: device_name is defined
-  tags:
-  - unmount_external_disks_remove_automount
-
-
-# 2. Remove the Logical Volume
-- name: Remove logical volume - "{{ logical_volume }}"
+# Создание Logical Volume
+# Проверка: "lvs"
+- name: Шаг 5 - Удаление Logical Volumes - "{{ logical_volume }}"
   community.general.lvol:
-    vg: "{{ volume_group }}"
-    lv: "{{ logical_volume }}"
+    vg: "{{ volume_group[item] }}"
+    lv: "{{ logical_volume[item] }}"
     state: absent
     force: true
-  when: device_name is defined
+  when: device_names is defined
+  loop: "{{ range(0, volume_group | length) | list }}"
   tags:
     - unmount_external_disks_remove_lv
 
-# 3. Remove the Volume Group
-- name: Remove volume group
+
+# Удаление VG
+# Проверка: "vgs"
+- name: Шаг 6 - Удаление Volume Groups - "{{ volume_group }}"
   community.general.lvg:
-    vg: "{{ volume_group }}"
+    vg: "{{ item }}"
     state: absent
-  when: device_name is defined
+  when: device_names is defined
+  loop: "{{ volume_group }}"
   tags:
     - unmount_external_disks_remove_vg
 
-# 4. Remove the partition using fdisk
-- name: Partition "{{ device_path }}" disk
+
+# Удаление раздела
+# Проверка удаления раздела "lsblk -f"
+- name: Шаг 7 - Удаление partitiion "{{ device_path }}" disk
   community.general.parted:
-    device: "{{ device_path }}"
+    device: "{{ item }}"
     number: 1
     state: absent
-  when: device_name is defined
+  when: device_names is defined
+  loop: "{{ device_path }}"
   tags:
     - unmount_external_disks_remove_disk_partition
+
+
+
+
+
+# # 4. Remove the partition using fdisk
+# - name: Partition "{{ device_path }}" disk
+#   community.general.parted:
+#     device: "{{ device_path }}"
+#     number: 1
+#     state: absent
+#   when: device_name is defined
+#   tags:
+#     - unmount_external_disks_remove_disk_partition
 
   
 

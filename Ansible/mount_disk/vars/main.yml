@@ -9,12 +9,5 @@ volume_group: []
 mount_pairs: []
 origin_path: /dev/
 file_system: ext4
-# # device_path: "/{{ origin_path }}/{{ device_names }}"
-# volume_group: vg-db-storage  # Определение переменной для группы томов
-# logical_volume: "lv-{{ hostvars[inventory_hostname]['external_disks'][0]['disk_name'] }}"  # Определение переменной для логического тома
-# # physical_volume: "{{ device_path }}1"  # Определение переменной для физического тома
-# # vg_lv_path: "/{{ origin_path }}/{{ volume_group }}/{{ logical_volume }}"
-# file_system: "{{ hostvars[inventory_hostname]['external_disks'][0]['filesystem'] }}"
-# mount_point: "{{ hostvars[inventory_hostname]['external_disks'][0]['mount_point'] }}"
 
 
