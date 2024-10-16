@@ -360,11 +360,60 @@ Standby БД получает реплицированные данные с Pri
 
 #### Настройка PostgreSQL
 
-1. Запуск test
+1. Общие настройки для Primary и Standby PostgreSQL
 
-- тестовая инфа
 
-2. Дополнительная информация
+   <details>
+   <summary>Развернуть</summary> 
+   
+   - Установка postgresql
+
+         # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
+         sudo apt update && sudu apt upgrade -y
+         sudo apt install postgresql 
+         sudo systemctl enable postgresql
+
+         # Проверка установки: автозапуск и статус службы
+         systemctl is-enabled postgresql
+         systemctl status postgresql
+
+
+    - пункт2
+
+  </details>  
+  
+
+
+2. Настройка Primary PostgreSQL
+
+
+   <details>
+   <summary>Развернуть</summary> 
+   
+   - Пункт1
+
+         # Комментарий
+         sudo ....
+
+
+    - пункт2
+
+  </details>  
+
+
+
+
+3. Настройка Standby PostgreSQL
+
+
+  <details>
+  <summary>Развернуть</summary> 
+
+  </details>  
+
+
+
+3. Дополнительная информация
 
 - Основные команды для работы с PostgreSQL  
 
