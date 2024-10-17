@@ -532,8 +532,8 @@ Standby БД получает реплицированные данные с Pri
       
     - Монтирование дисков
 
-    <details>
-    <summary>Развернуть</summary>  
+     <details>
+     <summary>Развернуть</summary>  
 
           # p.s. для добавления доп. жесткого диска к ВМ cloudshell
           vm attach <название ВМ>
@@ -582,7 +582,7 @@ Standby БД получает реплицированные данные с Pri
           echo "/dev/<название VG>/<название LV> ext4 defaults 0 0" | sudo tee -a /etc/fstab
           (напр.: sudo echo "/dev/vg-db-storage/lv-db /opt/db_mount/ ext4 defaults 0 0" | sudo tee -a /etc/fstab)
 
-    </details> 
+     </details> 
 
 
     - Размонтирование дисков
