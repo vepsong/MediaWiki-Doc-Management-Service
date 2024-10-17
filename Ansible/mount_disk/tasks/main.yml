@@ -10,7 +10,7 @@
 # 3.1. fdisk /dev/vdb далее n (создание раздела) далее 1 (номер раздела) далее enter (вопрос про секторы) далее w (сохр. изменения и выйти)
 # 4. Инициализация Physical Volume: pvcreate /dev/<название раздела>
 # 4.1. pvcreate /dev/vdb1 
-# 5. Создание Volume Group: vgcreate <имя группы томов> /dev/<имя раздела>
+# 5. Создание Volume Group: vgcreate <имя группы томов> /dev/<название раздела>
 # 5.1. vgcreate vg-db-storage /dev/vdb1 (vgs - проверка, что VG создан)
 # 6. Cоздание Logical Volume: lvcreate -n <имя LV> -l <кол-во extents (можно посмотреть vgdisplay <имя VG>)> <имя VG>
 # lvcreate -n lv-vhdd-1-monitoring-system-db -l 7167 vg-db-storage (lvs - проверка, что LV создан)
