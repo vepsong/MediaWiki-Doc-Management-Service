@@ -498,6 +498,11 @@ Standby БД получает реплицированные данные с Pri
           # Создание тестовой БД на Primary PostgreSQL  
           sudo -u postgres createdb replica_test 
 
+          # Проверка тестовой БД на Standby PostgreSQL  
+          sudo su - postgres
+          psql
+          \l
+
   </details> 
 
 
