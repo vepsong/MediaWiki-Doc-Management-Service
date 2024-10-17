@@ -366,19 +366,16 @@ Standby БД получает реплицированные данные с Pri
    <details>
    <summary>Развернуть</summary> 
    
-   - Установка postgresql
+    - Установка postgresql
 
-         # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
-         sudo apt update && sudu apt upgrade -y
-         sudo apt install postgresql 
-         sudo systemctl enable postgresql
+          # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install postgresql 
+          sudo systemctl enable postgresql
 
-         # Проверка установки: автозапуск и статус службы
-         systemctl is-enabled postgresql
-         systemctl status postgresql
-
-
-    - пункт2
+          # Проверка установки: автозапуск и статус службы
+          systemctl is-enabled postgresql
+          systemctl status postgresql
 
    </details>  
   
@@ -390,15 +387,51 @@ Standby БД получает реплицированные данные с Pri
    <details>
    <summary>Развернуть</summary> 
    
-   - Пункт1
+    - Создание новой роли 
 
-         # Комментарий
-         sudo ....
+          # Вход в систему под пользователем Postgres для выполнения административных задач
+          sudo su - postgres
+          # Создание нового пользователя wikiuser
+          createuser wikiuser
+          # Создание пароля для пользователей
+          psql
+          ALTER USER postgres with encrypted password 'SuperStongPassword';
+          ALTER USER wikiuser with encrypted password 'MyPassword';
+          # Создание базы данных
+          psql
+          CREATE DATABASE my_wiki;
+          # Назначение пользователю прав на базу данных
+          GRANT ALL PRIVILEGES ON DATABASE my_wiki to  wikiuser; 
+          # Вывод списка пользоватей с правами
+          psql
+          \du
+          # Вывод списка баз данных
+          \l
+
+    - Настройка сетевого подлкючения
+
+          # Вывод информации о ip и NAT-ip
+          # При использовании tailscale, указать NAT-ip оттуда
+          ip addr show
+          curl ifconfig.me
+
+          # В конец файла /etc/postgresql/14/main/pg_hba.conf добавить параметры подлючения
+          host my_wiki       wikiuser       10.10.0.0/16               scram-sha-256 
+              - host my_wiki - база данных для поключения по сети
+              - wikiuser - имя пользователя
+              - 10.10.0.0/16 - из какой сети разрешено подлкючение
+              - scram-sha-256 - авторизация по паролю
+
+          # Настроить /etc/postgresql/14/main/postgresql.conf
+          listen_addresses = '*'
+
+          # Перезапустить сервис
+          sudo systemctl restart postgresql 
+
+<!-- psql --host 10.10.2.162 --username wikiuser --password --dbname my_wiki  -->
 
 
-    - пункт2
-
-   </details>  
+    </details>  
 
 
 
@@ -426,6 +459,8 @@ Standby БД получает реплицированные данные с Pri
       psql
       # Выход из консоли
       \q
+      # Выход из оболочки пользователя
+      Ctrl+D
       # Просмотр статуса подключения
       \conninfo
       # Список БД
