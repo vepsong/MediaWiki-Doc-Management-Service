@@ -700,6 +700,74 @@ Standby БД получает реплицированные данные с Pri
 <!-- END_5.5. postgresql_setup.md -->
 
 </details>
+
+
+### 5.6 Настройка MediaWiki
+
+<details>
+<summary>Развернуть</summary>  
+
+<!-- START_5.6. mediawiki_setup.md -->
+<!-- # Настройка MediaWiki -->
+
+#### Настройка MediaWiki
+
+1. Test Header1
+
+
+   <details>
+   <summary>Развернуть</summary> 
+   
+    - Установка postgresql
+
+          # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install postgresql 
+          sudo systemctl enable postgresql
+
+          # Проверка установки: автозапуск и статус службы
+          systemctl is-enabled postgresql
+          systemctl status postgresql
+
+   </details>  
+  
+
+
+2. Test Header2
+
+
+   <details>
+   <summary>Развернуть</summary> 
+   
+    - Создание новой роли 
+
+          # Создание новых пользователей: wikiuser (основной), syncuser (для репликации)
+          sudo -u postgres createuser -P wikiuser
+          sudo -u postgres createuser --replication -P syncuser
+              - --replication - право на репликацию
+          # Создание базы данных
+          sudo su - postgres
+          psql
+          CREATE DATABASE my_wiki;
+          # Назначение пользователю прав на базу данных
+          sudo su - postgres
+          psql
+          GRANT ALL PRIVILEGES ON DATABASE my_wiki to wikiuser; 
+          # Вывод списка пользоватей с правами
+          psql
+          \du
+          # Вывод списка баз данных
+          \l
+
+
+    </details>  
+
+<!-- END_5.6. mediawiki_setup.md -->
+
+</details>
+
+
+
 </details>
 
 
