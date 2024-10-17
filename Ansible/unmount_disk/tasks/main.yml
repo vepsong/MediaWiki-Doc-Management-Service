@@ -17,8 +17,8 @@
 # vgremove vg-db-storage
 
 # 4. Удалить partition (и вместе с ним physical volume):
-# 4.1. Просмотреть partition: fdisk -l -a или lsblk -f
-# 4.2. Удалить Volume Group: fdisk <path> 
+# 4.1. Просмотреть partition: fdisk -l или lsblk -f
+# 4.2. Удалить partition: fdisk <path> 
 # fdisk /dev/vdb далее p (просмотр сущ. разделов) далее d (удалить раздел) далее выбрать номер раздела далее w (сохранить изменени
 
 ---

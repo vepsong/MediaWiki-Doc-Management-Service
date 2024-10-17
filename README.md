@@ -507,9 +507,113 @@ Standby БД получает реплицированные данные с Pri
    </details> 
 
 
+4. Проверка параметров репликации
+
+   <details>
+   <summary>Развернуть</summary>  
+      
+    - Настройка репликации
+
+          # Просмотр параметров репликации
+          sudo su - postgres
+          psql
+          \x
+          SELECT * FROM pg_stat_replication;
 
 
-4. Основные команды для работы с PostgreSQL  
+
+   </details> 
+
+
+5. Настройка внешних жестких дисков
+
+   <details>
+   <summary>Развернуть</summary>  
+      
+    - Монтирование дисков
+
+          # p.s. для добавления доп. жесткого диска к ВМ cloudshell
+          vm attach <название ВМ>
+
+          # Отобразить инфо о дисках и разделах:
+          lsblk -f
+
+          # Разметка диска новыми разделами (partition): fdisk /dev/<название устройства>
+          fdisk /dev/<название устройства>
+          (напр.: $ sudo fdisk /dev/vdb)
+              # Открывается консоль "fdisk" 
+              - g — создание таблицы разделов gpt
+              - n — Создание раздела диска (partition) > указать номер раздела (обычно 1) > enter (вопрос про секторы)
+              - w — сохр. изменения и выйти
+          
+          # Инициализация Physical Volume
+          lsblk -f
+          pvcreate /dev/<название раздела>
+          (напр.: $ sudo pvcreate /dev/vdb1)
+
+          # Создание VG (Volume Group)
+          # vgs - проверка, что VG создан
+          vgcreate <название группы томов> /dev/<название раздела>
+          (напр.: $ sudo vgcreate vg-db-storage /dev/vdb1)
+
+          # Cоздание LV (Logical Volume)
+          # lvs - проверка, что LV создан
+          lvcreate -n <название LV> -l <кол-во extents (можно посмотреть vgdisplay <название VG>)> <название VG>
+              - vgdisplay <название VG> — проверить кол-во PE (physical extents)
+          (напр.: $ sudo lvcreate -n lv-db -l 5119 vg-db-storage)
+
+          # Форматирование LV и создание файловой системы ext4
+          mkfs.ext4 /dev/<название VG>/<название LV>
+          (напр.: sudo mkfs.ext4 /dev/vg-db-storage/lv-db)
+
+          # Создание точки монтирования
+          mkdir /opt/<название директории>/
+          (напр.: sudo mkdir /opt/db_mount/)
+
+          # Монтирование LV
+          mount /dev/<название VG>/<название LV> <точка монтирования>
+          (напр.: sudo mount /dev/vg-db-storage/lv-db /opt/db_mount/)
+
+          # Добавлление LV в автомонтирование /etc/fstab 
+          # cat /etc/fstab или mount -a - проверка автомонтирования
+          echo "/dev/<название VG>/<название LV> ext4 defaults 0 0" | sudo tee -a /etc/fstab
+          (напр.: sudo echo "/dev/vg-db-storage/lv-db /opt/db_mount/ ext4 defaults 0 0" | sudo tee -a /etc/fstab)
+
+
+
+
+    - Размонтирование дисков
+          # Просмотреть path точки монтирования
+          lsblk -f
+          
+          # Размонтирование директории
+          umount <path>
+          (напр.: sudo umount /opt/db_mount)
+
+          # Удаление LV (Logical Volume)
+          # lvdisplay — просмотр LV 
+          lvremove <path>
+          (напр.: sudo lvremove /dev/vg-db-storage/lv-db)
+
+          # Удаление VG (Volume Group)
+          # vgdisplay — просмотр VG 
+          vgremove <название VG>
+          (напр.: sudo vgremove vg-db-storage)
+
+          # Удаление partition (и вместе с ним PV (Physical Volume))
+          # fdisk -l или lsblk -f — просмотр partition
+          fdisk <path> 
+              - p — просмотр сущ. разделов (partition)
+              - d — удалить раздел > указать номер раздела
+              - w — сохр. изменения и выйти
+
+
+   </details> 
+
+
+
+
+6. Основные команды для работы с PostgreSQL  
 
    <details>
    <summary>Развернуть</summary>  
