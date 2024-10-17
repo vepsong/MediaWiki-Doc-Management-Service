@@ -475,7 +475,8 @@ Standby БД получает реплицированные данные с Pri
           # Удаление старой БД
           sudo -u postgres rm -rf /var/lib/postgresql/14/main/
           # Запуск сервиса
-          sudo systemctl start postgresql  
+          sudo systemctl start postgresql
+          sudo systemctl restart postgresql   
           # Создание backup'a
           sudo -u postgres pg_basebackup -h 10.11.1.131 -D /var/lib/postgresql/14/main -U syncuser -P -v -R
               - h MAIN_IP — адрес главного сервера
@@ -488,9 +489,21 @@ Standby БД получает реплицированные данные с Pri
 
   </details>  
 
+3. Проверка репликации
+
+  <details>
+  <summary>Развернуть</summary>  
+      
+    - Настройка репликации
+          # Создание тестовой БД на Primary PostgreSQL  
+          sudo -u postgres createdb replica_test 
+
+  </details> 
 
 
-3. Дополнительная информация
+
+
+4. Дополнительная информация
 
 - Основные команды для работы с PostgreSQL  
 
