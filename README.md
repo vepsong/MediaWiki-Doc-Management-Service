@@ -460,8 +460,8 @@ Standby БД получает реплицированные данные с Pri
 3. Настройка Standby PostgreSQL
 
 
-  <details>
-  <summary>Развернуть</summary> 
+   <details>
+   <summary>Развернуть</summary> 
 
     - Настройка репликации
 
@@ -487,14 +487,15 @@ Standby БД получает реплицированные данные с Pri
               - R — создаёт в папке с базами данных файл standby.signal. Это маркер для сервера PostgreSQL, что нужно запуститься в резервном режиме
 
 
-  </details>  
+   </details>  
 
 3. Проверка репликации
 
-  <details>
-  <summary>Развернуть</summary>  
+   <details>
+   <summary>Развернуть</summary>  
       
     - Настройка репликации
+
           # Создание тестовой БД на Primary PostgreSQL  
           sudo -u postgres createdb replica_test 
 
@@ -503,17 +504,15 @@ Standby БД получает реплицированные данные с Pri
           psql
           \l
 
-  </details> 
+   </details> 
 
 
 
 
-4. Дополнительная информация
+4. Основные команды для работы с PostgreSQL  
 
-- Основные команды для работы с PostgreSQL  
-
-  <details>
-  <summary>Развернуть</summary>  
+   <details>
+   <summary>Развернуть</summary>  
       
       # Вход в аккаунт postgres
       sudo -i -u postgres
@@ -542,7 +541,7 @@ Standby БД получает реплицированные данные с Pri
       sudo -i -u <имя созданного пользователя linux>
       psql
 
-  </details> 
+   </details> 
 
 <!-- END_5.5. postgresql_setup.md -->
 
