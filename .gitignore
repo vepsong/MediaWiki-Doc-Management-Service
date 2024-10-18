@@ -7,6 +7,7 @@ root.code-workspace
 .env
 .env.local
 .env.*.local
+myenv
 
 # Файлы с секретами
 yc_meta.json
