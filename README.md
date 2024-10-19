@@ -467,12 +467,24 @@ Standby БД получает реплицированные данные с Pri
 
           # Остановка сервиса
           sudo systemctl stop postgresql
+
+          # Если необходимо хранить реплицируемую БД в другом катологе
+          # Архивное копирование директории (с сохранением прав на директорию)
+          cp -a /var/lib/postgresql/14/main /путь/к/целевой_папке
+          (напр.: sudo cp -a /var/lib/postgresql/14/main /opt/db_mount_dump/postgresql/14)
+          # Настройка файла конфигурации /etc/postgresql/14/main/postgresql.conf
+          data_directory = '/opt/db_mount_dump/postgresql/14/main'
+
+
+          # Очистка содержимого папки main
+          rm -rf /opt/db_mount_dump/postgresql/14/main/*
+
           # Удаление старой БД
           sudo -u postgres rm -rf /var/lib/postgresql/14/main/
           # Запуск сервиса
           sudo systemctl start postgresql
           sudo systemctl restart postgresql   
-          # Создание backup'a
+          # Создание синхронной репликации
           sudo -u postgres pg_basebackup -h 10.11.1.131 -D /var/lib/postgresql/14/main -U syncuser -P -v -R
               - h MAIN_IP — адрес главного сервера
               - D — папка, куда нужно положить backup
@@ -480,6 +492,7 @@ Standby БД получает реплицированные данные с Pri
               - P — запрашивает ввод пароля
               - v — выводит подробный лог выполнения команды
               - R — создаёт в папке с базами данных файл standby.signal. Это маркер для сервера PostgreSQL, что нужно запуститься в резервном режиме
+
 
 
    </details>  
@@ -662,8 +675,71 @@ Standby БД получает реплицированные данные с Pri
    </details> 
 
 
+7. Настройка pgdump 
 
-7. Основные команды для работы с PostgreSQL  
+   <details>
+   <summary>Развернуть</summary>  
+
+    - Настройка pgdump из Standby PostgreSQL на внешний жесткий диск
+
+          # Установка python
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install python3
+          apt install python3-venv
+          # Создание директории /scripts для python-скрипта
+          sudo mkdir /scripts
+          # Настройка python ВО
+          cd /scripts
+          python3 -m venv myenv
+          source myenv/bin/activate
+          sudo apt install python3-pip 
+          sudo pip3 install python-dotenv
+          # Настройка переменных окружения
+          # За основу взять файл [.env(for postgres)_EXAMPLE](credentials/templates/.env(for postgres)_EXAMPLE)
+          sudo touch/scripts/.env
+
+
+          # Копирование скрипта [pgdump.py](python-scripts/pgdump.py) в созданную выше директорию
+          # Добавить разрешение на исполнение скрипта
+          sudo chmod +x /scripts/pgdump.py
+          # Проверка разрешений файла
+          sudo ls -l /scripts/pgdump.py
+
+          # Создание расписание cronrab
+          sudo crontab -e
+          # В конец файла добавить:
+          0 3 * * * /scripts/myenv/bin/python /scripts/pgdump.py >> /scripts/pgdump.log 2>&1
+              - 0 3 * * * — запуск скрипта каждый день в 3 ночи
+          # Перезапуск сервиса
+          sudo systemctl restart cron
+          # Проверка
+          sudo grep CRON /var/log/syslog
+        
+
+
+          # Создание директории для хранения dump
+          # Для удобства можно архивно скопировать (с сохранением прав на директорию) уже существующую директорию с БД postgres и потом переименовать
+          cp -a /источник /путь/к/целевой_папке
+          (напр.: sudo cp -a /opt/db_mount_dump/postgresql/14/main /opt/db_mount_dump/)
+          # Очистка содержимого скопированной папки
+          sudo rm -rf /opt/db_mount_dump/main/*
+          # Переименование скопированной папки
+          sudo mv /opt/db_mount_dump/main/ /opt/db_mount_dump/pgdump
+
+          # Добавить в настройки аутентификации в файле /etc/postgresql/14/main/pg_hba.conf
+          local   all             syncuser                                peer
+
+          # Перезапустить сервис
+          sudo systemctl restart postgresql 
+
+
+
+          
+
+
+   </details> 
+
+8. Основные команды для работы с PostgreSQL  
 
    <details>
    <summary>Развернуть</summary>  
@@ -712,7 +788,7 @@ Standby БД получает реплицированные данные с Pri
 
 #### Настройка MediaWiki
 
-1. Test Header1
+1. Установка пакетов
 
 
    <details>
