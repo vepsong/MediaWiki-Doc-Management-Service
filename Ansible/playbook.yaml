@@ -26,7 +26,7 @@
   tags:
     - unmount_external_disks
 
-
+# Инициализация и настройка postgresql
 - name: Set up db_postgresql
   hosts: "{{ target_groups }}"
   become: true

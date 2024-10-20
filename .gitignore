@@ -17,6 +17,7 @@ terraform_vm_data.json
 ansible_meta.json
 .terraformrc
 **/.terraformrc
+.ansible_db_postgresql_vault_pass
 
 # Служебные файлы Terraform
 .terraform.lock.hcl

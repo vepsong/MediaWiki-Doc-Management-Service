@@ -21,7 +21,7 @@
     - db_postgresql_install_packages 
 
 # Запуск сервиса и добавление в автозапуск
-- name: "Step 3 - Start and enable services"
+- name: Step 3 - Start and enable services
   service: 
     name=postgresql
     state=started 
@@ -30,18 +30,19 @@
     - db_postgresql_start_enable_service
 
 
-
-- name: Шаг 5 - Создать динамические переменные
+# Создание динамических переменных
+- name: Step 4 - Create dynamic vars
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
 
-
-- name: Create a group for PostgreSQL access
+# Создание группы безопасности
+- name: Step 5 - Create a group for PostgreSQL access
   ansible.builtin.group:
     name: dbadmin
     state: present
 
-- name: Add multiple users to dbadmin group
+# Добавление пользователей в группу безопасности
+- name: Step 6 - Add multiple users to dbadmin group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: dbadmin
@@ -49,10 +50,10 @@
   loop:
     - postgres
     - sudo
-    - "{{ postgres_vars.db_user }}"
+    - "{{ postgres_wikiuser_user_vars.db_user }}"
 
-
-- name: Change group ownership for PostgreSQL directories
+# Смена владельцев директории
+- name: Step 7 - Change group ownership for PostgreSQL directories
   ansible.builtin.file:
     path: "{{ item }}"
     owner: root
@@ -63,8 +64,8 @@
   - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
   - "/opt"  # Указываем на родительскую директорию
 
-
-- name: Set permissions for PostgreSQL directories
+# Установка разрешений для директории
+- name: Step 8 - Set permissions for PostgreSQL directories
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
@@ -74,69 +75,45 @@
     - "/opt"  # Указываем на родительскую директорию
 
 
-# Создание пользователя для PRIMARY PostgreSQL db
-- name: Step 4 - create user in  PRIMARY PostgreSQL db
+# Создание пользователя wikiuser для PRIMARY PostgreSQL db
+- name: Step 9 - create user - wikiuser - in PRIMARY PostgreSQL db
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
-    name: "{{ postgres_vars.db_user }}"
-    password: "{{ postgres_vars.db_password }}"
-    role_attr_flags: "{{ postgres_vars.attr | join(',') }}"
+    name: "{{ postgres_wikiuser_user_vars.db_user }}"
+    password: "{{ postgres_wikiuser_user_vars.db_user_password }}"
+    role_attr_flags: "{{ postgres_wikiuser_user_vars.attr | join(',') }}"
     state: present
   tags:
-    - db_postgresql_create_primary_postgres_user
+    - db_postgresql_create_primary_postgres_wikiuser_user
   when: db_hosts.primary in inventory_hostname
   notify: reload_postgresql
 
 
-- name: Ensure the PostgreSQL database is present
+# Создание пользователя wikiuser для PRIMARY PostgreSQL db
+- name: Step 10 - create user - syncuser - in PRIMARY PostgreSQL db
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_replication_user_vars.db_user }}"
+    password: "{{ postgres_replication_user_vars.db_user_password }}"
+    role_attr_flags: "{{ postgres_replication_user_vars.attr | join(',') }}"
+    state: present
+  tags:
+    - db_postgresql_create_primary_postgres_syncuser  _user
+  when: db_hosts.primary in inventory_hostname
+  notify: reload_postgresql
+
+
+# Проверка существования БД (если ее нет, то создание)
+- name: Step 11 - Ensure the PostgreSQL database is present
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
     name: "{{ postgres_vars.db_name }}"
-    owner: "{{ postgres_vars.db_user }}"
+    owner: "{{ postgres_wikiuser_user_vars.db_user }}"
     state: present
   when: db_hosts.primary in inventory_hostname
-
-
-# - name: Create tablespace on external disk
-#   become: true
-#   become_user: postgres
-#   community.postgresql.postgresql_tablespace:
-#     name: "{{ postgres_vars.db_tablespace_name }}"
-#     location: "{{ item }}"
-#   loop: "{{ mount_point }}"
-#   when: db_hosts.primary in inventory_hostname
-#   tags:
-#     - db_postgresql_create_tablespace_on_external_disk
-
-
-
-# - name: Create a new database called mydb in tablespace bar
-#   community.postgresql.postgresql_db:
-#     name: "{{ postgres_vars.db_name }}"
-#     tablespace: "{{ postgres_vars.db_tablespace_name }}"
-#     owner: "{{ postgres_vars.db_user }}"
-#     state: present
-#   when: db_hosts.primary in inventory_hostname
-
-
-
-
-
-
-
-
-
-# - name: Create the databases
-#   community.postgresql.postgresql_db:
-#     name: "{{ postgres_vars.db_name  }}"
-#     encoding: "UTF-8"
-#   become: true
-#   become_user: postgres
-#   tags:
-#     - db_postgresql_create_db
-
 
 
 

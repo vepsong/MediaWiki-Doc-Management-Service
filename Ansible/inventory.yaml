@@ -3,45 +3,45 @@ linuxVM:
     monitoringSystem:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: 51.250.8.91
+          ansible_host: 89.169.143.171
           external_disks:
-          - disk_id: fhmicho1hf5gkq5ingml
+          - disk_id: fhmr3si44quikjfvaa7b
             disk_name: vhdd-1-monitoring-system-db
             mount_point: /opt/vhdd-1-monitoring-system-db
             filesystem: ext4
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.146.173
+          ansible_host: 51.250.66.55
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.144.232
+          ansible_host: 89.169.157.224
         vm-4-mediawiki-server-2:
-          ansible_host: 89.169.157.67
+          ansible_host: 89.169.151.239
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 89.169.130.152
+          ansible_host: 89.169.137.69
     primaryDb:
       hosts:
         vm-6-primary-db:
-          ansible_host: 51.250.2.167
+          ansible_host: 89.169.138.138
           external_disks:
-          - disk_id: fhmlic1v3ka9jdfd3n9u
+          - disk_id: fhmhrem4r23bv4oce9dg
             disk_name: vssd-1-primary-db
             mount_point: /opt/vssd-1-primary-db
             filesystem: ext4
     standbyDb:
       hosts:
         vm-7-standby-db:
-          ansible_host: 89.169.147.167
+          ansible_host: 89.169.143.7
           external_disks:
-          - disk_id: fhmtu79lvfn7jo7vst72
+          - disk_id: fhmo9q3gvjpumfs4np40
             disk_name: vhdd-2-standby-db
             mount_point: /opt/vhdd-2-standby-db
             filesystem: ext4
-          - disk_id: fhme5prcm0urkkiktonq
+          - disk_id: fhmd38cvkttvq28fh3ab
             disk_name: vhdd-3-dump-db
             mount_point: /opt/vhdd-3-dump-db
             filesystem: ext4

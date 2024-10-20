@@ -298,7 +298,8 @@ Standby БД получает реплицированные данные с Pri
 
 2. Pipeline по запуску playbook'ов playbook
    - Изменение имени хостов всех ВМ
-            ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
+          
+         ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
 
    - Монтирование внешних жестких дисков, инициализация LVM.  
       - Будут созданы: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt, запись в /etc/fstab для автомонтирования диска после перезапуска ВМ
@@ -307,10 +308,32 @@ Standby БД получает реплицированные данные с Pri
 
    - Размонтирование внешних жестких дисков, деинициализация LVM.  
 
-            ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_disks"
+         ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_disks"
 
-   - Установка пакетов для postgresql  
-            ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_db_postgresql"
+   - Инициализация и настройка postgresql на vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
+
+      - [Создание файла с секретными переменными](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) в Ansible/<название роли>/vars
+
+            # Создать файл secrets.yml
+            # За основу взять [ansible_secrets_EXAMPLE](../credentials/templates/ansible_secrets_EXAMPLE)
+            ansible-vault encrypt db_postgresql/vars/secrets.yml
+
+            # Создать файл .ansible_db_postgresql_vault_pass c паролем для расшифровки secrets.yml
+            # За основу взять [.ansible_vault_pass_EXAMPLE](../credentials/templates/.ansible_vault_pass_EXAMPLE)
+
+            # Изменение пароля
+            ansible-vault rekey <название файла>
+            # Редактирование файла
+            ansible-vault edit <название файла>
+            # Расшифровка файла
+            ansible-vault decrypt <название файла>
+            # Расшифровка просмотр файла
+            ansible-vault view
+
+      - Обновление пакетного репозитория, установка пакетов, создание: БД my_wiki, пользователь wikiuser (основной пользователь БД), пользователь syncuser (для репликации)
+
+            ansible-playbook playbook.yaml --vault-password-file /root/YP-sp13_MediaWiki/Ansible/.ansible_db_postgresql_vault_pass -i inventory.yaml --tags="setup_db_postgresql"
+            
 
 
 3. Дополнительная информация
@@ -794,16 +817,19 @@ Standby БД получает реплицированные данные с Pri
    <details>
    <summary>Развернуть</summary> 
    
-    - Установка postgresql
+    - Установка Mediawiki с помощью [unit.nginx](https://unit.nginx.org/howto/mediawiki/)
 
           # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
           sudo apt update && sudo apt upgrade -y
-          sudo apt install postgresql 
-          sudo systemctl enable postgresql
+          sudo apt install nginx -y
+          sudo systemctl enable nginx
+          sudo systemctl restart nginx
+          sudo apt install php-pgsql
+          sudo ln -s /etc/nginx/sites-available/mediawiki /etc/nginx/sites-enabled/
 
           # Проверка установки: автозапуск и статус службы
-          systemctl is-enabled postgresql
-          systemctl status postgresql
+          systemctl is-enabled nginx
+          systemctl status nginx
 
    </details>  
   
