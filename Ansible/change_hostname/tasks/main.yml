@@ -1,7 +1,7 @@
 ---
 # tasks file for change_hostname
 # Меняем имя ВМ, если имя в inventory.yaml отличается от фактического
-- name: Меняем имя машины
+- name: Изменение имени ВМ
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
   notify: "vm_reboot"
