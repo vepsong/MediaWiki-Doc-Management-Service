@@ -29,20 +29,23 @@
   tags:
     - db_postgresql_start_enable_service
 
+# Добавление секретных переменных
+- name: Step 4 - Include secret variables
+  include_vars: secrets.yml
 
 # Создание динамических переменных
-- name: Step 4 - Create dynamic vars
+- name: Step 5 - Create dynamic vars
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
 
 # Создание группы безопасности
-- name: Step 5 - Create a group for PostgreSQL access
+- name: Step 6 - Create a group for PostgreSQL access
   ansible.builtin.group:
     name: dbadmin
     state: present
 
 # Добавление пользователей в группу безопасности
-- name: Step 6 - Add multiple users to dbadmin group
+- name: Step 7 - Add multiple users to dbadmin group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: dbadmin
@@ -53,7 +56,7 @@
     - "{{ postgres_wikiuser_user_vars.db_user }}"
 
 # Смена владельцев директории
-- name: Step 7 - Change group ownership for PostgreSQL directories
+- name: Step 8 - Change group ownership for PostgreSQL directories
   ansible.builtin.file:
     path: "{{ item }}"
     owner: root
@@ -65,7 +68,7 @@
   - "/opt"  # Указываем на родительскую директорию
 
 # Установка разрешений для директории
-- name: Step 8 - Set permissions for PostgreSQL directories
+- name: Step 9 - Set permissions for PostgreSQL directories
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
@@ -75,8 +78,9 @@
     - "/opt"  # Указываем на родительскую директорию
 
 
+
 # Создание пользователя wikiuser для PRIMARY PostgreSQL db
-- name: Step 9 - create user - wikiuser - in PRIMARY PostgreSQL db
+- name: Step 10 - create user - wikiuser - in PRIMARY PostgreSQL db
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -91,7 +95,7 @@
 
 
 # Создание пользователя wikiuser для PRIMARY PostgreSQL db
-- name: Step 10 - create user - syncuser - in PRIMARY PostgreSQL db
+- name: Step 11 - create user - syncuser - in PRIMARY PostgreSQL db
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -106,7 +110,7 @@
 
 
 # Проверка существования БД (если ее нет, то создание)
-- name: Step 11 - Ensure the PostgreSQL database is present
+- name: Step 12 - Ensure the PostgreSQL database is present
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
