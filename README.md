@@ -296,12 +296,12 @@ Standby БД получает реплицированные данные с Pri
         ~/<имя репозитория>/<папка Terraform> terraform output 
         # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
-2. Pipeline по запуску playbook'ов playbook
-   - Изменение имени хостов всех ВМ
+2. Guideline по запуску playbook'ов playbook
+   - #### Изменение имени хостов всех ВМ
           
          ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
 
-   - Монтирование внешних жестких дисков, инициализация LVM.  
+   - #### Монтирование внешних жестких дисков, инициализация LVM.  
       - Будут созданы: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt, запись в /etc/fstab для автомонтирования диска после перезапуска ВМ
 
             ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
@@ -310,29 +310,37 @@ Standby БД получает реплицированные данные с Pri
 
          ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_disks"
 
-   - Инициализация и настройка postgresql на vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
+   - #### Инициализация и настройка postgresql на vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
 
       - [Создание файла с секретными переменными](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) в Ansible/<название роли>/vars
 
-            # Создать файл secrets.yml
-            # За основу взять ansible_secrets_EXAMPLE
-            ansible-vault encrypt db_postgresql/vars/secrets.yml
+        - Создать файл secrets.yml для хранения переменных: postgres, wikiuser, replication user
 
-            # Создать файл .ansible_db_postgresql_vault_pass c паролем для расшифровки secrets.yml
-            # За основу взять .ansible_vault_pass_EXAMPLE
+              # За основу взять ansible_secrets_EXAMPLE
+              ansible-vault encrypt db_postgresql/vars/secrets.yml
 
-            # Изменение пароля
-            ansible-vault rekey <название файла>
-            # Редактирование файла
-            ansible-vault edit <название файла>
-            # Расшифровка файла
-            ansible-vault decrypt <название файла>
-            # Просмотр файла
-            ansible-vault view <название файла>
+        - Создать файл .ansible_db_postgresql_vault_pass в корневой директории Ansible с паролем для расшифровки secrets.yml
 
-      - Обновление пакетного репозитория, установка пакетов, создание: БД my_wiki, пользователь wikiuser (основной пользователь БД), пользователь syncuser (для репликации)
+              # За основу взять .ansible_vault_pass_EXAMPLE
+
+        - Дополнительные команды vault
+
+              # Изменение пароля
+              ansible-vault rekey <название файла>
+              # Редактирование файла
+              ansible-vault edit <название файла>
+              # Расшифровка файла
+              ansible-vault decrypt <название файла>
+              # Просмотр файла
+              ansible-vault view <название файла>
+
+        - Cкопировать файл
+
+
+      - Обновление пакетного репозитория, установка пакетов, создание: БД my_wiki, пользователь wikiuser (основной пользователь БД), пользователь syncuser (для репликации), перенос директории Primary и Standby БД на внешний жесткий диск, настройка репликации, настройка dump
 
             ansible-playbook playbook.yaml --vault-password-file /root/YP-sp13_MediaWiki/Ansible/.ansible_db_postgresql_vault_pass -i inventory.yaml --tags="setup_db_postgresql"
+
             
 
 
@@ -545,7 +553,7 @@ Standby БД получает реплицированные данные с Pri
       
     - Настройка репликации
 
-          # Просмотр параметров репликации
+          # Просмотр параметров репликации (выполнять на Primary)
           sudo su - postgres
           psql
           \x
@@ -660,7 +668,6 @@ Standby БД получает реплицированные данные с Pri
           sudo systemctl stop postgresql
 
           # Копирование БД в новую директорию
-          <!-- sudo cp -R /var/lib/postgresql/14/main /opt/db_mount/ -->
           sudo rsync -arv /var/lib/postgresql/14/main /opt/db_mount/
           
           # "Спрятать" старую БД
@@ -678,10 +685,6 @@ Standby БД получает реплицированные данные с Pri
 
           # Настройка файла конфигурации /etc/postgresql/14/main/postgresql.conf
           data_directory = '/opt/db_mount/14/main'
-
-          <!-- # Настройка прав доступа к директории
-          sudo chown -R postgres:postgres /opt/db_mount/
-          sudo chmod -R 700 /opt/db_mount/ -->
 
           # Запуск сервиса
           sudo systemctl start postgresql
@@ -708,18 +711,19 @@ Standby БД получает реплицированные данные с Pri
           # Установка python
           sudo apt update && sudo apt upgrade -y
           sudo apt install python3
-          apt install python3-venv
+          sudo apt install python3-venv
           # Создание директории /scripts для python-скрипта
           sudo mkdir /scripts
           # Настройка python ВО
           cd /scripts
           python3 -m venv myenv
           source myenv/bin/activate
+          sudo apt install python
           sudo apt install python3-pip 
           sudo pip3 install python-dotenv
           # Настройка переменных окружения
           # За основу взять файл [.env(for postgres)_EXAMPLE](credentials/templates/.env(for postgres)_EXAMPLE)
-          sudo touch/scripts/.env
+          sudo touch /scripts/.env
 
 
           # Копирование скрипта [pgdump.py](python-scripts/pgdump.py) в созданную выше директорию

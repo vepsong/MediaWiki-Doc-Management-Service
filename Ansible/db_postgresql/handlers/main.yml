@@ -6,3 +6,10 @@
     state: restarted
     enabled: yes
   listen: "reload_postgresql"
+
+- name: Cron Reloader
+  ansible.builtin.service:
+    name: cron
+    state: restarted
+    enabled: yes
+  listen: "reload_cron"
