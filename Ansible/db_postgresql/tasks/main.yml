@@ -208,7 +208,7 @@
   tags:
     - db_postgresql_add_hot_standby_on_postgresql_conf
 
-# Настройка  data_directory в /etc/postgresql/14/main/postgresql.conf в Standby Postgresql
+# Настройка data_directory в /etc/postgresql/14/main/postgresql.conf в Standby Postgresql
 - name: Step 17 - Ensure data_directory is mount point in postgresql.conf in Standby Postgresql
   become: true
   become_user: postgres
@@ -221,22 +221,24 @@
   tags:
     - db_postgresql_add_data_directory_on_postgresql_conf
 
-# Настройка копирования директории на внешний жесткий диск
-- name: Step 18 - Copy directory with preserving permissions (like cp -a) on remote host
-  become: true
-  become_user: root
-  command: "cp -a /var/lib/postgresql {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}"
-  when: db_hosts.standby in inventory_hostname
-  tags:
-    - db_postgresql_copy_path
 
-# Удаление всех файлов из скопированной директории
-- name: Step 19 - Remove all contents of the directory
+# Создание архива с бекапом postgres_initial_main_backup_(date +'%Y%m%d_%H%M%S') в /tmp/
+# Удаление всех файлов из /var/lib/postgresql/14/main
+# Проверка наличия примонтированнй директории
+# Архивное копирование (с сохр. всех прав) папки /var/lib/postgresql/ в точку монтирования
+# Удаление папки /var/lib/postgresql/14/main
+- name: Step 18 - Backup the old directory and clean up contents in one task
   become: true
   become_user: root
-  # command: "rm -rf {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main/*"
-  shell: "rm -rf {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main/*"
+  shell: |
+    tar -czvf /tmp/postgres_initial_main_backup_$(date +'%Y%m%d_%H%M%S').tar.gz -C /var/lib/postgresql/14/ main && \
+    rm -rf /var/lib/postgresql/14/main/* && \
+    ls -a {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }} && \
+    cp -a /var/lib/postgresql/ {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }} && \
+    rm -rf /var/lib/postgresql/14/main
+
   when: db_hosts.standby in inventory_hostname
   tags:
+    - backup_directory
     - cleanup_directory
 
