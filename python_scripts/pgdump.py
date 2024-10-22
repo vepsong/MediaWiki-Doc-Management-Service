@@ -15,7 +15,7 @@ NOW = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 DATABASE_USER = os.getenv("DATABASE_USER")
-DATABASE_PASSWORD = Path(os.getenv("DATABASE_PASSWORD"))
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 DATABASE_PORT = os.getenv("DATABASE_PORT")
 
 BACKUPS_PATH = Path(os.getenv("BACKUPS_DIR"))
@@ -23,11 +23,17 @@ PRIVATE_KEY_PATH = Path(os.getenv("PRIVATE_KEY_PATH"))
 REMOTE_HOST = os.getenv("REMOTE_HOST")
 REMOTE_USER = os.getenv("REMOTE_USER")
 
+
+
+# под удаление
 SQL_DUMP_FILE_NAME = f'dump_{DATABASE_NAME}_{NOW}.sql'
 ARCHIVE_FILE_NAME = f'archive_sql_dump_{DATABASE_NAME}_and_mediawiki_folder_{NOW}.tar.gz'
 
 REMOTE_PATH = '/var/www/mediawiki'
 MEDIAWIKI_FOLDER_NAME = 'mediawiki'
+
+ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_{DATABASE_NAME}_{NOW}.sql'
+ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME = f'backup_{REMOTE_HOST}_{REMOTE_PATH}_{NOW}.tar.gz'.replace('/', '_')
 
 BACKUP_PATTERN = re.compile(r"archive_sql_dump_(.+)_and_mediawiki_folder_(\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2})\.tar\.gz")
 KEEP_LAST_N_BACKUPS = 10  # Количество бэкапов, которые нужно ост
@@ -38,9 +44,10 @@ def get_remote_folder():
         command = [
             'rsync',
             '-avz',
+            '--delete',
             '-e', f"ssh -i {PRIVATE_KEY_PATH}",
-            BACKUPS_PATH,
-            f"{REMOTE_USER}@{REMOTE_HOST}:{REMOTE_PATH}"
+            f"{REMOTE_USER}@{REMOTE_HOST}:{REMOTE_PATH}",
+            BACKUPS_PATH
         ]
         
         # Выполнение команды rsync
@@ -49,6 +56,19 @@ def get_remote_folder():
         # Вывод результатов
         print("Результат синхронизации:")
         print(result.stdout.decode('utf-8'))
+
+        # Создание архива после синхронизации
+        archive_path = f'{BACKUPS_PATH}/{ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME}'
+        mediawiki_folder_path = f'{BACKUPS_PATH}/{MEDIAWIKI_FOLDER_NAME}'
+
+        # Команда для создания архива
+        tar_command = ['tar', '-czvf', archive_path, '-C', mediawiki_folder_path, '.']
+        # Выполнение команды архивации
+        tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        print("Архивация завершена:")
+        print(tar_result.stdout.decode('utf-8'))
+
     except subprocess.CalledProcessError as e:
         print("Ошибка при синхронизации:")
         print(e.stderr.decode('utf-8'))
