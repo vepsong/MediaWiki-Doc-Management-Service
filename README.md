@@ -279,7 +279,7 @@ Standby БД получает реплицированные данные с Pri
 
 <!-- 1. Копирование приватного ssh-ключа на vm-7-standby-db в /root/.ssh, чтобы иметь возможность подключаться к другим ВМ -->
 
-### 1. Список настраиваемых файлов/скриптов конфигурации
+#### 1. Список настраиваемых файлов/скриптов конфигурации
 
    - [ansible_structure](python-scripts/ansible_structure.py)
 
@@ -298,9 +298,9 @@ Standby БД получает реплицированные данные с Pri
 
       </details>
 
-### 2. Guideline по запуску playbook'ов playbook
+#### 2. Guideline по запуску playbook'ов playbook
 
-   - ### 2.1. Подготовительная работа
+   - #### 2.1. Подготовительная работа
 
       <details>
       <summary>Развернуть</summary>  
@@ -354,11 +354,11 @@ Standby БД получает реплицированные данные с Pri
 
       </details>
 
-   - ### 2.2. Изменение имени хостов всех ВМ
+   - #### 2.2. Изменение имени хостов всех ВМ
           
          ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
 
-   - ### 2.3.1. Монтирование внешних жестких дисков, инициализация LVM.  
+   - #### 2.3.1. Монтирование внешних жестких дисков, инициализация LVM.  
       - Будут созданы: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt, запись в /etc/fstab для автомонтирования диска после перезапуска ВМ
 
             ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
@@ -370,7 +370,7 @@ Standby БД получает реплицированные данные с Pri
             ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_disks"
 
 
-   - ### 2.4. Инициализация и настройка postgresql на vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
+   - #### 2.4. Инициализация и настройка postgresql на vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
 
       - Обновление пакетного репозитория, установка пакетов
       - Cоздание БД my_wiki, пользователя wikiuser (основной пользователь БД), пользователя syncuser (для репликации)
@@ -380,7 +380,7 @@ Standby БД получает реплицированные данные с Pri
             ansible-playbook playbook.yaml --vault-id @/root/YP-sp13_MediaWiki/Ansible/vault_passwords.txt -i inventory.yaml --tags="setup_db_postgresql"
 
 
-### 3. Дополнительная информация
+#### 3. Дополнительная информация
 
 - Основные команды для работы с Ansible  
   Выполнять из директории с файлами Ansible
