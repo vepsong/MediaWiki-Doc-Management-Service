@@ -18,6 +18,9 @@ ansible_meta.json
 .terraformrc
 **/.terraformrc
 .ansible_db_postgresql_vault_pass
+id_ed25519
+vault_passwords.txt
+
 
 # Служебные файлы Terraform
 .terraform.lock.hcl

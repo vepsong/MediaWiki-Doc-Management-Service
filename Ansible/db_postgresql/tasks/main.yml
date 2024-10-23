@@ -450,7 +450,19 @@
     - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_fill_up_env
 
 
-- name: Step 29 - change ssh-permissions
+# Копирование private ssh-key в ~/.ssh
+- name: Step 29 - Private ssh-key to /scripts
+  copy:
+    src: "{{ role_path }}/files/id_ed25519"
+    dest: ~/.ssh
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - db_postgresql_copy_private_ssh_key_to_standby
+    - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_copy_private_ssh_key_to_standby
+
+
+# Изменение разрешений на запуск private ssh-key
+- name: Step 30 - change ssh-permissions
   become: true
   become_user: root
   shell: |
