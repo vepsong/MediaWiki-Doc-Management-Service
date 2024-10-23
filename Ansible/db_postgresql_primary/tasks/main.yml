@@ -1,0 +1,210 @@
+---
+
+# =====================================
+# Блок с задачами Primary PostgreSQL db
+# =====================================
+
+# Добавление секретных переменных
+- name: Step 1 - Include secret variables
+  include_vars: secrets.yml
+  tags:
+    - setup_db_primary_postgresql_add_secret_variables
+
+# Создание динамических переменных
+- name: Step 2 - Create dynamic variables
+  set_fact:
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
+  tags:
+    - setup_db_primary_postgresql_create_dynamic_variables
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables
+
+# Остановка сервиса PostgreSQL
+- name: Step 3 - Stop PostgreSQL service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: stopped
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_stop_postgresql
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_stop_postgresql
+
+# Проверка наличия mount point
+- name: Step 4 - Check contents of the mount point
+  become: true
+  become_user: root
+  command: ls -a {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
+  register: mount_point_contents
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_check_existance_mount_point
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_check_existance_mount_point
+
+# Копирование текущей директории БД в mount point
+- name: Step 5 - Copy current db_path to mount_point
+  become: true
+  become_user: root
+  command: >
+    cp -a /var/lib/postgresql/ {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_current_db_path_to_mount_point
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_current_db_path_to_mount_point
+
+# Создание архива с бэкапом
+- name: Step 6 - Create a archive backup of the main directory
+  become: true
+  become_user: root
+  command: >
+    tar -czvf /var/lib/postgresql/14/main_{{ ansible_date_time.iso8601_basic }}.bak.tar.gz -C /var/lib/postgresql/14/ main
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_create_archive
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_create_archive
+
+
+# Удаление старой директории
+- name: Step 7 - Remove old main directory data
+  become: true
+  become_user: root
+  command: rm -rf /var/lib/postgresql/14/main
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_remove_primary_db_old_path
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_remove_primary_db_old_path
+
+# Настройка data_directory в /etc/postgresql/14/main/postgresql.conf в Primary Postgresql
+- name: Step 8 - Ensure data_directory is mount point in postgresql.conf in Primary Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*data_directory\s*=\s*.*'
+    replace: "data_directory = '{{ hostvars['vm-6-primary-db'].external_disks[0].mount_point }}/postgresql/14/main'"
+  notify: reload_postgresql
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_add_data_directory_primary_on_postgresql_conf
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_add_data_directory_primary_on_postgresql_conf
+
+
+# Добавление разрешений в pg_hba.conf на подключение к Primary Postgresql
+- name: Step 9 - Add entries to pg_hba.conf for Primary PostgreSQL
+  become: true
+  become_user: postgres
+  blockinfile:
+    path: /etc/postgresql/14/main/pg_hba.conf
+    block: |
+      host my_wiki       wikiuser       77.137.79.100/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32          scram-sha-256
+      host my_wiki       wikiuser       192.168.10.11/32           scram-sha-256    
+      host my_wiki       wikiuser       {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.13/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.14/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.15/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.16/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32          scram-sha-256
+      host my_wiki       wikiuser       192.168.10.17/32           scram-sha-256
+      host replication   syncuser       77.137.79.100/32           scram-sha-256
+      host replication   syncuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32          scram-sha-256    
+      host replication   syncuser       192.168.10.16/32           scram-sha-256
+      host replication   syncuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32          scram-sha-256
+      host replication   syncuser       192.168.10.17/32           scram-sha-256
+
+    marker: "# {mark} Ansible managed block for PostgreSQL"
+  notify: reload_postgresql
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_add_ip_pg_hba_conf
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_add_ip_pg_hba_conf
+
+# Настройка  listen_addresses в /etc/postgresql/14/main/postgresql.conf в Primary Postgresql
+- name: Step 10 - Ensure listen_addresses is set to '*' in postgresql.conf in Primary Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*listen_addresses\s*=\s*.*'
+    replace: "listen_addresses = '*'"
+  notify: reload_postgresql
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_add_listen_addresses_primary_postgresql_conf
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_add_listen_addresses_primary_postgresql_conf
+
+# Настройка  wal_level в /etc/postgresql/14/main/postgresql.conf в Primary Postgresql
+- name: Step 11 - Ensure wal_level is set to replica in postgresql.conf in Primary Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*wal_level\s*=\s*\w+'
+    replace: 'wal_level = replica'
+  notify: reload_postgresql
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_add_wal_level_primary_postgresql_conf
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_add_wal_level_primary_postgresql_conf
+
+
+# Немедленный перезапуск сервиса PostgreSQL
+- name: Step 12 - Reload PostgreSQL service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: restarted
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_reload_postgresql
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_reload_postgresql
+
+
+# Создание пользователя wikiuser для PRIMARY PostgreSQL db
+- name: Step 13 - create user - wikiuser - in PRIMARY PostgreSQL db
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_wikiuser_user_vars.db_user }}"
+    password: "{{ postgres_wikiuser_user_vars.db_user_password }}"
+    role_attr_flags: "{{ postgres_wikiuser_user_vars.attr | join(',') }}"
+    state: present
+  when: db_hosts.primary in inventory_hostname
+  notify: reload_postgresql
+  tags:
+    - setup_db_primary_postgresql_create_user_wikiuser
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_create_user_wikiuser
+
+# Создание пользователя syncuser для PRIMARY PostgreSQL db
+- name: Step 14 - create user - syncuser - in PRIMARY PostgreSQL db
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_replication_user_vars.db_user }}"
+    password: "{{ postgres_replication_user_vars.db_user_password }}"
+    role_attr_flags: "{{ postgres_replication_user_vars.attr | join(',') }}"
+    state: present
+  when: db_hosts.primary in inventory_hostname
+  notify: reload_postgresql
+  tags:
+    - setup_db_primary_postgresql_create_user_syncuser
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_create_user_syncuser
+
+# Проверка существования БД (если ее нет, то создание)
+- name: Step 15 - Ensure the PostgreSQL database is present
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ postgres_vars.db_name }}"
+    owner: "{{ postgres_wikiuser_user_vars.db_user }}"
+    state: present
+  when: db_hosts.primary in inventory_hostname
+  tags:
+    - setup_db_primary_postgresql_ensure_postgresql_db_is_presents
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_ensure_postgresql_db_is_presents
+
+

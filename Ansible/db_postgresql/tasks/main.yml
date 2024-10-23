@@ -126,7 +126,7 @@
     systemctl stop postgresql && \
     ls -a {{ hostvars[inventory_hostname].external_disks[0].mount_point }} && \
     cp -a /var/lib/postgresql/ {{ hostvars[inventory_hostname].external_disks[0].mount_point }} && \
-    tar -czvf /var/lib/postgresql/14/main_$(date +'%d-%m-%Y_%H:%M:%S').bak.tar.gz -C /var/lib/postgresql/14/ main && \
+    tar -czvf /var/lib/postgresql/14/main_$(date +'%d_%m_%Y_%H_%M_%S').bak.tar.gz -C /var/lib/postgresql/14/ main && \
     rm -rf /var/lib/postgresql/14/main || true
     
   when: db_hosts.primary in inventory_hostname
@@ -350,16 +350,30 @@
   become: true
   become_user: root
   shell: |
-    tar -czvf /tmp/postgres_initial_main_backup_$(date +'%d-%m-%Y_%H:%M:%S').tar.gz -C /var/lib/postgresql/14/ main && \
+    systemctl stop postgresql && \
+    tar -czvf /tmp/postgres_initial_main_backup_$(date +'%d_%m_%Y_%H_%M_%S').tar.gz -C /var/lib/postgresql/14/ main && \
     rm -rf /var/lib/postgresql/14/main/* && \
     ls -a {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }} && \
     cp -a /var/lib/postgresql/ {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }} && \
-    rm -rf /var/lib/postgresql/14/main || true
+    rm -rf /var/lib/postgresql/14/main
 
   when: db_hosts.standby in inventory_hostname
+  notify: reload_postgresql
   tags:
     - db_postgresql_backup_directory
     - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_backup_directory
+
+# Немедленный перезапуск сервиса PostgreSQL
+- name: Step 24 - Reload PostgreSQL service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: restarted
+  when: db_hosts.standbyin inventory_hostname
+  tags:
+    - db_postgresql_reload_postgresql
+    - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_reload_postgresql
 
 # Запуск репликации
 # - h MAIN_IP — адрес главного сервера
@@ -369,7 +383,7 @@
 # - v — выводит подробный лог выполнения команды
 # - R — создаёт в папке с базами данных файл standby.signal. Это маркер для сервера PostgreSQL, что нужно запуститься в резервном режиме
 
-- name: Step 24 - Run pg_basebackup for replication
+- name: Step 25 - Run pg_basebackup for replication
   become: true
   become_user: postgres
   shell: |
@@ -393,13 +407,12 @@
 # Установка python-библиотек
 # Создание директории /scripts, в которой будут хранится скрипты для dump'a
 # Cоздание пустого файла .env для дальнейшего наполнения значениями из secrets.yml
-- name: Step 25 - create path for scripts standby Postgresql
+- name: Step 26 - create path for scripts standby Postgresql
   become: true
   become_user: root
   shell: |
     pip3 install python-dotenv
     pip3 install log
-    pip3 install paramiko
     mkdir /scripts 
     touch /scripts/.env
   when: db_hosts.standby in inventory_hostname
@@ -408,7 +421,7 @@
     - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_create_path_scripts
 
 # Копирование скрипта pgdump.py в /scripts
-- name: Step 26 - Copy pgdump.py to /scripts
+- name: Step 27 - Copy pgdump.py to /scripts
   copy:
     src: "{{ role_path }}/files/pgdump.py"
     dest: /scripts/
@@ -418,7 +431,7 @@
     - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_copy_pgdump_py_to_scripts_standby
 
 # Добавление скрипту pgdump.py прав на исполнение 
-- name: Step 27 - Make pgdump.py executable
+- name: Step 28 - Make pgdump.py executable
   file:
     path: /scripts/pgdump.py
     mode: '0755'
@@ -428,7 +441,7 @@
     - db_postgresql_add_secret_variables, db_postgresql_create_dynamic_variables, db_postgresql_add_exec_to_pgdump_py_standby
 
 # Наполнение .env
-- name: Step 28 - Fill up .env
+- name: Step 29 - Fill up .env
   become: true
   become_user: root
   blockinfile:
@@ -451,7 +464,7 @@
 
 
 # Копирование private ssh-key в ~/.ssh
-- name: Step 29 - Private ssh-key to /scripts
+- name: Step 30 - Private ssh-key to /scripts
   copy:
     src: "{{ role_path }}/files/id_ed25519"
     dest: ~/.ssh
@@ -462,7 +475,7 @@
 
 
 # Изменение разрешений на запуск private ssh-key
-- name: Step 30 - change ssh-permissions
+- name: Step 31 - change ssh-permissions
   become: true
   become_user: root
   shell: |
@@ -475,7 +488,7 @@
 
 
 # Добавление запуска pgdump.py в планировшик задания cron
-- name: Step 30 - Run pgdump.py script
+- name: Step 32 - Run pgdump.py script
   become: true
   become_user: root
   ansible.builtin.cron:

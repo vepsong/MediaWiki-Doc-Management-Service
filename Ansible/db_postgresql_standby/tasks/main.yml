@@ -1,0 +1,296 @@
+---
+# tasks file for db_postgresql_standby
+
+# =====================================
+# Блок с задачами Standby PostgreSQL db
+# =====================================
+
+# Добавление секретных переменных
+- name: Step 1 - Include secret variables
+  include_vars: secrets.yml
+  tags:
+    - setup_db_standby_postgresql_add_secret_variables
+
+# Создание динамических переменных
+- name: Step 2 - Create dynamic variables
+  set_fact:
+    mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
+  tags:
+    - setup_db_standby_postgresql_create_dynamic_variables
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables
+
+# Остановка сервиса PostgreSQL
+- name: Step 3 - Stop PostgreSQL service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: stopped
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_stop_postgresql
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_stop_postgresql
+
+# Создание архива с бэкапом
+- name: Step 4 - Create backup of the old directory
+  become: true
+  become_user: root
+  command: >
+    tar -czvf /tmp/postgres_initial_main_backup_{{ ansible_date_time.iso8601_basic }}.tar.gz
+    -C /var/lib/postgresql/14/ main
+  when: db_hosts.standby in inventory_hostname
+  register: backup_result
+  tags:
+    - setup_db_standby_postgresql_create_archive
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_create_archive
+
+# Очистка содержимого старой директрии
+- name: Step 5 - Clean up contents in the main directory
+  become: true
+  become_user: root
+  command: rm -rf /var/lib/postgresql/14/main/*
+  when: db_hosts.standby in inventory_hostname and backup_result is succeeded
+  tags:
+    - setup_db_standby_postgresql_remove_old_path
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_remove_old_path
+
+# Проверка наличия mount point
+- name: Step 6 - List contents of the external disk mount point
+  become: true
+  become_user: root
+  command: ls -a {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_check_existance_mount_point
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_check_existance_mount_point
+
+# Архивное копирование (с сохр. всех прав) папки /var/lib/postgresql/ в точку монтирования
+- name: Step 7 - Copy PostgreSQL "main" folder to mount point
+  become: true
+  become_user: root
+  command: cp -a /var/lib/postgresql/ {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_copy_main_folder_mount_point
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_copy_main_folder_mount_point
+
+
+# Добавление разрешений в pg_hba.conf на подключение к Standby Postgresql
+- name: Step 8 - Add entries to pg_hba.conf for standby PostgreSQL
+  become: true
+  become_user: postgres
+  blockinfile:
+    path: /etc/postgresql/14/main/pg_hba.conf
+    block: |
+      host my_wiki       wikiuser       77.137.79.100/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32          scram-sha-256
+      host my_wiki       wikiuser       192.168.10.11/32           scram-sha-256    
+      host my_wiki       wikiuser       {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.13/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.14/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.15/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32          scram-sha-256    
+      host my_wiki       wikiuser       192.168.10.16/32           scram-sha-256
+      host my_wiki       wikiuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32          scram-sha-256
+      host my_wiki       wikiuser       192.168.10.17/32           scram-sha-256
+      host replication   syncuser       77.137.79.100/32           scram-sha-256
+      host replication   syncuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32          scram-sha-256    
+      host replication   syncuser       192.168.10.16/32           scram-sha-256
+      host replication   syncuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32          scram-sha-256
+      host replication   syncuser       192.168.10.17/32           scram-sha-256
+
+    marker: "# {mark} Ansible managed block for PostgreSQL"
+  notify: reload_postgresql
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_add_ip_pg_hba_conf
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_add_ip_pg_hba_conf
+
+
+
+# Настройка  listen_addresses в /etc/postgresql/14/main/postgresql.conf в Primary Postgresql
+- name: Step 9 - Ensure listen_addresses is set to '*' in postgresql.conf in Standby Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*listen_addresses\s*=\s*.*'
+    replace: "listen_addresses = '*'"
+  notify: reload_postgresql
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_add_listen_addresses_standby_postgresql_conf
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_add_listen_addresses_standby_postgresql_conf
+
+# Настройка hot_standby в /etc/postgresql/14/main/postgresql.conf в Standby Postgresql
+- name: Step 10 - Ensure hot_standby is set to 'on' in postgresql.conf in Standby Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*hot_standby\s*=\s*.*'
+    replace: 'hot_standby = on'
+  notify: reload_postgresql
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_add_hot_standby_on_postgresql_conf
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_add_hot_standby_on_postgresql_conf
+
+# Настройка data_directory в /etc/postgresql/14/main/postgresql.conf в Standby Postgresql
+- name: Step 11 - Ensure data_directory is mount point in postgresql.conf in Standby Postgresql
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*data_directory\s*=\s*.*'
+    replace: "data_directory = '{{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main'"
+  notify: reload_postgresql
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_add_data_directory_standby_on_postgresql_conf
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_add_data_directory_standby_on_postgresql_conf
+
+
+
+
+# Немедленный перезапуск сервиса PostgreSQL
+- name: Step 12 - Reload PostgreSQL service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: restarted
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_reload_postgresql
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_reload_postgresql
+
+# Запуск репликации
+# - h MAIN_IP — адрес главного сервера
+# - D — папка, куда нужно положить backup
+# - U — пользователь для подключения
+# - P — запрашивает ввод пароля
+# - v — выводит подробный лог выполнения команды
+# - R — создаёт в папке с базами данных файл standby.signal. Это маркер для сервера PostgreSQL, что нужно запуститься в резервном режиме
+
+- name: Step 13 - Run pg_basebackup for replication
+  become: true
+  become_user: postgres
+  shell: |
+    pg_basebackup -h 192.168.10.16 -D {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main \
+    -U {{ postgres_replication_user_vars.db_user }} \
+    -P -v -R
+  environment:
+    PGPASSWORD: "{{ postgres_replication_user_vars.db_user_password }}"
+  notify: reload_postgresql
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_run_pg_basebackup
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_run_pg_basebackup
+
+
+
+# =======================================================
+# Блок с задачами Standby PostgreSQL db для создания dump
+# =======================================================
+
+# Установка python-библиотек
+# Создание директории /scripts, в которой будут хранится скрипты для dump'a
+# Cоздание пустого файла .env для дальнейшего наполнения значениями из secrets.yml
+- name: Step 11 - create path for scripts standby Postgresql
+  become: true
+  become_user: root
+  shell: |
+    pip3 install python-dotenv
+    pip3 install log
+    mkdir /scripts 
+    touch /scripts/.env
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_create_path_scripts
+
+# Копирование скрипта pgdump.py в /scripts
+- name: Step 12 - Copy pgdump.py to /scripts
+  copy:
+    src: "{{ role_path }}/files/pgdump.py"
+    dest: /scripts/
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_copy_pgdump_py_to_scripts_standby
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_copy_pgdump_py_to_scripts_standby
+
+# Добавление скрипту pgdump.py прав на исполнение 
+- name: Step 13 - Make pgdump.py executable
+  file:
+    path: /scripts/pgdump.py
+    mode: '0755'
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_add_exec_to_pgdump_py_standby
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_add_exec_to_pgdump_py_standby
+
+# Наполнение .env
+- name: Step 14 - Fill up .env
+  become: true
+  become_user: root
+  blockinfile:
+    path: /scripts/.env
+    block: |
+      BACKUPS_DIR="{{ postgres_vars.db_backups_dir }}"
+      DATABASE_USER={{ postgres_wikiuser_user_vars.db_user }}
+      DATABASE_PASSWORD={{ postgres_wikiuser_user_vars.db_user_password }}
+      DATABASE_NAME={{ postgres_vars.db_name }}
+      DATABASE_PORT={{ postgres_vars.db_port }}
+      REMOTE_HOST={{ vm_7_standby_db_private_key_ssh.remote_host }}
+      REMOTE_USER={{ vm_7_standby_db_private_key_ssh.remote_user }}
+      PRIVATE_KEY_PATH={{ vm_7_standby_db_private_key_ssh.private_key_ssh_path }}
+
+    marker: "# {mark} Ansible managed block for .env"
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_fill_up_env
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_fill_up_env
+
+
+# Копирование private ssh-key в ~/.ssh
+- name: Step 15 - Private ssh-key to /scripts
+  copy:
+    src: "{{ role_path }}/files/id_ed25519"
+    dest: ~/.ssh
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_copy_private_ssh_key_to_standby
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_copy_private_ssh_key_to_standby
+
+
+# Изменение разрешений на запуск private ssh-key
+- name: Step 16 - change ssh-permissions
+  become: true
+  become_user: root
+  shell: |
+    chmod 600 /root/.ssh/id_ed25519
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_change_ssh_permissions
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_change_ssh_permissions
+
+
+
+# Добавление запуска pgdump.py в планировшик задания cron
+- name: Step 17 - Run pgdump.py script
+  become: true
+  become_user: root
+  ansible.builtin.cron:
+    name: "Run pgdump script"
+    minute: "*"
+    hour: "*"
+    job: "/usr/bin/python3 /scripts/pgdump.py >> /scripts/pgdump.log 2>&1"
+  notify: reload_cron
+  when: db_hosts.standby in inventory_hostname
+  tags:
+    - setup_db_standby_postgresql_run_pgdump_py_cron_standby
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_run_pgdump_py_cron_standby
+
+

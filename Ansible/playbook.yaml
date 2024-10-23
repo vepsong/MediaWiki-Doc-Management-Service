@@ -26,7 +26,7 @@
   tags:
     - unmount_external_disks
 
-# Инициализация и настройка postgresql
+# Инициализация и общая настройка postgresql
 - name: Set up db_postgresql
   hosts: "{{ target_groups }}"
   become: true
@@ -35,3 +35,20 @@
   tags:
     - setup_db_postgresql
 
+# Настройка primary postgresql
+- name: Set up primary db_postgresql
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: db_postgresql_primary
+  tags:
+    - setup_db_primary_postgresql
+
+# Настройка standby postgresql
+- name: Set up standby db_postgresql
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: db_postgresql_standby
+  tags:
+    - setup_db_standby_postgresql
