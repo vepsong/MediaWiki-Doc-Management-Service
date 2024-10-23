@@ -363,7 +363,7 @@ Standby БД получает реплицированные данные с Pri
 
             ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
 
-   - ### 2.3.2. Размонтирование внешних жестких дисков, деинициализация LVM.  
+   - #### 2.3.2. Размонтирование внешних жестких дисков, деинициализация LVM.  
 
       - Будут удалены: disk Partition, Physical Volume, Group Volume, Logical Volume, точка монтирования в /opt
 
