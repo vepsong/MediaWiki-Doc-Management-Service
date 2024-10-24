@@ -26,11 +26,15 @@ REMOTE_USER = os.getenv("REMOTE_USER")
 REMOTE_PATH = '/var/www/mediawiki'
 MEDIAWIKI_FOLDER_NAME = 'mediawiki'
 
-ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_sql_{DATABASE_NAME}_{NOW}.tar.gz'.replace('/', '_')
+ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_sql_{DATABASE_NAME}_{NOW}.sql.gz'.replace('/', '_')
 ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME = f'backup_{REMOTE_HOST}_{REMOTE_PATH}_{NOW}.tar.gz'.replace('/', '_')
 
-BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.tar\.gz")
-BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.tar\.gz")
+BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.sql\.gz")
+BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.tar\.gz")
+
+
+# BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.sql\.gz")
+# BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.tar\.gz")
 
 KEEP_LAST_N_BACKUPS = 10  # Количество бэкапов, которые нужно ост
 
@@ -92,43 +96,50 @@ def create_dump_postgres():
 
         command = (
             f"PGPASSWORD={DATABASE_PASSWORD} "
-            f"pg_dump -h localhost -U {DATABASE_USER} -p {DATABASE_PORT} {DATABASE_NAME} "
-            f"| gzip | tar -cvf {dest_path} -"
+            f"pg_dump -U {DATABASE_USER} -p {DATABASE_PORT} -h localhost {DATABASE_NAME} "
+            f"| gzip > {dest_path}"
         )
 
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("Command pg_dump was successfully executed")
 
-        if result != 0:
-            raise Exception(f"pg_dump failed with code {result.returncode}, command = {command}")
     except Exception as e:
-        print(f"Error in create_dump_postgres: {e}")
+        print(f"Error in create_dump_postgres: {e.stderr.decode('utf-8')}")
         sys.exit(10)
 
 
 def rotate_sql_backups(backups_by_db):
     """Ротация SQL бэкапов."""
+
     for db_name, backups in backups_by_db.items():
         # Сортируем бэкапы по времени создания (в имени файла)
         backups.sort(key=lambda x: x[1], reverse=True)
 
         # Если количество бэкапов больше, чем нужно сохранить
         if len(backups) > KEEP_LAST_N_BACKUPS:
+            print(f"Удаляем старые бэкапы для {db_name}. Текущее количество: {len(backups)}")
             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
                 print(f"Удаляю старый SQL бэкап: {backup_to_delete[0]}")
                 backup_to_delete[0].unlink()  # Удаление файла
+        else:
+            print(f"Нет необходимости в ротации для {db_name}. Текущее количество: {len(backups)}")
+
 
 def rotate_mediawiki_backups(backups_by_remote):
     """Ротация MediaWiki бэкапов."""
     for remote_host, backups in backups_by_remote.items():
+
         # Сортируем бэкапы по времени создания (в имени файла)
         backups.sort(key=lambda x: x[1], reverse=True)
 
         # Если количество бэкапов больше, чем нужно сохранить
         if len(backups) > KEEP_LAST_N_BACKUPS:
+            print(f"Удаляем старые бэкапы для {remote_host}. Текущее количество: {len(backups)}")
             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
                 print(f"Удаляю старый MediaWiki бэкап: {backup_to_delete[0]}")
                 backup_to_delete[0].unlink()  # Удаление файла
-
+        else:
+            print(f"Нет необходимости в ротации для {remote_host}. Текущее количество: {len(backups)}")
 
 def rotate_backups():
     """
@@ -155,6 +166,11 @@ def rotate_backups():
                 if remote_host not in backups_by_remote:
                     backups_by_remote[remote_host] = []
                 backups_by_remote[remote_host].append((backup_file, timestamp))
+
+    # # Отладочная печать для проверки данных
+    # print(f"backups_by_db (SQL): {backups_by_db}")
+    # print(f"backups_by_remote (MediaWiki): {backups_by_remote}")
+
     try:           
         rotate_sql_backups(backups_by_db)
     except Exception as e:
@@ -179,6 +195,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Error occurred: {e}")
-
-
-
