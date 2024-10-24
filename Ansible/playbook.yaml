@@ -52,3 +52,5 @@
     - role: db_postgresql_standby
   tags:
     - setup_db_standby_postgresql
+
+

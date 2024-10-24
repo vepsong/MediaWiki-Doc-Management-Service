@@ -92,7 +92,7 @@ def create_dump_postgres():
 
         command = (
             f"PGPASSWORD={DATABASE_PASSWORD} "
-            f"pg_dump -U {DATABASE_USER} -p {DATABASE_PORT} {DATABASE_NAME} "
+            f"pg_dump -h localhost -U {DATABASE_USER} -p {DATABASE_PORT} {DATABASE_NAME} "
             f"| gzip | tar -cvf {dest_path} -"
         )
 

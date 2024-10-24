@@ -19,6 +19,55 @@
     - setup_db_standby_postgresql_create_dynamic_variables
     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables
 
+# # Создание группы безопасности
+# - name: Step 6 - Create a group for PostgreSQL access
+#   ansible.builtin.group:
+#     name: dbadmin
+#     state: present
+#   tags:
+#     - db_postgresql_create_Postgresql_group_access
+
+# # Добавление пользователей в группу безопасности
+# - name: Step 7 - Add multiple users to dbadmin group
+#   ansible.builtin.user:
+#     name: "{{ item }}"
+#     groups: dbadmin
+#     append: yes
+#   loop:
+#     - postgres
+#     - sudo
+#     - "{{ postgres_wikiuser_user_vars.db_user }}"
+#   tags:
+#     - db_postgresql_add_users_dbadmin_group
+
+# # Смена владельцев директории
+# - name: Step 8 - Change group ownership for PostgreSQL directories
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     owner: root
+#     group: dbadmin
+#     state: directory
+#   loop: 
+#   - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
+#   - "/opt"  # Указываем на родительскую директорию
+#   tags:
+#     - db_postgresql_change_postgresql_path_ownership
+
+
+# # Установка разрешений для директории
+# - name: Step 9 - Set permissions for PostgreSQL directories
+#   ansible.builtin.file:
+#     path: "{{ item }}"
+#     mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
+#   # loop: "{{ mount_point }}"
+#   loop: 
+#     - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
+#     - "/opt"  # Указываем на родительскую директорию
+#   tags:
+#     - db_postgresql_set_postgresql_permissions
+
+
+
 # Остановка сервиса PostgreSQL
 - name: Step 3 - Stop PostgreSQL service immediately
   become: true
@@ -48,8 +97,9 @@
 - name: Step 5 - Clean up contents in the main directory
   become: true
   become_user: root
-  command: rm -rf /var/lib/postgresql/14/main/*
-  when: db_hosts.standby in inventory_hostname and backup_result is succeeded
+  # command: rm -rf /var/lib/postgresql/14/main/*
+  shell: sh -c 'rm -rf /var/lib/postgresql/14/main/*'
+  when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_remove_old_path
     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_remove_old_path
