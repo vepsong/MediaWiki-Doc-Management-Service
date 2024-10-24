@@ -14,7 +14,7 @@
     - setup_mediawiki_apt_update
 
 # Установка пакетов
-- name: Step 2 - Packet installing
+- name: Step 2 - Install packages
   become: true
   become_user: root
   apt:
@@ -81,7 +81,9 @@
   ansible.builtin.get_url:
     url: "https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz"
     dest: "/var/www/"
-  when: setup_mediawiki_hosts.server1 in inventory_hostname
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_download_mediaWiki_archive
 
 # Распаковка архива c MediaWiki в /var/www/
 - name: Step 8 - Unzip MediaWiki archive to /var/www/
@@ -91,7 +93,9 @@
     src: "/var/www/mediawiki-1.42.3.tar.gz"
     dest: "/var/www/"
     remote_src: yes
-  when: setup_mediawiki_hosts.server1 in inventory_hostname
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_unzip_mediaWiki_archive
 
 # Переименование разархивированной паки c MediaWiki в /var/www/mediawiki
 - name: Step 9 - Rename unzipped folder to /var/www/mediawiki
@@ -99,11 +103,15 @@
   become_user: root
   ansible.builtin.command:
     cmd: "mv /var/www/mediawiki-1.42.3 /var/www/mediawiki"
-  when: setup_mediawiki_hosts.server1 in inventory_hostname
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_rename_unzipped_mediaWiki_archive
 
 # Удаление архива с MediaWiki из /var/www/mediawiki-1.42.3.tar.gz
 - name: Step 10 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
   ansible.builtin.file:
     path: "/var/www/mediawiki-1.42.3.tar.gz"
     state: absent
-  when: setup_mediawiki_hosts.server1 in inventory_hostname
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_remove_mediaWiki_archive

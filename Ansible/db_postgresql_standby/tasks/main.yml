@@ -306,6 +306,8 @@
 
 # Копирование private ssh-key в ~/.ssh
 - name: Step 15 - Private ssh-key to ~/.ssh
+  become: true
+  become_user: root
   copy:
     src: "{{ role_path }}/files/id_ed25519"
     dest: ~/.ssh
