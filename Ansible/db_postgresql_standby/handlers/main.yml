@@ -1,16 +1,16 @@
 ---
 # handlers file for db_postgresql_standby
 
-- name: Postgresql Reloader
+- name: Postgresql Restarter
   ansible.builtin.service:
     name: postgresql
     state: restarted
     enabled: yes
-  listen: "reload_postgresql"
+  listen: "restart_postgresql"
 
-- name: Cron Reloader
+- name: Cron Restarter
   ansible.builtin.service:
     name: cron
     state: restarted
     enabled: yes
-  listen: "reload_cron"
+  listen: "restart_cron"

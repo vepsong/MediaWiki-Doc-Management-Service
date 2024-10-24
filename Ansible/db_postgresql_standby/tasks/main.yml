@@ -19,54 +19,6 @@
     - setup_db_standby_postgresql_create_dynamic_variables
     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables
 
-# # Создание группы безопасности
-# - name: Step 6 - Create a group for PostgreSQL access
-#   ansible.builtin.group:
-#     name: dbadmin
-#     state: present
-#   tags:
-#     - db_postgresql_create_Postgresql_group_access
-
-# # Добавление пользователей в группу безопасности
-# - name: Step 7 - Add multiple users to dbadmin group
-#   ansible.builtin.user:
-#     name: "{{ item }}"
-#     groups: dbadmin
-#     append: yes
-#   loop:
-#     - postgres
-#     - sudo
-#     - "{{ postgres_wikiuser_user_vars.db_user }}"
-#   tags:
-#     - db_postgresql_add_users_dbadmin_group
-
-# # Смена владельцев директории
-# - name: Step 8 - Change group ownership for PostgreSQL directories
-#   ansible.builtin.file:
-#     path: "{{ item }}"
-#     owner: root
-#     group: dbadmin
-#     state: directory
-#   loop: 
-#   - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
-#   - "/opt"  # Указываем на родительскую директорию
-#   tags:
-#     - db_postgresql_change_postgresql_path_ownership
-
-
-# # Установка разрешений для директории
-# - name: Step 9 - Set permissions for PostgreSQL directories
-#   ansible.builtin.file:
-#     path: "{{ item }}"
-#     mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
-#   # loop: "{{ mount_point }}"
-#   loop: 
-#     - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
-#     - "/opt"  # Указываем на родительскую директорию
-#   tags:
-#     - db_postgresql_set_postgresql_permissions
-
-
 
 # Остановка сервиса PostgreSQL
 - name: Step 3 - Stop PostgreSQL service immediately
@@ -152,7 +104,7 @@
       host replication   syncuser       192.168.10.17/32           scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_add_ip_pg_hba_conf
@@ -168,7 +120,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*listen_addresses\s*=\s*.*'
     replace: "listen_addresses = '*'"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_add_listen_addresses_standby_postgresql_conf
@@ -182,7 +134,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*hot_standby\s*=\s*.*'
     replace: 'hot_standby = on'
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_add_hot_standby_on_postgresql_conf
@@ -196,7 +148,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*data_directory\s*=\s*.*'
     replace: "data_directory = '{{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main'"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_add_data_directory_standby_on_postgresql_conf
@@ -206,7 +158,7 @@
 
 
 # Немедленный перезапуск сервиса PostgreSQL
-- name: Step 12 - Reload PostgreSQL service immediately
+- name: Step 12 - Restart PostgreSQL service immediately
   become: true
   become_user: root
   systemd:
@@ -214,8 +166,8 @@
     state: restarted
   when: db_hosts.standby in inventory_hostname
   tags:
-    - setup_db_standby_postgresql_reload_postgresql
-    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_reload_postgresql
+    - setup_db_standby_postgresql_restart_postgresql
+    - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_restart_postgresql
 
 # Запуск репликации
 # - h MAIN_IP — адрес главного сервера
@@ -234,7 +186,7 @@
     -P -v -R
   environment:
     PGPASSWORD: "{{ postgres_replication_user_vars.db_user_password }}"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_run_pg_basebackup
@@ -352,7 +304,7 @@
     minute: "*"
     hour: "*"
     job: "/usr/bin/python3 /scripts/pgdump.py >> /scripts/pgdump.log 2>&1"
-  notify: reload_cron
+  notify: restart_cron
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_run_pgdump_py_cron_standby

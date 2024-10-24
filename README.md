@@ -329,15 +329,19 @@ Standby БД получает реплицированные данные с Pri
 
       - Настройка secrets.yml (для хранения секретных переменных)
 
-        - Создание и наполнение файла secrets.yml в роли:
+        - Создание и наполнение файла secrets.yml в ролях:
           - [db_postgresql_primary/vars](/Ansible/db_postgresql_primary/vars)       
           - [db_postgresql_standby/vars](/Ansible/db_postgresql_standby/vars)   
-        
+          - [mediawiki/vars](/Ansible/mediawiki/vars)   
+
           За основу взять [ansible_secrets.yml_EXAMPLE](/credentials/templates/ansible_secrets.yml_EXAMPLE) 
 
               touch ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
 
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_primary/vars/secrets.yml 
+
+              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml 
+
 
         - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) secrets.yml
               
@@ -345,6 +349,21 @@ Standby БД получает реплицированные данные с Pri
               ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
 
               ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_primary/vars/secrets.yml
+
+              ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml
+
+      - Настройка LocalSettings.php (конфигурация MediaWiki)
+
+        - Создание и наполнение файла LocalSettings.php в роли:
+          - [mediawiki/vars](/Ansible/mediawiki/files)        
+        
+          За основу взять [LocalSettings.php_EXAMPLE](/credentials/templates/LocalSettings.php_EXAMPLE) 
+
+        - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) LocalSettings.php
+
+              # Шифрование LocalSettings.php с vault-id: "ans_vault_mediawiki_localsettings"
+              ansible-vault encrypt --vault-id ans_vault_mediawiki_localsettings@prompt ~/YP-sp13_MediaWiki/Ansible/mediawiki/files/LocalSettings.php
+
 
 
       - Настройка vault_passwords (директория для хранения паролей ansible-vault)
@@ -355,7 +374,7 @@ Standby БД получает реплицированные данные с Pri
               mkdir ~/YP-sp13_MediaWiki/Ansible/vault_passwords
               echo "password1" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt
               echo "password2" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt
-
+              echo "password3" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_mediawiki_localsettings.txt
 
       - Дополнительные команды vault
 
@@ -417,9 +436,12 @@ Standby БД получает реплицированные данные с Pri
       - Обновление пакетного репозитория, установка пакетов
       - Скачивание архива с MediaWiki
       - Настройка Nginx
+      - Копирование LocalSettings.php в корневую директорию Mediawiki на vm-3-mediawiki-server-1
 
             ansible-playbook playbook.yaml \
+            --vault-id ans_vault_secrets@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt \
             --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
+            --vault-id ans_vault_mediawiki_localsettings@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/ans_vault_mediawiki_localsettings.txt \
             -i inventory.yaml --tags="setup_mediawiki"
 
 
@@ -946,7 +968,7 @@ Standby БД получает реплицированные данные с Pri
    </details>  
 
 
-3. Настройка Nginx на vm-3-mediawiki-server-1
+3. Настройка Nginx на всех серверах MediaWiki
 
    <details>
    <summary>Развернуть</summary> 

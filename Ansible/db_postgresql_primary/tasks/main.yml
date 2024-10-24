@@ -116,7 +116,7 @@
       host replication   syncuser       192.168.10.17/32           scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.primary in inventory_hostname
   tags:
     - setup_db_primary_postgresql_add_ip_pg_hba_conf
@@ -130,7 +130,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*listen_addresses\s*=\s*.*'
     replace: "listen_addresses = '*'"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.primary in inventory_hostname
   tags:
     - setup_db_primary_postgresql_add_listen_addresses_primary_postgresql_conf
@@ -144,7 +144,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*wal_level\s*=\s*\w+'
     replace: 'wal_level = replica'
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.primary in inventory_hostname
   tags:
     - setup_db_primary_postgresql_add_wal_level_primary_postgresql_conf
@@ -174,7 +174,7 @@
     role_attr_flags: "{{ postgres_wikiuser_user_vars.attr | join(',') }}"
     state: present
   when: db_hosts.primary in inventory_hostname
-  notify: reload_postgresql
+  notify: restart_postgresql
   tags:
     - setup_db_primary_postgresql_create_user_wikiuser
     - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_create_user_wikiuser
@@ -189,7 +189,7 @@
     role_attr_flags: "{{ postgres_replication_user_vars.attr | join(',') }}"
     state: present
   when: db_hosts.primary in inventory_hostname
-  notify: reload_postgresql
+  notify: restart_postgresql
   tags:
     - setup_db_primary_postgresql_create_user_syncuser
     - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_create_user_syncuser

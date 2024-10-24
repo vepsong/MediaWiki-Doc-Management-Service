@@ -48,24 +48,37 @@
     - setup_mediawiki_start_enable_postgresql_service
 
 
+# Копирование конфигурационного файла nginx в /etc/nginx/sites-available/nginx_mediawiki 
+- name: Step 5 - Copy nginx configuration file to /etc/nginx/sites-available/nginx_mediawiki  
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/nginx_mediawiki"
+    dest: /etc/nginx/sites-available/
+  notify: restart_nginx
+  tags:
+    - setup_mediawiki_copy_nginx_configuration_file
+
+# Создание symlink (символической ссылки) из /etc/nginx/sites-available/mediawiki в /etc/nginx/sites-enabled/mediawiki
+- name: Step 6 - Symlink creation for Nginx mediawiki conf file to /etc/nginx/sites-enabled/mediawiki
+  become_user: root
+  become: true
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/nginx_mediawiki"
+    dest: "/etc/nginx/sites-enabled/nginx_mediawiki"
+    state: link
+  notify: restart_nginx
+  tags:
+    - setup_mediawiki_symlink_creation_mediawiki
+
+
 # =======================================
 # Блок с задачами vm-3-mediawiki-server-1
 # =======================================
 
 
-# Копирование private ssh-key в ~/.ssh
-- name: Step 5 - Copy Private ssh-key to ~/.ssh
-  become: true
-  become_user: root
-  copy:
-    src: "{{ role_path }}/files/id_ed25519"
-    dest: ~/.ssh
-  when: mediawiki_hosts.server1 in inventory_hostname
-  tags:
-    - setup_mediawiki_copy_private_ssh_key_to_server1
-
 # Изменение разрешений на запуск private ssh-key
-- name: Step 6 - change ssh-permissions
+- name: Step 7 - change ssh-permissions
   become: true
   become_user: root
   shell: |
@@ -75,7 +88,7 @@
     - setup_mediawiki_change_ssh_private_key_permissions_server1
 
 # Скачивание архива с MediaWiki в /var/www/
-- name: Step 7- Download MediaWiki archive to /var/www/
+- name: Step 8 - Download MediaWiki archive to /var/www/
   become: true
   become_user: root
   ansible.builtin.get_url:
@@ -86,7 +99,7 @@
     - setup_mediawiki_download_mediaWiki_archive
 
 # Распаковка архива c MediaWiki в /var/www/
-- name: Step 8 - Unzip MediaWiki archive to /var/www/
+- name: Step 9 - Unzip MediaWiki archive to /var/www/
   become: true
   become_user: root
   ansible.builtin.unarchive:
@@ -98,7 +111,7 @@
     - setup_mediawiki_unzip_mediaWiki_archive
 
 # Переименование разархивированной паки c MediaWiki в /var/www/mediawiki
-- name: Step 9 - Rename unzipped folder to /var/www/mediawiki
+- name: Step 10 - Rename unzipped folder to /var/www/mediawiki
   become: true
   become_user: root
   ansible.builtin.command:
@@ -108,10 +121,53 @@
     - setup_mediawiki_rename_unzipped_mediaWiki_archive
 
 # Удаление архива с MediaWiki из /var/www/mediawiki-1.42.3.tar.gz
-- name: Step 10 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
+- name: Step 11 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
   ansible.builtin.file:
     path: "/var/www/mediawiki-1.42.3.tar.gz"
     state: absent
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
     - setup_mediawiki_remove_mediaWiki_archive
+
+
+# Немедленный перезапуск сервиса Nginx
+- name: Step 12 - Restart Nginx service immediately
+  become: true
+  become_user: root
+  systemd:
+    name: nginx
+    state: restarted
+  when: mediawiki_hosts.server1 in inventory_hostnam
+  tags:
+    - setup_mediawiki_restart_nginx
+
+
+# Копирование LocalSettings.php в /var/www/mediawiki
+- name: Step 13 - Copy LocalSettings.php в /var/www/mediawiki
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/LocalSettings.php"
+    dest: /var/www/mediawiki
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_copy_localsettings_php_to_mediawiki
+
+
+
+
+# =======================================
+# Блок с задачами vm-4-mediawiki-server-2
+# =======================================
+
+
+# Копирование private ssh-key в ~/.ssh
+- name: Step 14 - Copy Private ssh-key to ~/.ssh
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/id_ed25519"
+    dest: ~/.ssh
+  when: mediawiki_hosts.server2 in inventory_hostname
+  tags:
+    - setup_mediawiki_copy_private_ssh_key_to_server2
