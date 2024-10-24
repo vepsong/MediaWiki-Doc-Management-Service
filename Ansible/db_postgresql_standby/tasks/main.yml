@@ -305,7 +305,7 @@
 
 
 # Копирование private ssh-key в ~/.ssh
-- name: Step 15 - Private ssh-key to /scripts
+- name: Step 15 - Private ssh-key to ~/.ssh
   copy:
     src: "{{ role_path }}/files/id_ed25519"
     dest: ~/.ssh

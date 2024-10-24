@@ -3,3 +3,8 @@
 
 target_groups:
   - mediawikiServer
+
+
+mediawiki_hosts:
+  server1: vm-3-mediawiki-server-1
+  server2: vm-4-mediawiki-server-2

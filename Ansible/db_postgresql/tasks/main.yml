@@ -9,7 +9,7 @@
 - name: Step 1 - Update list of packages
   apt:
     update_cache: yes
-  become: yes
+  become: true
   tags:
     - db_postgresql_apt_update
 

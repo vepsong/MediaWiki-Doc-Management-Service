@@ -54,3 +54,11 @@
     - setup_db_standby_postgresql
 
 
+# Настройка mediawiki
+- name: Set up standby db_postgresql
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: mediawiki
+  tags:
+    - setup_mediawiki

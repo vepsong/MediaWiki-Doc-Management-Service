@@ -1,3 +1,109 @@
 ---
 # tasks file for mediawiki
 
+# =========================
+# Блок с общими задачами
+# =========================
+
+# Обновление пакетного репозитория 
+- name: Step 1 - Update list of packages
+  apt:
+    update_cache: yes
+  become: yes
+  tags:
+    - setup_mediawiki_apt_update
+
+# Установка пакетов
+- name: Step 2 - Packet installing
+  become: true
+  become_user: root
+  apt:
+    name: "{{ item }}" 
+    state: present
+  loop:
+    - "{{ packages_to_install }}"
+  tags:
+    - setup_mediawiki_install_packages 
+
+# Запуск сервиса nginx и добавление в автозапуск
+- name: Step 3 - Start and enable nginx services
+  become: true
+  become_user: root
+  service: 
+    name=nginx
+    state=started 
+    enabled=yes
+  tags:
+    - setup_mediawiki_start_enable_nginx_service
+
+# Запуск сервиса postgresql и добавление в автозапуск
+- name: Step 4 - Start and enable postgresql services
+  become: true
+  become_user: root
+  service: 
+    name=postgresql
+    state=started 
+    enabled=yes
+  tags:
+    - setup_mediawiki_start_enable_postgresql_service
+
+
+# =======================================
+# Блок с задачами vm-3-mediawiki-server-1
+# =======================================
+
+
+# Копирование private ssh-key в ~/.ssh
+- name: Step 5 - Copy Private ssh-key to ~/.ssh
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/id_ed25519"
+    dest: ~/.ssh
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_copy_private_ssh_key_to_server1
+
+# Изменение разрешений на запуск private ssh-key
+- name: Step 6 - change ssh-permissions
+  become: true
+  become_user: root
+  shell: |
+    chmod 600 /root/.ssh/id_ed25519
+  when: mediawiki_hosts.server1 in inventory_hostname
+  tags:
+    - setup_mediawiki_change_ssh_private_key_permissions_server1
+
+# Скачивание архива с MediaWiki в /var/www/
+- name: Step 7- Download MediaWiki archive to /var/www/
+  become: true
+  become_user: root
+  ansible.builtin.get_url:
+    url: "https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz"
+    dest: "/var/www/"
+  when: setup_mediawiki_hosts.server1 in inventory_hostname
+
+# Распаковка архива c MediaWiki в /var/www/
+- name: Step 8 - Unzip MediaWiki archive to /var/www/
+  become: true
+  become_user: root
+  ansible.builtin.unarchive:
+    src: "/var/www/mediawiki-1.42.3.tar.gz"
+    dest: "/var/www/"
+    remote_src: yes
+  when: setup_mediawiki_hosts.server1 in inventory_hostname
+
+# Переименование разархивированной паки c MediaWiki в /var/www/mediawiki
+- name: Step 9 - Rename unzipped folder to /var/www/mediawiki
+  become: true
+  become_user: root
+  ansible.builtin.command:
+    cmd: "mv /var/www/mediawiki-1.42.3 /var/www/mediawiki"
+  when: setup_mediawiki_hosts.server1 in inventory_hostname
+
+# Удаление архива с MediaWiki из /var/www/mediawiki-1.42.3.tar.gz
+- name: Step 10 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
+  ansible.builtin.file:
+    path: "/var/www/mediawiki-1.42.3.tar.gz"
+    state: absent
+  when: setup_mediawiki_hosts.server1 in inventory_hostname

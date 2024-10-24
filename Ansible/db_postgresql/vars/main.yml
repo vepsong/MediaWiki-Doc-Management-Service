@@ -1,13 +1,6 @@
 ---
 # vars file for db_postgresql
 packages_to_install:
-  - nginx
-  - php 
-  - php-intl
-  - php-mbstring
-  - php-xml
-  - php-apcu 
-  - php-curl
   - postgresql
   - postgresql-contrib
   - python3-psycopg2

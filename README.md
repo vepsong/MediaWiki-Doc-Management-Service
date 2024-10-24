@@ -312,14 +312,20 @@ Standby БД получает реплицированные данные с Pri
 
       - Настройка private ssh-key (для подключения к другим ВМ)
       
-        - Копирование private ssh-key в роль [db_postgresql_standby/files](/Ansible/db_postgresql_standby/files)  
-      
+        - Копирование private ssh-key в роли:
+          - [db_postgresql_standby/files](/Ansible/db_postgresql_standby/files)  
+          - [db_postgresql_standby/files](/Ansible/db_postgresql_mediawiki/files) 
+
               cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files
+              cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files
 
         - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) private ssh-key 
 
               # Шифрование private ssh-key с vault-id: "ans_vault_ssh"
               ansible-vault encrypt --vault-id ans_vault_ssh@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files/id_ed25519
+
+              # Шифрование private ssh-key с vault-id: "ans_vault_ssh"
+              ansible-vault encrypt --vault-id ans_vault_ssh@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files/id_ed25519
 
       - Настройка secrets.yml (для хранения секретных переменных)
 
@@ -335,7 +341,7 @@ Standby БД получает реплицированные данные с Pri
 
         - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) secrets.yml
               
-              # Шифрование private ssh-key с vault-id: "ans_vault_secrets"
+              # Шифрование secrets.yml с vault-id: "ans_vault_secrets"
               ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
 
               ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_primary/vars/secrets.yml
@@ -407,6 +413,14 @@ Standby БД получает реплицированные данные с Pri
             --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
             -i inventory.yaml --tags="setup_db_standby_postgresql"
 
+   - #### 2.4.4. Настройка серверов MediaWiki на vm-3-mediawiki-server-1 и vm-4-mediawiki-server-2
+      - Обновление пакетного репозитория, установка пакетов
+      - Скачивание архива с MediaWiki
+      - Настройка Nginx
+
+            ansible-playbook playbook.yaml \
+            --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
+            -i inventory.yaml --tags="setup_mediawiki"
 
 
 #### 3. Дополнительная информация
@@ -880,28 +894,68 @@ Standby БД получает реплицированные данные с Pri
 
 #### Настройка MediaWiki
 
-1. Установка пакетов
+1. Установка пакетов на всех серверах MediaWiki
 
 
    <details>
    <summary>Развернуть</summary> 
    
-    - Установка Mediawiki с помощью [unit.nginx](https://unit.nginx.org/howto/mediawiki/)
+    - Обновление пакетов репозитория, добавление в автозагрузку
 
-          # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
           sudo apt update && sudo apt upgrade -y
-          sudo apt install nginx -y
-          sudo systemctl enable nginx
-          sudo systemctl restart nginx
-          sudo apt install php-pgsql
-          sudo ln -s /etc/nginx/sites-available/mediawiki /etc/nginx/sites-enabled/
 
-          # Проверка установки: автозапуск и статус службы
+    - Установка пакетов  
+    
+          sudo apt install -y nginx php php-intl php-mbstring php-xml php-apcu php-curl install php8.1-fpm php8.1-pgsql postgresql postgresql-contrib python3-psycopg2 acl rsync python3 python3-venv python3-pip
+
+    - Добавление в автозагрузку nginx и postgresql
+ 
+          sudo systemctl enable nginx
+          sudo systemctl enable postgresql
+          sudo systemctl restart nginx
+
+    - Проверка установки, автозапуска и статуса служб nginx и postgresql 
+
           systemctl is-enabled nginx
+          sudo systemctl restart nginx
           systemctl status nginx
 
    </details>  
   
+2. Скачивание и распаковка MediaWiki на vm-3-mediawiki-server-1
+
+   <details>
+   <summary>Развернуть</summary> 
+
+    - Скачивание архива с MediaWiki в /var/www/
+
+          sudo wget -P /var/www/ https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
+
+    - Распаковка архива c MediaWiki в /var/www/
+
+          sudo tar -xzvf /var/www/mediawiki-1.42.3.tar.gz -C /var/www/
+
+    - Переименование распакованной папки    
+
+          sudo mv /var/www/mediawiki-1.42.3 /var/www/mediawiki
+
+    - Удаление архива   
+
+          sudo rm -r /var/www/mediawiki-1.42.3.tar.gz
+
+   </details>  
+
+
+3. Настройка Nginx на vm-3-mediawiki-server-1
+
+   <details>
+   <summary>Развернуть</summary> 
+
+    - Удаление архива   
+
+          sudo rm -r /var/www/mediawiki-1.42.3.tar.gz
+
+   </details>  
 
 
 2. Test Header2
