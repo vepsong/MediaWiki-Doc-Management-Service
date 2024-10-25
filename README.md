@@ -244,7 +244,7 @@ Standby БД получает реплицированные данные с Pri
       terraform apply -auto-approve
 
       # Cинхронизация состояния ресурсов с облачным провайдером (обновится файл terraform.tfstate)
-      terraform refresh
+      terraform apply -refresh-only
 
       # Удаление всех созданных ресурсов
       terraform destroy -auto-approve
