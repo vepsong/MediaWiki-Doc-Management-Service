@@ -206,7 +206,6 @@
   become_user: root
   shell: |
     pip3 install python-dotenv
-    pip3 install log
     mkdir /scripts 
     touch /scripts/.env
   when: db_hosts.standby in inventory_hostname

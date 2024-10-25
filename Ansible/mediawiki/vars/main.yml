@@ -18,3 +18,35 @@ packages_to_install:
   - python3
   - python3-venv
   - python3-pip
+
+pip3_packages_to_install:
+  - python-dotenv
+
+vm_3_mediawiki_server_1:
+  mediawiki_parent_path: var/wwww/
+  mediawiki_path: var/wwww/mediawiki
+  mediawiki_folder_name: mediawiki
+  mediawiki_local_settings_file_name: LocalSettings.php
+  mediawiki_archive_name: mediawiki-1.42.3.tar.gz
+  mediawiki_unzipped_folder_name: mediawiki-1.42.3
+  mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
+
+
+vm_4_mediawiki_server_2:
+  private_key_ssh_parent_path: /root/.ssh/
+  private_key_ssh_name: id_ed25519
+  private_key_ssh_path: /root/.ssh/id_ed25519
+
+  mediawiki_parent_path: var/wwww/
+  mediawiki_path: var/wwww/mediawiki
+
+  scripts_path: /scripts
+  env_path: /scripts/.env
+
+  remote_rsync_script_name: archive_remote_rsync.py
+
+  log_file_name: archive_remote_rsync.log
+
+  logrotate_conf_name: logrotate_archive_remote_rsync
+
+  nginx_conf_name: nginx_mediawiki
