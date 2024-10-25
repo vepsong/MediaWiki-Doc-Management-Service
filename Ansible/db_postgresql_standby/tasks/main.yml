@@ -281,14 +281,15 @@
     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_change_ssh_permissions
 
 
-# Копирование файла конфигурации /etc/logrotate.d/pgdump
+# Копирование файла конфигурации /etc/logrotate.d/logrotate_pgdump
 # Управление файлами логов в /scripts/pgdump.log
-- name: Step 17 - Copy logrotate to /etc/logrotate.d/pgdump
+# Команда для принудительного запуска logrotate - logrotate -f /etc/logrotate.conf
+- name: Step 17 - Copy logrotate to /etc/logrotate.d/logrotate_pgdump
   become: true
   become_user: root
   copy:
-    src: "{{ role_path }}/files/id_ed25519"
-    dest: ~/.ssh
+    src: "{{ role_path }}/files/logrotate_pgdump"
+    dest: /etc/logrotate.d/logrotate_pgdump
   when: db_hosts.standby in inventory_hostname
   tags:
     - setup_db_standby_postgresql_copy_logrotate_standby
@@ -296,13 +297,15 @@
 
 
 # Добавление запуска pgdump.py в планировшик задания cron
+# minute: "0" - запуск в начале часа
+# hour: "*/4" - запуск каждые 4 часа
 - name: Step 18 - Run pgdump.py script
   become: true
   become_user: root
   ansible.builtin.cron:
     name: "Run pgdump script"
-    minute: "*"
-    hour: "*"
+    minute: "0"
+    hour: "*/4"
     job: "/usr/bin/python3 /scripts/pgdump.py >> /scripts/pgdump.log 2>&1"
   notify: restart_cron
   when: db_hosts.standby in inventory_hostname
