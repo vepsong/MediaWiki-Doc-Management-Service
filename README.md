@@ -1075,8 +1075,13 @@ Standby БД получает реплицированные данные с Pri
 
 </details>
 
+</details>
 
 
+## 6. Ручное развёртывание приложения в облачной инфраструктуры Yandex Cloud
+
+<details>
+<summary>Развернуть</summary> 
 
 ### 5.7 Настройка Nginx
 
@@ -1119,16 +1124,6 @@ Standby БД получает реплицированные данные с Pri
 <!-- END_5.7. nginx_setup.md -->
 
 </details>
-
-
-
-</details>
-
-
-## 6. Ручное развёртывание приложения в облачной инфраструктуры Yandex Cloud
-
-<details>
-<summary>Развернуть</summary> 
 
 
 </details>
