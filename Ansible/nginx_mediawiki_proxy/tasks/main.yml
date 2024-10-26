@@ -50,8 +50,9 @@
   copy:
     src: "{{ role_path }}/files/{{ vm_2_nginx_proxy_server.nginx_conf_name }}" 
     dest: /etc/nginx/sites-available/
+    force: yes
   notify: restart_nginx
-  when: nginx_mediawiki_hosts.nginx_conf_name in inventory_hostname
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
   tags:
     - setup_nginx_mediawiki_proxy_copy_nginx_configuration_file
 
@@ -65,6 +66,6 @@
     dest: "/etc/nginx/sites-enabled/{{ vm_2_nginx_proxy_server.nginx_conf_name }}"
     state: link
   notify: restart_nginx
-  when: nginx_mediawiki_hosts.nginx_conf_name in inventory_hostname
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
   tags:
     - setup_nginx_mediawiki_proxy_symlink_creation_mediawiki

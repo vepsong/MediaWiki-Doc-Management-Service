@@ -1,23 +1,59 @@
+# # Определение upstream группы серверов MediaWiki
+# upstream mediawiki_backend {
+#     # Использование алгоритма round robin по умолчанию
+#     server 192.168.10.13;  # Внутренний IP MediaWiki-сервер 1
+#     server 192.168.10.14;  # Внутренний IP MediaWiki-сервер 2
+# }
+
+# # Виртуальный хост для обработки запросов
+# server {
+#     listen 80;
+#     server_name _;  # принимает запрос на любой nat ip-адрес
+
+#     # Прокси запросов на upstream группу
+#     location / {
+#         proxy_pass http://mediawiki_backend;
+        
+#         # Дополнительные настройки прокси
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+# }
+
+# Определение upstream группы серверов MediaWiki
+upstream mediawiki_backend {
+    # Использование алгоритма round robin по умолчанию
+    server 192.168.10.13;  # Внутренний IP MediaWiki-сервер 1
+    server 192.168.10.14;  # Внутренний IP MediaWiki-сервер 2
+}
+
+
+# Серверный блок для обработки NAT IP и перенаправления на внутренний IP
 server {
     listen 80;
-    server_name _; # принимает запрос на любой nat ip-адрес
+    server_name _;  # принимает запрос на любой nat ip-адрес
 
-    root /var/www/mediawiki;
+    # # Редирект на внутренний IP
+    # location / {
+    #     return 301 http://192.168.10.12$request_uri;
+    # }
+}
 
-    index index.php;
+# Серверный блок для обработки внутренних запросов
+server {
+    # listen 80;
+    # server_name 192.168.10.12;  # Внутренний IP
 
+    # Прокси запросов на upstream группу
     location / {
-        try_files $uri $uri/ index.php?$args;
-    }
+        proxy_pass http://mediawiki_backend;
 
-    location ~ \.php$ {
-          include snippets/fastcgi-php.conf;
-          fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
-          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-          include fastcgi_params;
-    }
-
-    location ~ /\.ht {
-          deny all;
+        # Дополнительные настройки прокси
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
