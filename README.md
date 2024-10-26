@@ -1124,6 +1124,22 @@ Standby БД получает реплицированные данные с Pri
           ~/<имя репозитория>/<папка Terraform> terraform output 
           # Или в файле ~/<имя репозитория>/<папка Terraform>/terraform.tfstate
 
+#### Ansible
+
+1. [pgdump.py](python-scripts/pgdump.py)
+
+   - rsync папки var/www/mediawiki/ из vm-3-mediawiki-server-1 в vm-7-standby-db и архивирование в tar.gz
+   - dump postgresql и архивирование в .gz
+   - Проверка количества существующих копий backup'ов папки mediawiki dump'ов БД
+   - Удаление лишних копий, для сохранности места на жестком диске
+
+
+2. [archive_remote_rsync.py](python-scripts/archive_remote_rsync.py)
+
+   - rsync папки var/www/mediawiki/ из vm-3-mediawiki-server-1 в vm-4-mediawiki-server-2
+   - rsync конфигурации nginx в /etc/nginx/sites-available
+   - rsync symlink конфигурации nginx в /etc/nginx/sites-enabled
+
 #### Вспомогательные
 
 1. utils.py - Хранилище общих и частоиспользуемых функций

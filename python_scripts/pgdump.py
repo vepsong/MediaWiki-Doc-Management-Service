@@ -63,7 +63,7 @@ def get_and_archive_remote_folder():
             'rsync',
             '-avz',
             '--delete',
-            '-e', f"ssh -i {PRIVATE_KEY_PATH}",
+            '-e', f"ssh -i {PRIVATE_KEY_PATH} -o StrictHostKeyChecking=no",
             f"{REMOTE_USER}@{REMOTE_HOST}:{REMOTE_PATH}",
             BACKUPS_PATH
         ]
@@ -195,6 +195,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Error occurred: {e}")
-
-
-

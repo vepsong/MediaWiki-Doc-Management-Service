@@ -44,8 +44,18 @@
   tags:
     - setup_mediawiki_start_enable_nginx_service
 
+
+# Удаление symlink (символической ссылки) "default" из /etc/nginx/sites-enabled/default
+- name: Step 5 - Remove symlink to default nginx conf from /etc/nginx/sites-enabled/default
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  tags:
+    - setup_mediawiki_remove_symlink_default_nginx_conf
+
+
 # Запуск сервиса postgresql и добавление в автозапуск
-- name: Step 5 - Start and enable postgresql services
+- name: Step 6 - Start and enable postgresql services
   become: true
   become_user: root
   service: 
@@ -86,7 +96,7 @@
 
 
 # Копирование конфигурационного файла nginx в /etc/nginx/sites-available/nginx_mediawiki 
-- name: Step 6 - Copy nginx configuration file to /etc/nginx/sites-available/nginx_mediawiki  
+- name: Step 7 - Copy nginx configuration file to /etc/nginx/sites-available/nginx_mediawiki  
   become: true
   become_user: root
   copy:
@@ -99,7 +109,7 @@
     - setup_mediawiki_add_secret_variables, setup_mediawiki_copy_nginx_configuration_file
 
 # Создание symlink (символической ссылки) из /etc/nginx/sites-available/mediawiki в /etc/nginx/sites-enabled/mediawiki
-- name: Step 7 - Symlink creation for Nginx mediawiki conf file to /etc/nginx/sites-enabled/mediawiki
+- name: Step 8 - Symlink creation for Nginx mediawiki conf file to /etc/nginx/sites-enabled/mediawiki
   become_user: root
   become: true
   ansible.builtin.file:
@@ -112,25 +122,26 @@
     - setup_mediawiki_symlink_creation_mediawiki
     - setup_mediawiki_add_secret_variables, setup_mediawiki_symlink_creation_mediawiki
 
+
 # Скачивание архива с MediaWiki в /var/www/
-- name: Step 8 - Download MediaWiki archive to /var/www/
+- name: Step 9 - Download MediaWiki archive to /var/www/
   become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_1.user }}"
+  become_user: "{{ secret_vm_3_mediawiki_server_1.user }}"
   ansible.builtin.get_url:
-    url: "{{ vm_4_mediawiki_server_1.mediawiki_download_link }}"
-    dest: "{{ vm_4_mediawiki_server_1.mediawiki_parent_path }}"
+    url: "{{ vm_3_mediawiki_server_1.mediawiki_download_link }}"
+    dest: "{{ vm_3_mediawiki_server_1.mediawiki_parent_path }}"
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
     - setup_mediawiki_download_mediaWiki_archive
     - setup_mediawiki_add_secret_variables, setup_mediawiki_download_mediaWiki_archive
 
 # Распаковка архива c MediaWiki в /var/www/
-- name: Step 9 - Unzip MediaWiki archive to /var/www/
+- name: Step 10 - Unzip MediaWiki archive to /var/www/
   become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_1.user }}"
+  become_user: "{{ secret_vm_3_mediawiki_server_1.user }}"
   ansible.builtin.unarchive:
-    src: "{{ vm_4_mediawiki_server_1.mediawiki_parent_path }}{{ vm_4_mediawiki_server_1.mediawiki_archive_name }}"
-    dest: "{{ vm_4_mediawiki_server_1.mediawiki_parent_path }}"
+    src: "{{ vm_3_mediawiki_server_1.mediawiki_parent_path }}{{ vm_3_mediawiki_server_1.mediawiki_archive_name }}"
+    dest: "{{ vm_3_mediawiki_server_1.mediawiki_parent_path }}"
     remote_src: yes
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
@@ -138,20 +149,20 @@
     - setup_mediawiki_add_secret_variables, setup_mediawiki_unzip_mediaWiki_archive
 
 # Переименование разархивированной паки c MediaWiki в /var/www/mediawiki
-- name: Step 10 - Rename unzipped folder to /var/www/mediawiki
+- name: Step 11 - Rename unzipped folder to /var/www/mediawiki
   become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_1.user }}"
+  become_user: "{{ secret_vm_3_mediawiki_server_1.user }}"
   ansible.builtin.command:
-    cmd: "mv {{ vm_4_mediawiki_server_1.mediawiki_parent_path }}{{ vm_4_mediawiki_server_1.mediawiki_unzipped_folder_name }} {{ vm_4_mediawiki_server_1.mediawiki_path }}"
+    cmd: "mv {{ vm_3_mediawiki_server_1.mediawiki_parent_path }}{{ vm_3_mediawiki_server_1.mediawiki_unzipped_folder_name }} {{ vm_3_mediawiki_server_1.mediawiki_path }}"
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
     - setup_mediawiki_rename_unzipped_mediaWiki_archive
     - setup_mediawiki_add_secret_variables, setup_mediawiki_rename_unzipped_mediaWiki_archive
 
 # Удаление архива с MediaWiki из /var/www/mediawiki-1.42.3.tar.gz
-- name: Step 11 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
+- name: Step 12 - Remove MediaWiki archive from /var/www/mediawiki-1.42.3.tar.gz
   ansible.builtin.file:
-    path: "{{ vm_4_mediawiki_server_1.mediawiki_parent_path }}{{ vm_4_mediawiki_server_1.mediawiki_archive_name }}"
+    path: "{{ vm_3_mediawiki_server_1.mediawiki_parent_path }}{{ vm_3_mediawiki_server_1.mediawiki_archive_name }}"
     state: absent
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
@@ -159,24 +170,24 @@
 
 
 # Немедленный перезапуск сервиса Nginx
-- name: Step 12 - Restart Nginx service immediately
+- name: Step 13 - Restart Nginx service immediately
   become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_1.user }}"
+  become_user: "{{ secret_vm_3_mediawiki_server_1.user }}"
   systemd:
     name: nginx
     state: restarted
-  when: mediawiki_hosts.server1 in inventory_hostnam
+  when: mediawiki_hosts.server1 in inventory_hostname
   tags:
     - setup_mediawiki_restart_nginx
     - setup_mediawiki_add_secret_variables, setup_mediawiki_restart_nginx
 
 # Копирование LocalSettings.php в /var/www/mediawiki
-- name: Step 13 - Copy LocalSettings.php в /var/www/mediawiki
+- name: Step 14 - Copy LocalSettings.php в /var/www/mediawiki
   become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_1.user }}"
+  become_user: "{{ secret_vm_3_mediawiki_server_1.user }}"
   copy:
-    src: "{{ role_path }}/files/{{ vm_4_mediawiki_server_1.mediawiki_local_settings_file_name }}"   
-    dest: "{{ vm_4_mediawiki_server_1.mediawiki_path }}"
+    src: "{{ role_path }}/files/{{ vm_3_mediawiki_server_1.mediawiki_local_settings_file_name }}"   
+    dest: "{{ vm_3_mediawiki_server_1.mediawiki_path }}"
   when: mediawiki_hosts.server1 in inventory_hostname
   tags:
     - setup_mediawiki_copy_localsettings_php_to_mediawiki
@@ -189,7 +200,7 @@
 # =======================================
 
 # Установка pip3 пакетов
-- name: Step 14 - Install pip3 packages
+- name: Step 15 - Install pip3 packages
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   ansible.builtin.pip:
@@ -203,7 +214,7 @@
     - setup_mediawiki_add_secret_variables, setup_mediawiki_install_pip3_packages
 
 # Создание директории /scripts, в которой будут хранится скрипты для rsync папки mediawiki
-- name: Step 15 - Create directory /scripts for scripts on vm-4-mediawiki-server-2
+- name: Step 16 - Create directory /scripts for scripts on vm-4-mediawiki-server-2
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   ansible.builtin.file:
@@ -216,7 +227,7 @@
     - setup_mediawiki_add_secret_variables, setup_mediawiki_create_path_for_scripts_folder
 
 # Cоздание пустого файла .env для дальнейшего наполнения значениями из secrets.yml
-- name: Step 16 - Create .env file in /scripts on vm-4-mediawiki-server-2
+- name: Step 17 - Create .env file in /scripts on vm-4-mediawiki-server-2
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   ansible.builtin.file:
@@ -229,7 +240,7 @@
     - setup_mediawiki_add_secret_variables, setup_mediawiki_create_env_file
 
 # Копирование скрипта archive_remote_rsync.py в /scripts с правами на исполнение
-- name: Step 17 - Copy archive_remote_rsync.py to /scripts on vm-4-mediawiki-server-2
+- name: Step 18 - Copy archive_remote_rsync.py to /scripts on vm-4-mediawiki-server-2
   copy:
     src: "{{ role_path }}/files/{{ vm_4_mediawiki_server_2.remote_rsync_script_name }}" 
     dest: "{{ vm_4_mediawiki_server_2.scripts_path }}"
@@ -240,14 +251,14 @@
 
 
 # Наполнение .env
-- name: Step 18 - Fill up .env
+- name: Step 19 - Fill up .env
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   blockinfile:
     path: "{{ vm_4_mediawiki_server_2.env_path }}"
     block: |
-      REMOTE_HOST={{ secret_vm_4_mediawiki_server_2.host_ip }}
-      REMOTE_USER={{ secret_vm_4_mediawiki_server_2.user }}
+      REMOTE_HOST={{ secret_vm_4_mediawiki_server_2.remote_host_ip }}
+      REMOTE_USER={{ secret_vm_4_mediawiki_server_2.remote_user }}
       PRIVATE_KEY_PATH={{ vm_4_mediawiki_server_2.private_key_ssh_path }}
       MEDIAWIKI_REMOTE_HOST_PATH={{ vm_3_mediawiki_server_1.mediawiki_path }}
       MEDIAWIKI_DESTINATION_PATH={{ vm_4_mediawiki_server_2.mediawiki_parent_path }}
@@ -262,7 +273,7 @@
 
 # Копирование private ssh-key в ~/.ssh
 # Изменение разрешений на запуск private ssh-key
-- name: Step 19 - Copy Private ssh-key to ~/.ssh
+- name: Step 20 - Copy Private ssh-key to ~/.ssh
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   copy:
@@ -278,13 +289,13 @@
 # Копирование файла конфигурации /etc/logrotate.d/archive_remote_rsync
 # Управление файлами логов в /scripts/archive_remote_rsync.log
 # Команда для принудительного запуска logrotate - logrotate -f /etc/logrotate.conf
-- name: Step 20 - Copy logrotate to /etc/logrotate.d/archive_remote_rsync
+- name: Step 21 - Copy logrotate to /etc/logrotate.d/archive_remote_rsync
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   copy:
     src: "{{ role_path }}/files/{{ vm_4_mediawiki_server_2.logrotate_conf_name }}"
     dest: "/etc/logrotate.d/{{ vm_4_mediawiki_server_2.logrotate_conf_name }}"
-  when: db_hosts.standby in inventory_hostname
+  when: mediawiki_hosts.server2 in inventory_hostname
   tags:
     - setup_mediawiki_copy_logrotate
     - setup_mediawiki_add_secret_variables, setup_mediawiki_copy_logrotate
@@ -293,7 +304,7 @@
 # Добавление archive_remote_rsync.py в планировшик задания cron
 # minute: "0" - запуск в начале часа
 # hour: "*/4" - запуск каждые 4 часа
-- name: Step 21 - Run archive_remote_rsync.py script
+- name: Step 22 - Run archive_remote_rsync.py script
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   ansible.builtin.cron:

@@ -23,8 +23,8 @@ pip3_packages_to_install:
   - python-dotenv
 
 vm_3_mediawiki_server_1:
-  mediawiki_parent_path: var/wwww/
-  mediawiki_path: var/wwww/mediawiki
+  mediawiki_parent_path: /var/www/
+  mediawiki_path: /var/www/mediawiki
   mediawiki_folder_name: mediawiki
   mediawiki_local_settings_file_name: LocalSettings.php
   mediawiki_archive_name: mediawiki-1.42.3.tar.gz
@@ -37,8 +37,8 @@ vm_4_mediawiki_server_2:
   private_key_ssh_name: id_ed25519
   private_key_ssh_path: /root/.ssh/id_ed25519
 
-  mediawiki_parent_path: var/wwww/
-  mediawiki_path: var/wwww/mediawiki
+  mediawiki_parent_path: /var/www/
+  mediawiki_path: /var/www/mediawiki
 
   scripts_path: /scripts
   env_path: /scripts/.env

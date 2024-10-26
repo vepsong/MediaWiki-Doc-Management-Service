@@ -6,3 +6,11 @@
     state: restarted
     enabled: yes
   listen: "restart_nginx"
+
+
+- name: CronRestarter
+  ansible.builtin.service:
+    name: cron
+    state: restarted
+    enabled: yes
+  listen: "restart_cron"
