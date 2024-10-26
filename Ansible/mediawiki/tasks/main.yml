@@ -61,7 +61,7 @@
 #   become: true
 #   become_user: root
 #   copy:
-#     src: "{{ role_path }}/files/{{ vm_4_mediawiki_server_1.nginx_conf_name }}" 
+#     src: "{{ role_path }}/files/{{ vm_3_mediawiki_server_1.nginx_conf_name }}" 
 #     dest: /etc/nginx/sites-available/
 #   notify: restart_nginx
 #   tags:
@@ -72,8 +72,8 @@
 #   become_user: root
 #   become: true
 #   ansible.builtin.file:
-#     src: "/etc/nginx/sites-available/{{ vm_4_mediawiki_server_1.nginx_conf_name }}"
-#     dest: "/etc/nginx/sites-enabled/{{ vm_4_mediawiki_server_1.nginx_conf_name }}"
+#     src: "/etc/nginx/sites-available/{{ vm_3_mediawiki_server_1.nginx_conf_name }}"
+#     dest: "/etc/nginx/sites-enabled/{{ vm_3_mediawiki_server_1.nginx_conf_name }}"
 #     state: link
 #   notify: restart_nginx
 #   tags:
@@ -90,7 +90,7 @@
   become: true
   become_user: root
   copy:
-    src: "{{ role_path }}/files/{{ vm_4_mediawiki_server_1.nginx_conf_name }}" 
+    src: "{{ role_path }}/files/{{ vm_3_mediawiki_server_1.nginx_conf_name }}" 
     dest: /etc/nginx/sites-available/
   notify: restart_nginx
   when: mediawiki_hosts.server1 in inventory_hostname
@@ -103,8 +103,8 @@
   become_user: root
   become: true
   ansible.builtin.file:
-    src: "/etc/nginx/sites-available/{{ vm_4_mediawiki_server_1.nginx_conf_name }}"
-    dest: "/etc/nginx/sites-enabled/{{ vm_4_mediawiki_server_1.nginx_conf_name }}"
+    src: "/etc/nginx/sites-available/{{ vm_3_mediawiki_server_1.nginx_conf_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ vm_3_mediawiki_server_1.nginx_conf_name }}"
     state: link
   notify: restart_nginx
   when: mediawiki_hosts.server1 in inventory_hostname
@@ -238,6 +238,7 @@
   tags:
     - setup_mediawiki_copy_archive_remote_rsync_py_to_scripts
 
+
 # Наполнение .env
 - name: Step 18 - Fill up .env
   become: true
@@ -245,14 +246,12 @@
   blockinfile:
     path: "{{ vm_4_mediawiki_server_2.env_path }}"
     block: |
-      BACKUPS_DIR="{{ postgres_vars.db_backups_dir }}"
-      DATABASE_USER={{ postgres_wikiuser_user_vars.db_user }}
-      DATABASE_PASSWORD={{ postgres_wikiuser_user_vars.db_user_password }}
-      DATABASE_NAME={{ postgres_vars.db_name }}
-      DATABASE_PORT={{ postgres_vars.db_port }}
-      REMOTE_HOST={{ vm_7_standby_db_private_key_ssh.remote_host }}
-      REMOTE_USER={{ vm_7_standby_db_private_key_ssh.remote_user }}
-      PRIVATE_KEY_PATH={{ vm_7_standby_db_private_key_ssh.private_key_ssh_path }}
+      REMOTE_HOST={{ secret_vm_4_mediawiki_server_2.host_ip }}
+      REMOTE_USER={{ secret_vm_4_mediawiki_server_2.user }}
+      PRIVATE_KEY_PATH={{ vm_4_mediawiki_server_2.private_key_ssh_path }}
+      MEDIAWIKI_REMOTE_HOST_PATH={{ vm_3_mediawiki_server_1.mediawiki_path }}
+      MEDIAWIKI_DESTINATION_PATH={{ vm_4_mediawiki_server_2.mediawiki_parent_path }}
+      NGINX_CONF_FILE={{ vm_4_mediawiki_server_2.nginx_conf_name }}
 
     marker: "# {mark} Ansible managed block for .env"
   when: mediawiki_hosts.server2 in inventory_hostname
@@ -290,6 +289,7 @@
     - setup_mediawiki_copy_logrotate
     - setup_mediawiki_add_secret_variables, setup_mediawiki_copy_logrotate
 
+
 # Добавление archive_remote_rsync.py в планировшик задания cron
 # minute: "0" - запуск в начале часа
 # hour: "*/4" - запуск каждые 4 часа
@@ -297,7 +297,7 @@
   become: true
   become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
   ansible.builtin.cron:
-    name: "Run pgdump script"
+    name: "Run archive_remote_rsync script"
     minute: "*"
     hour: "*"
     job: "/usr/bin/python3 {{ vm_4_mediawiki_server_2.scripts_path }}/{{ vm_4_mediawiki_server_2.remote_rsync_script_name }} >> {{ vm_4_mediawiki_server_2.scripts_path }}/{{ vm_4_mediawiki_server_2.log_file_name }} 2>&1"

@@ -30,7 +30,7 @@ vm_3_mediawiki_server_1:
   mediawiki_archive_name: mediawiki-1.42.3.tar.gz
   mediawiki_unzipped_folder_name: mediawiki-1.42.3
   mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
-
+  nginx_conf_name: nginx_mediawiki
 
 vm_4_mediawiki_server_2:
   private_key_ssh_parent_path: /root/.ssh/
@@ -48,5 +48,6 @@ vm_4_mediawiki_server_2:
   log_file_name: archive_remote_rsync.log
 
   logrotate_conf_name: logrotate_archive_remote_rsync
+
 
   nginx_conf_name: nginx_mediawiki
