@@ -267,7 +267,7 @@ Standby БД получает реплицированные данные с Pri
 </details>
 
 
-### 5.4 Настройка Ansible
+### 5.4 Запуск конвеера. Автоматическая настройка ВМ через Ansible
 
 <details>
 <summary>Развернуть</summary>  
@@ -432,7 +432,7 @@ Standby БД получает реплицированные данные с Pri
             --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
             -i inventory.yaml --tags="setup_db_standby_postgresql"
 
-   - #### 2.4.4. Настройка серверов MediaWiki на vm-3-mediawiki-server-1 и vm-4-mediawiki-server-2
+   - #### 2.5. Настройка серверов MediaWiki на vm-3-mediawiki-server-1 и vm-4-mediawiki-server-2
       - Обновление пакетного репозитория, установка пакетов
       - Скачивание архива с MediaWiki
       - Настройка Nginx
@@ -444,6 +444,9 @@ Standby БД получает реплицированные данные с Pri
             --vault-id ans_vault_mediawiki_localsettings@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/ans_vault_mediawiki_localsettings.txt \
             -i inventory.yaml --tags="setup_mediawiki"
 
+
+   - #### 2.6. Настройка Nginx. Балансировка нагрузки между серверами MediaWiki
+      - Обновление пакетного репозитория, установка пакетов
 
 #### 3. Дополнительная информация
 
@@ -482,12 +485,22 @@ Standby БД получает реплицированные данные с Pri
 </details>
 
 
-### 5.5 Настройка PostgreSQL
+</details>
+
+
+
+## 6. Ручное развёртывание приложения в облачной инфраструктуры Yandex Cloud
+
+<details>
+<summary>Развернуть</summary> 
+
+
+### 6.1 Настройка PostgreSQL
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_5.5. postgresql_setup.md -->
+<!-- START_6.1. postgresql_setup.md -->
 <!-- # Настройка PostgreSQL -->
 
 #### Настройка PostgreSQL
@@ -901,17 +914,18 @@ Standby БД получает реплицированные данные с Pri
 
    </details> 
 
-<!-- END_5.5. postgresql_setup.md -->
+<!-- END_6.1. postgresql_setup.md -->
 
 </details>
 
 
-### 5.6 Настройка MediaWiki
+
+### 6.2 Настройка MediaWiki
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_5.6. mediawiki_setup.md -->
+<!-- START_6.2. mediawiki_setup.md -->
 <!-- # Настройка MediaWiki -->
 
 #### Настройка MediaWiki
@@ -1071,27 +1085,20 @@ Standby БД получает реплицированные данные с Pri
 
     </details>  
 
-<!-- END_5.6. mediawiki_setup.md -->
+<!-- END_6.2. mediawiki_setup.md -->
 
 </details>
 
-</details>
 
-
-## 6. Ручное развёртывание приложения в облачной инфраструктуры Yandex Cloud
-
-<details>
-<summary>Развернуть</summary> 
-
-### 5.7 Настройка Nginx
+### 6.3 Настройка Nginx
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_5.7. nginx_setup.md -->
-<!-- # Настройка Nginx для балансировки запросов между серверами MediaWiki-->
+<!-- START_6.3. nginx_setup.md -->
+<!-- # Настройка Nginx для балансировки нагрузки между серверами MediaWiki-->
 
-#### Настройка Nginx. Балансировка запросов между серверами MediaWiki
+#### Настройка Nginx. Балансировка нагрузки между серверами MediaWiki
 
 1. Установка пакетов
 
@@ -1105,9 +1112,9 @@ Standby БД получает реплицированные данные с Pri
 
     - Установка пакетов  
     
-          sudo apt install -y nginx php php-intl php-mbstring php-xml php-apcu php-curl install php8.1-fpm php8.1-pgsql postgresql postgresql-contrib python3-psycopg2 acl rsync python3 python3-venv python3-pip
+          sudo apt install -y nginx
 
-    - Добавление в автозагрузку nginx и postgresql
+    - Добавление в автозагрузку nginx
  
           sudo systemctl enable nginx
           sudo systemctl restart nginx
@@ -1121,7 +1128,7 @@ Standby БД получает реплицированные данные с Pri
    </details>  
   
 
-<!-- END_5.7. nginx_setup.md -->
+<!-- END_6.3. nginx_setup.md -->
 
 </details>
 
