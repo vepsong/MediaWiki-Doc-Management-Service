@@ -1077,6 +1077,64 @@ Standby БД получает реплицированные данные с Pri
 
 
 
+
+### 5.7 Настройка Nginx
+
+<details>
+<summary>Развернуть</summary>  
+
+<!-- START_5.7. nginx_setup.md -->
+<!-- # Настройка Nginx для балансировки запросов между серверами MediaWiki-->
+
+#### Настройка Nginx. Балансировка запросов между серверами MediaWiki
+
+1. Установка пакетов
+
+
+   <details>
+   <summary>Развернуть</summary> 
+   
+    - Обновление пакетов репозитория, добавление в автозагрузку
+
+          sudo apt update && sudo apt upgrade -y
+
+    - Установка пакетов  
+    
+          sudo apt install -y nginx php php-intl php-mbstring php-xml php-apcu php-curl install php8.1-fpm php8.1-pgsql postgresql postgresql-contrib python3-psycopg2 acl rsync python3 python3-venv python3-pip
+
+    - Добавление в автозагрузку nginx и postgresql
+ 
+          sudo systemctl enable nginx
+          sudo systemctl restart nginx
+
+    - Проверка установки, автозапуска и статуса служб nginx 
+
+          systemctl is-enabled nginx
+          sudo systemctl restart nginx
+          systemctl status nginx
+
+   </details>  
+  
+
+<!-- END_5.7. nginx_setup.md -->
+
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </details>
 
 
