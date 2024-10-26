@@ -1,0 +1,8 @@
+---
+# vars file for nginx_mediawiki_proxy
+packages_to_install:
+  - nginx
+
+
+vm_2_nginx_proxy_server:
+  nginx_conf_name: nginx_mediawiki_proxy

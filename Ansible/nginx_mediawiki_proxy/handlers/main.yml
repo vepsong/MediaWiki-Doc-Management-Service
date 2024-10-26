@@ -1,0 +1,8 @@
+---
+# handlers file for nginx_mediawiki_proxy
+- name: Nginx Restarter
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+    enabled: yes
+  listen: "restart_nginx"

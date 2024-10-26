@@ -55,10 +55,20 @@
 
 
 # Настройка mediawiki
-- name: Set up standby db_postgresql
+- name: Set up mediawiki servers
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: mediawiki
   tags:
     - setup_mediawiki
+
+# Настройка nginx mediawiki proxy
+- name: Set up nginx mediawiki proxy
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: nginx_mediawiki_proxy
+  tags:
+    - setup_nginx_mediawiki_proxy
+
