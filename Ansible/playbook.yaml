@@ -72,3 +72,22 @@
   tags:
     - setup_nginx_mediawiki_proxy
 
+
+# Настройка zabbix-server monitoring system
+- name: Set up zabbix-server monitoring system
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: zabbix_server_monitoring_system
+  tags:
+    - setup_zabbix_server_monitoring_system
+
+
+# Настройка zabbix-agent monitoring system
+- name: Set up zabbix-agent monitoring system
+  hosts: all
+  become: true
+  roles:
+    - role: zabbix_agent_monitoring_system
+  tags:
+    - setup_zabbix_agent_monitoring_system

@@ -1,0 +1,11 @@
+---
+# defaults file for zabbix_agent_monitoring_system
+
+zabbix_agent_hosts:
+  zabbix_agent1: vm-1-monitoring-system
+  zabbix_agent2: vm-2-nginx-proxy-server
+  zabbix_agent3: vm-3-mediawiki-server-1
+  zabbix_agent4: vm-4-mediawiki-server-2
+  zabbix_agent5: vm-5-haproxy-proxy-server
+  zabbix_agent6: vm-6-primary-db
+  zabbix_agent7: vm-7-standby-db
