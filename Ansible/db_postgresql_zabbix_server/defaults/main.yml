@@ -1,0 +1,7 @@
+---
+# defaults file for db_postgresql_zabbix_server
+target_groups:
+  - monitoringSystem
+
+zabbix_server_hosts:
+  zabbix_server1: vm-1-monitoring-system

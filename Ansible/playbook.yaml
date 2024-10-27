@@ -54,6 +54,16 @@
     - setup_db_standby_postgresql
 
 
+# Настройка zabbix-server postgresql
+- name: Set up zabbix-server db_postgresql
+  hosts: "{{ target_groups }}"
+  become: true
+  roles:
+    - role: db_postgresql_zabbix_server
+  tags:
+    - setup_db_postgresql_zabbix_server
+
+
 # Настройка mediawiki
 - name: Set up mediawiki servers
   hosts: "{{ target_groups }}"

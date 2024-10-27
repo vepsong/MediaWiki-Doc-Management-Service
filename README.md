@@ -495,15 +495,15 @@ Standby БД получает реплицированные данные с Pri
 <summary>Развернуть</summary> 
 
 
-### 6.1 Настройка PostgreSQL
+### 6.1 Настройка Primary и Standby PostgreSQL для серверов MediaWiki
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_6.1. postgresql_setup.md -->
-<!-- # Настройка PostgreSQL -->
+<!-- START_6.1. postgresql_primary_standby_mediawiki_setup.md -->
+<!-- # Настройка Primary и Standby PostgreSQL для серверов MediaWiki -->
 
-#### Настройка PostgreSQL
+#### 6.1. Настройка Primary и Standby PostgreSQL для серверов MediaWiki
 
 1. Общие настройки для Primary и Standby PostgreSQL
 
@@ -914,18 +914,88 @@ Standby БД получает реплицированные данные с Pri
 
    </details> 
 
-<!-- END_6.1. postgresql_setup.md -->
+<!-- END_6.1. postgresql_primary_standby_mediawiki_setup.md -->
+
+</details>
+
+
+### 6.2 Настройка Zabbix-server для vm-1-monitoring-system
+
+<details>
+<summary>Развернуть</summary>  
+
+<!-- START_6.2. postgresql_zabbix_server_setup.md -->
+<!-- # Настройка Zabbix-server для vm-1-monitoring-system -->
+
+#### 6.2. Настройка Zabbix-server для vm-1-monitoring-system
+
+1. Общие настройки
+
+
+   <details>
+   <summary>Развернуть</summary> 
+   
+    - Установка postgresql
+
+          # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install postgresql 
+          sudo systemctl enable postgresql
+
+          # Проверка установки: автозапуск и статус службы
+          systemctl is-enabled postgresql
+          systemctl status postgresql
+
+   </details>  
+  
+
+
+8. Основные команды для работы с PostgreSQL  
+
+   <details>
+   <summary>Развернуть</summary>  
+      
+       # Вход в аккаунт postgres
+       sudo -i -u postgres
+       # Открытие консоли postgres
+       psql
+       # Выход из консоли
+       \q
+       # Выход из оболочки пользователя
+       Ctrl+D
+       # Просмотр статуса подключения
+       \conninfo
+       # Список БД
+       \l
+       # Подключение к БД
+       \c <имя БД>
+       # Просмотр списка ролей (пользователей)
+       \du
+       # Создать новую роль
+       createuser --interactive
+       # Создать новую БД
+       createdb <имя БД>
+
+       # Работа в консоли БД postgres подразумевает, что в linux существует такой же акк
+       # После создания новой БД выходим из акк postgres > создаем в linux нового пользователя с именем БД > переключаемся на него > подключаемся к консоли
+       sudo adduser <имя пользователя linux>
+       sudo -i -u <имя созданного пользователя linux>
+       psql
+
+   </details> 
+
+<!-- END_6.2. postgresql_zabbix_server_setup.md -->
 
 </details>
 
 
 
-### 6.2 Настройка MediaWiki
+### 6.3 Настройка MediaWiki
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_6.2. mediawiki_setup.md -->
+<!-- START_6.3. mediawiki_setup.md -->
 <!-- # Настройка MediaWiki -->
 
 #### Настройка MediaWiki
@@ -1055,47 +1125,17 @@ Standby БД получает реплицированные данные с Pri
 
    </details>  
 
-
-2. Test Header2
-
-
-   <details>
-   <summary>Развернуть</summary> 
-   
-    - Создание новой роли 
-
-          # Создание новых пользователей: wikiuser (основной), syncuser (для репликации)
-          sudo -u postgres createuser -P wikiuser
-          sudo -u postgres createuser --replication -P syncuser
-              - --replication - право на репликацию
-          # Создание базы данных
-          sudo su - postgres
-          psql
-          CREATE DATABASE my_wiki;
-          # Назначение пользователю прав на базу данных
-          sudo su - postgres
-          psql
-          GRANT ALL PRIVILEGES ON DATABASE my_wiki to wikiuser; 
-          # Вывод списка пользоватей с правами
-          psql
-          \du
-          # Вывод списка баз данных
-          \l
-
-
-    </details>  
-
-<!-- END_6.2. mediawiki_setup.md -->
+<!-- END_6.3. mediawiki_setup.md -->
 
 </details>
 
 
-### 6.3 Настройка Nginx
+### 6.4 Настройка Nginx
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_6.3. nginx_setup.md -->
+<!-- START_6.4. nginx_setup.md -->
 <!-- # Настройка Nginx для балансировки нагрузки между серверами MediaWiki-->
 
 #### Настройка Nginx. Балансировка нагрузки между серверами MediaWiki
@@ -1320,19 +1360,19 @@ Standby БД получает реплицированные данные с Pri
 
 
    </details>
-<!-- END_6.3. nginx_setup.md -->
+<!-- END_6.4. nginx_setup.md -->
 
 </details>
 
 
 
 
-### 6.3 Настройка Zabbix
+### 6.5 Настройка Zabbix
 
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_6.4. zabbix_setup.md -->
+<!-- START_6.5. zabbix_setup.md -->
 <!-- # Настройка Zabbix'a для мониторинга работы системы -->
 
 #### Настройка Zabbix. Система мониторинга
@@ -1365,7 +1405,7 @@ Standby БД получает реплицированные данные с Pri
    </details>  
   
 
-<!-- END_6.4. zabbix_setup.md -->
+<!-- END_6.5. zabbix_setup.md -->
 
 </details>
 
