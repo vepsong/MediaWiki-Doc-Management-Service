@@ -69,3 +69,17 @@
   when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
   tags:
     - setup_nginx_mediawiki_proxy_symlink_creation_mediawiki
+
+
+# Копирование nginx.conf с дополнительной логикой обработки логов в /etc/nginx/
+- name: Step 7 - Copy nginx.conf (with additionak logs settings) to /etc/nginx/
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/nginx.conf" 
+    dest: /etc/nginx/
+    force: yes
+  notify: restart_nginx
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
+  tags:
+    - setup_nginx_mediawiki_proxy_copy_nginx_conf
