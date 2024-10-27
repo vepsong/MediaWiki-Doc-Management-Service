@@ -432,6 +432,15 @@ Standby БД получает реплицированные данные с Pri
             --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
             -i inventory.yaml --tags="setup_db_standby_postgresql"
 
+   - #### 2.4.4. Настройка zabbix-server postgresql на vm-1-monitoring-system
+      - Cоздание БД _____, пользователя _____ 
+      - Перенос стандартной директории БД на внешний жесткий диск
+
+            ansible-playbook playbook.yaml \
+            --vault-id ans_vault_secrets@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt \
+            -i inventory.yaml --tags="setup_db_postgresql_zabbix_server"
+
+
    - #### 2.5. Настройка серверов MediaWiki на vm-3-mediawiki-server-1 и vm-4-mediawiki-server-2
       - Обновление пакетного репозитория, установка пакетов
       - Скачивание архива с MediaWiki
