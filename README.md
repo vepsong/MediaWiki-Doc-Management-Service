@@ -316,8 +316,9 @@ Standby БД получает реплицированные данные с Pri
           - [db_postgresql_standby/files](/Ansible/db_postgresql_standby/files)  
           - [db_postgresql_standby/files](/Ansible/db_postgresql_mediawiki/files) 
 
-              cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files
-              cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files
+                cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files
+                
+                cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files
 
         - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) private ssh-key 
 
