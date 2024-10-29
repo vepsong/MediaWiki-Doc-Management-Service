@@ -314,11 +314,11 @@ Standby БД получает реплицированные данные с Pri
       
         - Копирование private ssh-key в роли:
           - [db_postgresql_standby/files](/Ansible/db_postgresql_standby/files)  
-          - [db_postgresql_standby/files](/Ansible/db_postgresql_mediawiki/files) 
+          - [mediawiki/files](/Ansible/mediawiki/files) 
 
                 cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files
-                
-                cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files
+
+                cp ~/.ssh/id_ed25519 ~/YP-sp13_MediaWiki/Ansible/mediawiki/files
 
         - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) private ssh-key 
 
@@ -326,7 +326,7 @@ Standby БД получает реплицированные данные с Pri
               ansible-vault encrypt --vault-id ans_vault_ssh@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/files/id_ed25519
 
               # Шифрование private ssh-key с vault-id: "ans_vault_ssh"
-              ansible-vault encrypt --vault-id ans_vault_ssh@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql_mediawiki/files/id_ed25519
+              ansible-vault encrypt --vault-id ans_vault_ssh@prompt ~/YP-sp13_MediaWiki/Ansible/mediawiki/files/id_ed25519
 
       - Настройка secrets.yml (для хранения секретных переменных)
 
@@ -542,7 +542,7 @@ Standby БД получает реплицированные данные с Pri
    <details>
    <summary>Развернуть</summary> 
    
-    - Создание новой роли 
+    - Создание новой роли и БД
 
           # Создание новых пользователей: wikiuser (основной), syncuser (для репликации)
           sudo -u postgres createuser -P wikiuser
@@ -556,7 +556,7 @@ Standby БД получает реплицированные данные с Pri
           sudo su - postgres
           psql
           GRANT ALL PRIVILEGES ON DATABASE my_wiki to wikiuser; 
-          # Вывод списка пользоватей с правами
+          # Вывод списка пользователей с правами
           psql
           \du
           # Вывод списка баз данных
@@ -939,25 +939,82 @@ Standby БД получает реплицированные данные с Pri
 
 #### 6.2. Настройка Zabbix-server для vm-1-monitoring-system
 
-1. Общие настройки
-
+1. Установка postgresql
 
    <details>
    <summary>Развернуть</summary> 
    
-    - Установка postgresql
+       # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
+       sudo apt update && sudo apt upgrade -y
+       sudo apt install postgresql 
+       sudo systemctl enable postgresql
 
-          # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
-          sudo apt update && sudo apt upgrade -y
-          sudo apt install postgresql 
-          sudo systemctl enable postgresql
-
-          # Проверка установки: автозапуск и статус службы
-          systemctl is-enabled postgresql
-          systemctl status postgresql
+       # Проверка установки: автозапуск и статус службы
+       systemctl is-enabled postgresql
+       systemctl status postgresql
 
    </details>  
-  
+
+2. [Установка zabbix 7.0 LTS](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx)  
+Конфигурация: Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, Nginx
+
+   <details>
+   <summary>Развернуть</summary> 
+
+       # Установка репозитория zabbix
+
+       sudo wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb
+
+       sudo dpkg -i zabbix-release_latest+ubuntu22.04_all.deb
+
+       sudo apt update
+
+       # Установка Zabbix server, frontend, agent
+
+       sudo apt install zabbix-server-pgsql zabbix-frontend-php php8.1-pgsql zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
+
+   </details>  
+
+3. Настройка postgresql
+
+   <details>
+   <summary>Развернуть</summary> 
+
+       # Создание новой роли
+       sudo -u postgres createuser --pwprompt zabbix
+
+       # Создание новой БД
+       sudo -u postgres createdb -O zabbix zabbix
+
+       # Импорт исходной схемы и данных в созданную БД
+       zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
+
+       # Настройка /etc/zabbix/zabbix_server.conf
+       DBPassword=password
+
+       # Настройка /etc/zabbix/nginx.conf
+       listen 8080;
+       server_name example.com;
+
+
+   </details>  
+
+4. Проверка установки: запуск, добавление в автозапуск и статус службы
+
+   <details>
+   <summary>Развернуть</summary> 
+
+       # Перезапуск службы
+       systemctl restart zabbix-server zabbix-agent nginx php8.1-fpm
+
+       # Добавление в автозапуск
+       systemctl enable zabbix-server zabbix-agent nginx php8.1-fpm
+
+       # Проверка
+       systemctl is-enabled zabbix-server zabbix-agent nginx php8.1-fpm
+       systemctl status zabbix-server zabbix-agent nginx php8.1-fpm
+
+   </details>  
 
 
 8. Основные команды для работы с PostgreSQL  
