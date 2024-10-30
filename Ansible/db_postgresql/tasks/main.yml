@@ -63,6 +63,7 @@
     - postgres
     - sudo
     - "{{ postgres_wikiuser_user_vars.db_user }}"
+    - "{{ postgres_zabbix_server_user_vars.db_user }}"
   tags:
     - db_postgresql_add_users_dbadmin_group
 
