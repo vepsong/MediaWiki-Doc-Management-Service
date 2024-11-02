@@ -432,7 +432,7 @@ Standby БД получает реплицированные данные с Pri
             -i inventory.yaml --tags="setup_db_standby_postgresql"
 
    - #### 2.4.4. Настройка zabbix-server postgresql на vm-1-monitoring-system
-      - Cоздание БД _____, пользователя _____ 
+      - Cоздание БД zabbix, пользователя zabbix 
       - Перенос стандартной директории БД на внешний жесткий диск
 
             ansible-playbook playbook.yaml \

@@ -3,7 +3,7 @@ linuxVM:
     monitoringSystem:
       hosts:
         vm-1-monitoring-system:
-          ansible_host: 89.169.145.236
+          ansible_host: 89.169.128.151
           external_disks:
           - disk_id: fhmmla0r5sm2j6c4le8l
             disk_name: vhdd-1-monitoring-system-db
@@ -12,21 +12,21 @@ linuxVM:
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: ''
+          ansible_host: 89.169.153.24
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: ''
+          ansible_host: 89.169.137.212
         vm-4-mediawiki-server-2:
-          ansible_host: ''
+          ansible_host: 51.250.70.171
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: ''
+          ansible_host: 89.169.156.122
     primaryDb:
       hosts:
         vm-6-primary-db:
-          ansible_host: ''
+          ansible_host: 89.169.159.19
           external_disks:
           - disk_id: fhmvasqeieo3t7nqlol7
             disk_name: vssd-1-primary-db
@@ -35,7 +35,7 @@ linuxVM:
     standbyDb:
       hosts:
         vm-7-standby-db:
-          ansible_host: ''
+          ansible_host: 89.169.154.188
           external_disks:
           - disk_id: fhm0653bevuv57f7ng16
             disk_name: vhdd-2-standby-db
