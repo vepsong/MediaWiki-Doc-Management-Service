@@ -82,7 +82,7 @@
     path: /etc/postgresql/14/main/postgresql.conf
     regexp: '^#?\s*data_directory\s*=\s*.*'
     replace: "data_directory = '{{ hostvars['vm-6-primary-db'].external_disks[0].mount_point }}/postgresql/14/main'"
-  notify: reload_postgresql
+  notify: restart_postgresql
   when: db_hosts.primary in inventory_hostname
   tags:
     - setup_db_primary_postgresql_add_data_directory_primary_on_postgresql_conf
@@ -154,7 +154,7 @@
 
 
 # Немедленный перезапуск сервиса PostgreSQL
-- name: Step 12 - Reload PostgreSQL service immediately
+- name: Step 12 - Restart PostgreSQL service immediately
   become: true
   become_user: root
   systemd:
@@ -162,8 +162,8 @@
     state: restarted
   when: db_hosts.primary in inventory_hostname
   tags:
-    - setup_db_primary_postgresql_reload_postgresql
-    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_reload_postgresql
+    - setup_db_primary_postgresql_restart_postgresql
+    - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_restart_postgresql
 
 
 # Создание пользователя wikiuser для PRIMARY PostgreSQL db

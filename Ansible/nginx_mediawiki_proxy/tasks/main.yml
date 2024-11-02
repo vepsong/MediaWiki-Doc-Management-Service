@@ -83,3 +83,56 @@
   when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
   tags:
     - setup_nginx_mediawiki_proxy_copy_nginx_conf
+
+
+
+# ==================================
+# Блок с настройками DDNS (noip.com)
+# ==================================
+
+
+# Копирование noip-duc_3.3.0.tar.gz в /root
+- name: Step 8 - Copy nginx.conf (with additionak logs settings) to /etc/nginx/
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/noip-duc_3.3.0.tar.gz" 
+    dest: /root
+    force: yes
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
+  tags:
+    - setup_nginx_mediawiki_proxy_copy_noip_duc
+
+
+# Разархивирование noip-duc_3.3.0.tar.gz в /root
+- name: Step 9 - Extract noip-duc_3.1.1.tar.gz
+  become: true
+  become_user: root
+  ansible.builtin.unarchive:
+    src: /root/noip-duc_3.3.0.tar.gz
+    dest: /root
+    remote_src: yes
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
+  tags:
+    - setup_nginx_mediawiki_proxy_unzip_noip_duc
+
+# Установка noip-duc_3.3.0
+- name: Step 10 - Install noip-duc_3.3.0_amd64.deb package
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    deb: /root/noip-duc_3.3.0/binaries/noip-duc_3.3.0_amd64.deb
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
+  tags:
+    - setup_nginx_mediawiki_proxy_install_noip_duc
+
+# Копирование папки /root/noip-duc_3.3.0/debian/service в /etc/systemd/system/noip-duc.service
+- name: Step 11 - Copy noip-duc service file to systemd directory
+  become: true
+  become_user: root
+  ansible.builtin.copy:
+    src: /root/noip-duc_3.3.0/debian/service
+    dest: /etc/systemd/system/noip-duc.service
+  when: nginx_mediawiki_hosts.nginx_mediawiki_proxy in inventory_hostname
+  tags:
+    - setup_nginx_mediawiki_proxy_copy_noip_duc_service

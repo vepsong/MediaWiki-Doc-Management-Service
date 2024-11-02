@@ -1,2 +1,10 @@
 ---
 # vars file for zabbix_server_monitoring_system
+
+packages_to_install:
+  - zabbix-server-pgsql
+  - zabbix-frontend-php
+  - php8.1-pgsql
+  - zabbix-nginx-conf
+  - zabbix-sql-scripts
+  - zabbix-agent

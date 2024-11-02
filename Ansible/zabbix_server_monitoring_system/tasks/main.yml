@@ -1,2 +1,41 @@
 ---
 # tasks file for zabbix_server_monitoring_system
+
+# Скачивание репозитория zabbix
+- name: Step 1 - Download Zabbix repository package
+  ansible.builtin.get_url:
+    url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb
+    dest: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+
+# Установка репозитория zabbix
+- name: Step 2 - Install Zabbix repository package
+  ansible.builtin.apt:
+    deb: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+
+# Обновление пакетного репозитория 
+- name: Step 3 - Update list of packages
+  apt:
+    update_cache: yes
+  become: true
+  tags:
+    - zabbix_server_apt_update
+
+# Установка пакетов
+- name: Step 4 - Packet installing
+  apt:
+    name: "{{ item }}" 
+    state: present
+  loop:
+    - "{{ packages_to_install }}"
+  tags:
+    - zabbix_server_install_packages
+
+# Импорт схемы и данных для Zabbix server
+- name: Step 5 - Import initial schema and data for Zabbix server
+  become_user: postgres
+  ansible.builtin.shell: |
+    PGPASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }} zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | psql -U zabbix -d zabbix
+  args:
+    warn: false
+  tags:
+    - zabbix_server_import_initial_schema

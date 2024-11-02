@@ -22,7 +22,8 @@ ans_vault_mediawiki_localsettings.txt
 vault-id_ans_vault_secrets.txt
 vault-id_ans_vault_ssh.txt
 vault-id_ans_vault_mediawiki_localsettings.txt
-
+vault-id_ans_vault_noip_monitoring.txt
+vault-id_ans_vault_noip_nginx.txt
 
 # Служебные файлы Terraform
 .terraform.lock.hcl
