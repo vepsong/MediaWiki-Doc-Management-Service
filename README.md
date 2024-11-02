@@ -333,13 +333,15 @@ Standby БД получает реплицированные данные с Pri
         - Создание и наполнение файла secrets.yml в ролях:
           - [db_postgresql/vars](/Ansible/db_postgresql/vars)     
           - [db_postgresql_primary/vars](/Ansible/db_postgresql_primary/vars)       
-          - [db_postgresql_standby/vars](/Ansible/db_postgresql_standby/vars)   
+          - [db_postgresql_standby/vars](/Ansible/db_postgresql_standby/vars)
+          - [db_postgresql_zabbix_server/vars](/Ansible/db_postgresql_zabbix_server/vars)   
           - [mediawiki/vars](/Ansible/mediawiki/vars)   
+          - [zabbix_server_monitoring_system/vars](/Ansible/zabbix_server_monitoring_system/vars) 
 
           За основу взять [ansible_secrets.yml_EXAMPLE](/credentials/templates/ansible_secrets.yml_EXAMPLE) 
 
               # Cоздание и наполнение secrets.yml
-              touch ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
+              touch ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml
 
               # Шифрование secrets.yml с vault-id: "ans_vault_secrets" 
               ansible-vault encrypt --vault-id ans_vault_secrets@prompt ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml
@@ -349,7 +351,9 @@ Standby БД получает реплицированные данные с Pri
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_primary/vars/secrets.yml 
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_zabbix_server/vars/secrets.yml
-              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml 
+              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml
+              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/zabbix_server_monitoring_system/vars/secrets.yml
+
 
       - Настройка LocalSettings.php (конфигурация MediaWiki)
 
@@ -364,6 +368,22 @@ Standby БД получает реплицированные данные с Pri
               ansible-vault encrypt --vault-id ans_vault_mediawiki_localsettings@prompt ~/YP-sp13_MediaWiki/Ansible/mediawiki/files/LocalSettings.php
 
 
+      - Настройка DDNS (noip.com)
+
+        - Создание и наполнение файла noip-duc в ролях:
+          - [zabbix_server_monitoring_system/vars](/Ansible/zabbix_server_monitoring_system/files)        
+          - [nginx_mediawiki_proxy/vars](/Ansible/nginx_mediawiki_proxy/files)   
+
+          За основу взять [noip-duc_EXAMPLE](/credentials/templates/noip-duc_EXAMPLE) 
+
+        - Шифрование с помощью [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html) noip-duc
+
+              # Шифрование noip-duc с vault-id: "ans_vault_noip_monitoring"
+              ansible-vault encrypt --vault-id ans_vault_noip_monitoring@prompt ~/YP-sp13_MediaWiki/Ansible/zabbix_server_monitoring_system/files/noip-duc
+
+              # Шифрование noip-duc с vault-id: "ans_vault_noip_nginx"
+              ansible-vault encrypt --vault-id ans_vault_noip_monitoring@prompt ~/YP-sp13_MediaWiki/Ansible/nginx_mediawiki_proxy/files/noip-duc
+
 
       - Настройка vault_passwords (директория для хранения паролей ansible-vault)
         - Создание и наполнение директории vault_passwords в корневой директории [Ansible](/Ansible/)
@@ -371,9 +391,13 @@ Standby БД получает реплицированные данные с Pri
         - За основу файла с паролями взять [ansible_vault_passwords.txt_EXAMPLE](/credentials/templates/ansible_vault_passwords.txt_EXAMPLE) 
 
               mkdir ~/YP-sp13_MediaWiki/Ansible/vault_passwords
+
               echo "password1" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt
               echo "password2" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt
               echo "password3" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_mediawiki_localsettings.txt
+              echo "password4" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_vault-id_ans_vault_noip_monitoring.txt
+              echo "password5" > ~/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_vault-id_ans_vault_noip_nginx.txt
+           
 
       - Дополнительные команды [ansible-vault](https://docs.ansible.com/ansible/2.9/user_guide/vault.html)
 
@@ -449,12 +473,33 @@ Standby БД получает реплицированные данные с Pri
             ansible-playbook playbook.yaml \
             --vault-id ans_vault_secrets@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt \
             --vault-id ans_vault_ssh@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_ssh.txt \
-            --vault-id ans_vault_mediawiki_localsettings@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/ans_vault_mediawiki_localsettings.txt \
+            --vault-id ans_vault_mediawiki_localsettings@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_mediawiki_localsettings.txt \
             -i inventory.yaml --tags="setup_mediawiki"
 
 
    - #### 2.6. Настройка Nginx. Балансировка нагрузки между серверами MediaWiki
       - Обновление пакетного репозитория, установка пакетов
+      - Настройка nginx
+      - Настройка DDNS (noip.com)
+
+            ansible-playbook playbook.yaml \
+            --vault-id ans_vault_noip_nginx@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_noip_nginx.txt \
+            -i inventory.yaml --tags="setup_nginx_mediawiki_proxy"
+
+
+
+   - #### 2.7. Настройка zabbix-server
+      - Обновление пакетного репозитория, установка пакетов
+      - Настройка zabbix-server
+      - Настройка DDNS (noip.com)
+
+            ansible-playbook playbook.yaml \
+            --vault-id ans_vault_secrets@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_secrets.txt \
+            --vault-id ans_vault_noip_monitoring@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_noip_monitoring.txt \
+            -i inventory.yaml --tags="setup_zabbix_server_monitoring_system"
+
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_zabbix_server_monitoring_system"
+
 
 #### 3. Дополнительная информация
 
@@ -1442,30 +1487,12 @@ Standby БД получает реплицированные данные с Pri
 
 #### Настройка Zabbix. Система мониторинга
 
-1. Установка пакетов
+1. [Установка zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx)
 
 
    <details>
    <summary>Развернуть</summary> 
    
-    - Обновление пакетов репозитория, добавление в автозагрузку
-
-          sudo apt update && sudo apt upgrade -y
-
-    - Установка пакетов  
-    
-          sudo apt install -y nginx
-
-    - Добавление в автозагрузку zabbix
- 
-          sudo systemctl enable zabbix
-          sudo systemctl restart zabbix
-
-    - Проверка установки, автозапуска и статуса служб zabbix 
-
-          systemctl is-enabled zabbix
-          sudo systemctl restart zabbix
-          systemctl status zabbix
 
    </details>  
   

@@ -109,7 +109,8 @@
     path: /etc/postgresql/14/main/pg_hba.conf
     block: |
       host zabbix        zabbix         77.137.79.100/32           scram-sha-256
-      host zabbix        zabbix         212.179.174.196/32           scram-sha-256
+      host zabbix        zabbix         212.179.174.196/32         scram-sha-256
+      host zabbix        zabbix         5.29.11.237/32             scram-sha-256
       host zabbix        zabbix         {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32          scram-sha-256
       # host replication   syncuser       77.137.79.100/32           scram-sha-256
       # host replication   syncuser       212.179.174.196/32           scram-sha-256
