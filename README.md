@@ -984,118 +984,67 @@ Standby БД получает реплицированные данные с Pri
 
 #### 6.2. Настройка Zabbix-server для vm-1-monitoring-system
 
-1. Установка postgresql
+1. [Установка zabbix-server](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx) согласно документации.  
+Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
 
    <details>
-   <summary>Развернуть</summary> 
+   <summary>Проверка работоспособности (развернуть)</summary> 
    
-       # Обновление пакетов репозитория, установка postgresql, добавление в автозагрузку
-       sudo apt update && sudo apt upgrade -y
-       sudo apt install postgresql 
-       sudo systemctl enable postgresql
+       # Ввести в строке браузера:
+       ip ВМ:8080
 
-       # Проверка установки: автозапуск и статус службы
-       systemctl is-enabled postgresql
-       systemctl status postgresql
+      - Стартовая страница настройки Zabbix-server  
+      ![Стартовая страница настройки Zabbix-server](/project_documentation/mediafiles/6.%20app_deploy_in_yandex_cloud_manual/6.2.%20zabbix_server_setup.png)  
 
    </details>  
+  
 
-2. [Установка zabbix 7.0 LTS](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx)  
-Конфигурация: Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, Nginx
-
-   <details>
-   <summary>Развернуть</summary> 
-
-       # Установка репозитория zabbix
-
-       sudo wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb
-
-       sudo dpkg -i zabbix-release_latest+ubuntu22.04_all.deb
-
-       sudo apt update
-
-       # Установка Zabbix server, frontend, agent
-
-       sudo apt install zabbix-server-pgsql zabbix-frontend-php php8.1-pgsql zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
-
-   </details>  
-
-3. Настройка postgresql
-
-   <details>
-   <summary>Развернуть</summary> 
-
-       # Создание новой роли
-       sudo -u postgres createuser --pwprompt zabbix
-
-       # Создание новой БД
-       sudo -u postgres createdb -O zabbix zabbix
-
-       # Импорт исходной схемы и данных в созданную БД
-       zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
-
-       # Настройка /etc/zabbix/zabbix_server.conf
-       DBPassword=password
-
-       # Настройка /etc/zabbix/nginx.conf
-       listen 8080;
-       server_name example.com;
-
-
-   </details>  
-
-4. Проверка установки: запуск, добавление в автозапуск и статус службы
-
-   <details>
-   <summary>Развернуть</summary> 
-
-       # Перезапуск службы
-       systemctl restart zabbix-server zabbix-agent nginx php8.1-fpm
-
-       # Добавление в автозапуск
-       systemctl enable zabbix-server zabbix-agent nginx php8.1-fpm
-
-       # Проверка
-       systemctl is-enabled zabbix-server zabbix-agent nginx php8.1-fpm
-       systemctl status zabbix-server zabbix-agent nginx php8.1-fpm
-
-   </details>  
-
-
-8. Основные команды для работы с PostgreSQL  
+2. Настройка pgdump zabbix-server
 
    <details>
    <summary>Развернуть</summary>  
-      
-       # Вход в аккаунт postgres
-       sudo -i -u postgres
-       # Открытие консоли postgres
-       psql
-       # Выход из консоли
-       \q
-       # Выход из оболочки пользователя
-       Ctrl+D
-       # Просмотр статуса подключения
-       \conninfo
-       # Список БД
-       \l
-       # Подключение к БД
-       \c <имя БД>
-       # Просмотр списка ролей (пользователей)
-       \du
-       # Создать новую роль
-       createuser --interactive
-       # Создать новую БД
-       createdb <имя БД>
 
-       # Работа в консоли БД postgres подразумевает, что в linux существует такой же акк
-       # После создания новой БД выходим из акк postgres > создаем в linux нового пользователя с именем БД > переключаемся на него > подключаемся к консоли
-       sudo adduser <имя пользователя linux>
-       sudo -i -u <имя созданного пользователя linux>
-       psql
+    - Настройка pgdump zabbix-server в /opt/vhdd-1-monitoring-system-db/zabbix_dump
 
+          # Установка python
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install python3
+          sudo apt install python3-venv
+
+          # Создание директории /scripts для python-скрипта
+          sudo mkdir /scripts
+
+          # Настройка python ВО
+          cd /scripts
+          python3 -m venv myenv
+          source myenv/bin/activate
+          sudo apt install python
+          sudo apt install python3-pip 
+          sudo pip3 install python-dotenv
+
+          # Настройка переменных окружения
+          # За основу взять файл [.env(for postgres)_EXAMPLE](credentials/templates/.env(for postgres)_EXAMPLE)
+          sudo touch /scripts/.env
+
+
+          # Копирование скрипта [pgdump.py](python-scripts/pgdump.py) в созданную выше директорию
+          # Добавить разрешение на исполнение скрипта
+          sudo chmod +x /scripts/pgdump.py
+          # Проверка разрешений файла
+          sudo ls -l /scripts/pgdump.py
+
+          # Создание расписание cronrab
+          sudo crontab -e
+          # В конец файла добавить:
+          0 3 * * * /scripts/myenv/bin/python /scripts/pgdump.py >> /scripts/pgdump.log 2>&1
+              - 0 3 * * * — запуск скрипта каждый день в 3 ночи
+          # Перезапуск сервиса
+          sudo systemctl restart cron
+          # Проверка
+          sudo grep CRON /var/log/syslog
+
+          
    </details> 
-
 <!-- END_6.2. postgresql_zabbix_server_setup.md -->
 
 </details>
@@ -1232,7 +1181,7 @@ Standby БД получает реплицированные данные с Pri
           # Ввести в строке браузера nat-ip ВМ
 
       - Стартовая страница настройки MediaWiki  
-      ![Стартовая страница настройки MediaWiki](/project_documentation/mediafiles/5.%20app_deploy_in_yandex_cloud/5.6.%20mediawiki_setup.png)  
+      ![Стартовая страница настройки MediaWiki](/project_documentation/mediafiles/6.%20app_deploy_in_yandex_cloud_manual/6.3.%20mediawiki_setup.png)  
 
 
    </details>  
@@ -1484,31 +1433,22 @@ Standby БД получает реплицированные данные с Pri
 <details>
 <summary>Развернуть</summary>  
 
-<!-- START_6.5. zabbix_setup.md -->
-<!-- # Настройка Zabbix'a для мониторинга работы системы -->
+<!-- START_6.5. zabbix_agent_setup.md -->
+<!-- # Настройка Zabbix-agent для мониторинга работы системы -->
 
-#### Настройка Zabbix. Система мониторинга
+#### 6.2. Настройка Zabbix-agent для всех вм, кроме vm-1-monitoring-system
 
-1. [Установка zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx) согласно документации.  
-Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
-
-
-
-
+1. [Установка zabbix-agent](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=agent_2&db=&ws=) согласно документации.  
 
    <details>
-   <summary>Проверка работоспособности (развернуть)</summary> 
+   <summary>Развернуть</summary> 
    
-       # Ввести в строке браузера:
-       ip ВМ:8080
-
-      - Стартовая страница настройки Zabbix-server  
-      ![Стартовая страница настройки Zabbix-server](/project_documentation/mediafiles/6.%20app_deploy_in_yandex_cloud_manual/6.5.%20zabbix_server_setup.png)  
+       # test
+       test
 
    </details>  
   
-
-<!-- END_6.5. zabbix_setup.md -->
+<!-- END_6.5. zabbix_agent_setup.md -->
 
 </details>
 
