@@ -1428,7 +1428,7 @@ Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
 
 
 
-### 6.5 Настройка Zabbix
+### 6.5 Настройка Zabbix-agent
 
 <details>
 <summary>Развернуть</summary>  
