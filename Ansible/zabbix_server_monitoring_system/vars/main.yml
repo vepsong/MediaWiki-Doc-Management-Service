@@ -8,3 +8,15 @@ packages_to_install:
   - zabbix-nginx-conf
   - zabbix-sql-scripts
   - zabbix-agent
+
+packages_to_enable:
+  - zabbix-server
+  - zabbix-agent
+  - nginx
+  - php8.1-fpm
+
+packages_to_restart:
+  - zabbix-server
+  - zabbix-agent
+  - nginx
+  - php8.1-fpm

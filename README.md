@@ -501,6 +501,8 @@ Standby БД получает реплицированные данные с Pri
             ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_zabbix_server_monitoring_system"
 
 
+
+
 #### 3. Дополнительная информация
 
 - Основные команды для работы с Ansible  
@@ -1487,12 +1489,21 @@ Standby БД получает реплицированные данные с Pri
 
 #### Настройка Zabbix. Система мониторинга
 
-1. [Установка zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx)
+1. [Установка zabbix](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=server_frontend_agent&db=pgsql&ws=nginx) согласно документации.  
+Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
+
+
+
 
 
    <details>
-   <summary>Развернуть</summary> 
+   <summary>Проверка работоспособности (развернуть)</summary> 
    
+       # Ввести в строке браузера:
+       ip ВМ:8080
+
+      - Стартовая страница настройки Zabbix-server  
+      ![Стартовая страница настройки Zabbix-server](/project_documentation/mediafiles/6.%20app_deploy_in_yandex_cloud_manual/6.5.%20zabbix_server_setup.png)  
 
    </details>  
   

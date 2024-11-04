@@ -145,4 +145,66 @@
     - zabbix_server_import_initial_schema
     - zabbix_server_add_secret_variables, zabbix_server_import_initial_schema
 
+# Конфигурация DBPassword в /etc/zabbix/zabbix_server.conf 
+- name: Step 15 - Ensure DBPassword is set in /etc/zabbix/zabbix_server.conf 
+  become: true
+  ansible.builtin.replace:
+    path: /etc/zabbix/zabbix_server.conf
+    regexp: '^#?\s*DBPassword\s*=.*'
+    replace: "DBPassword = {{ postgres_zabbix_server_user_vars.db_user_password }}"
+  # notify: restart_zabbix
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - zabbix_server_add_dbpassword
+    - zabbix_server_add_secret_variables, zabbix_server_add_dbpassword
+
+
+# Конфигурация listen в /etc/zabbix/nginx.conf
+- name: Step 16 - Ensure listen is set in /etc/zabbix/nginx.conf
+  become: true
+  ansible.builtin.replace:
+    path: /etc/zabbix/nginx.conf
+    regexp: '^#?\s*listen\s*.*'
+    replace: '        listen 8080;'
+  # notify: restart_zabbix
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - zabbix_server_add_listen
+
+
+# Конфигурация server_name в /etc/zabbix/nginx.conf
+- name: Step 17 - Ensure server_name is set in /etc/zabbix/nginx.conf
+  become: true
+  ansible.builtin.replace:
+    path: /etc/zabbix/nginx.conf
+    regexp: '^#?\s*server_name\s*.*'
+    replace: '        server_name monitoring-wiki.ddns.net;'
+  # notify: restart_zabbix
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - zabbix_server_add_server_name
+
+
+# Перезапуск сервисов
+- name: Step 18 - Restart packages
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}" 
+    state: restarted
+  loop: "{{ packages_to_restart }}"
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - zabbix_server_restart_packages
+
+
+# Автозагрузка сервисов
+- name: Step 19 - Enable packages
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}" 
+    enabled: yes
+  loop: "{{ packages_to_enable }}"
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - zabbix_server_enable_packages
 
