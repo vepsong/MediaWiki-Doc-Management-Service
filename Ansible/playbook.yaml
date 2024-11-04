@@ -95,7 +95,7 @@
 
 # Настройка zabbix-agent monitoring system
 - name: Set up zabbix-agent monitoring system
-  hosts: all
+  hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: zabbix_agent_monitoring_system

@@ -351,9 +351,8 @@ Standby БД получает реплицированные данные с Pri
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_primary/vars/secrets.yml 
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml
               cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/db_postgresql_zabbix_server/vars/secrets.yml
-              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml
-              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql_standby/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/zabbix_server_monitoring_system/vars/secrets.yml
-
+              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/mediawiki/vars/secrets.yml
+              cp ~/YP-sp13_MediaWiki/Ansible/db_postgresql/vars/secrets.yml ~/YP-sp13_MediaWiki/Ansible/zabbix_server_monitoring_system/vars/secrets.yml
 
       - Настройка LocalSettings.php (конфигурация MediaWiki)
 
@@ -498,8 +497,12 @@ Standby БД получает реплицированные данные с Pri
             --vault-id ans_vault_noip_monitoring@/root/YP-sp13_MediaWiki/Ansible/vault_passwords/vault-id_ans_vault_noip_monitoring.txt \
             -i inventory.yaml --tags="setup_zabbix_server_monitoring_system"
 
-            ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_zabbix_server_monitoring_system"
 
+   - #### 2.8. Настройка zabbix-agent
+      - Обновление пакетного репозитория, установка пакетов
+      - Настройка zabbix-agent
+
+            ansible-playbook playbook.yaml -i inventory.yaml --tags="setup_zabbix_agent_monitoring_system"
 
 
 
@@ -1027,16 +1030,16 @@ Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
           sudo touch /scripts/.env
 
 
-          # Копирование скрипта [pgdump.py](python-scripts/pgdump.py) в созданную выше директорию
+          # Копирование скрипта [pgdump_zabbix_server.py](python-scripts/pgdump_zabbix_server.py) в созданную выше директорию
           # Добавить разрешение на исполнение скрипта
-          sudo chmod +x /scripts/pgdump.py
+          sudo chmod +x /scripts/pgdump_zabbix_server.py
           # Проверка разрешений файла
-          sudo ls -l /scripts/pgdump.py
+          sudo ls -l /scripts/pgdump_zabbix_server.py
 
           # Создание расписание cronrab
           sudo crontab -e
           # В конец файла добавить:
-          0 3 * * * /scripts/myenv/bin/python /scripts/pgdump.py >> /scripts/pgdump.log 2>&1
+          0 3 * * * /scripts/myenv/bin/python /scripts/pgdump_zabbix_server.py >> /scripts/pgdum_zabbix_server.log 2>&1
               - 0 3 * * * — запуск скрипта каждый день в 3 ночи
           # Перезапуск сервиса
           sudo systemctl restart cron
@@ -1436,15 +1439,21 @@ Zabbix 7.0 LTS, Ubuntu 22.04, Server, Frontend, Agent, Postgresql, nginx
 <!-- START_6.5. zabbix_agent_setup.md -->
 <!-- # Настройка Zabbix-agent для мониторинга работы системы -->
 
-#### 6.2. Настройка Zabbix-agent для всех вм, кроме vm-1-monitoring-system
+#### 6.5. Настройка Zabbix-agent для всех вм
 
 1. [Установка zabbix-agent](https://www.zabbix.com/download?zabbix=7.0&os_distribution=ubuntu&os_version=22.04&components=agent_2&db=&ws=) согласно документации.  
 
    <details>
    <summary>Развернуть</summary> 
    
-       # test
-       test
+       # Редактирование /etc/zabbix/zabbix_agentd.conf 
+       Server=monitoring-wiki.ddns.net
+       ServerActive=monitoring-wiki.ddns.net
+       Hostname=<hostname of current VM>
+
+       # Добавление сервиса в автозагрузку
+       sudo systemctl start zabbix-agent 
+       sudo systemctl enable zabbix-agent 
 
    </details>  
   

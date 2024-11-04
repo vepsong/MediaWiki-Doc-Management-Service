@@ -71,6 +71,7 @@
   command: >
     tar -czvf /var/lib/postgresql/14/main_{{ ansible_date_time.iso8601_basic }}.bak.tar.gz -C /var/lib/postgresql/14/ main
   when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  ignore_errors: yes
   tags:
     - setup_db_postgresql_zabbix_server_create_archive
     - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_create_archive
@@ -196,3 +197,102 @@
     - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_ensure_postgresql_db_is_presents
 
 
+# =======================================================
+# Блок с задачами zabbix-server db для создания dump
+# =======================================================
+
+# Установка python-библиотек
+# Создание директории /scripts, в которой будут хранится скрипты для dump'a
+# Cоздание пустого файла .env для дальнейшего наполнения значениями из secrets.yml
+- name: Step 16 - create path for scripts zabbix-server
+  become: true
+  become_user: root
+  shell: |
+    pip3 install python-dotenv
+    mkdir /scripts 
+    touch /scripts/.env
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_create_path_script
+
+
+# Копирование скрипта pgdump_zabbix_server.py в /scripts
+- name: Step 17 - Copy pgdump_zabbix_server.py to /scripts
+  copy:
+    src: "{{ role_path }}/files/pgdump_zabbix_server.py"
+    dest: /scripts/
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_copy_pgdump_py_to_scripts
+
+# Добавление скрипту pgdump_zabbix_server.py прав на исполнение 
+- name: Step 18 - Make pgdump_zabbix_server.py executable
+  file:
+    path: /scripts/pgdump_zabbix_server.py
+    mode: '0755'
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_add_exec_to_pgdump_zabbix_server
+
+# Наполнение .env
+- name: Step 19 - Fill up .env
+  become: true
+  become_user: root
+  blockinfile:
+    path: /scripts/.env
+    block: |
+      BACKUPS_DIR="{{ postgres_zabbix_server_vars.db_backups_dir }}"
+      DATABASE_USER={{ postgres_zabbix_server_user_vars.db_user }}
+      DATABASE_PASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }}
+      DATABASE_NAME={{ postgres_zabbix_server_vars.db_name }}
+      DATABASE_PORT={{ postgres_zabbix_server_vars.db_port }}
+
+    marker: "# {mark} Ansible managed block for .env"
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_fill_up_env
+
+
+# Копирование файла конфигурации /etc/logrotate.d/logrotate_pgdump
+# Управление файлами логов в /scripts/pgdump.log
+# Команда для принудительного запуска logrotate - logrotate -f /etc/logrotate.conf
+- name: Step 20 - Copy logrotate to /etc/logrotate.d/logrotate_pgdump
+  become: true
+  become_user: root
+  copy:
+    src: "{{ role_path }}/files/logrotate_pgdump"
+    dest: /etc/logrotate.d/logrotate_pgdump
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_copy_logrotate
+
+
+# Запуск сервиса logrotate и добавление в автозапуск
+- name: Step 21 - Start and enable logrotate service
+  become: true
+  become_user: root
+  # ansible.builtin.service:  ansible.builtin.systemd:
+  ansible.builtin.systemd:
+    name: logrotate
+    state: started 
+    enabled: yes
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_start_enable_logrotate_service
+
+
+# Добавление запуска pgdump_zabbix_server.py в планировшик задания cron
+# minute: "0" - запуск в начале часа
+# hour: "*/4" - запуск каждые 4 часа
+- name: Step 22 - Run pgdump_zabbix_server.py script
+  become: true
+  become_user: root
+  ansible.builtin.cron:
+    name: "Run pgdump script"
+    minute: "0"
+    hour: "*/4"
+    job: "/usr/bin/python3 /scripts/pgdump_zabbix_server.py >> /scripts/pgdump_zabbix_server.log 2>&1"
+  notify: restart_cron
+  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  tags:
+    - setup_db_postgresql_zabbix_server_run_pgdump_zabbix_server_py_cron
