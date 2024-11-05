@@ -23,8 +23,29 @@
   tags:
     - db_postgresql_install_packages 
 
+
+# Установка пакета pip3 python-dotenv
+- name: Step 3 - Install python-dotenv using pip3
+  become: true
+  ansible.builtin.pip:
+    name: python-dotenv
+    executable: pip3
+  when: db_hosts.standby in inventory_hostname or db_hosts.zabbix_server in inventory_hostname
+  tags:
+    - db_postgresql_install_pip3_packages_python_dotenv
+
+# Установка пакета pip3 patroni
+- name: Step 4 - Install patroni using pip3
+  become: true
+  ansible.builtin.pip:
+    name: python-dotenv
+    executable: pip3
+  when: db_hosts.primary in inventory_hostname or db_hosts.standby in inventory_hostname
+  tags:
+    - db_postgresql_install_pip3_packages_python_patroni
+
 # Запуск сервиса и добавление в автозапуск
-- name: Step 3 - Start and enable services
+- name: Step 5 - Start and enable services
   service: 
     name=postgresql
     state=started 
@@ -33,20 +54,20 @@
     - db_postgresql_start_enable_service
 
 # Добавление секретных переменных
-- name: Step 4 - Include secret variables
+- name: Step 6 - Include secret variables
   include_vars: secrets.yml
   tags:
     - db_postgresql_add_secret_variables
 
 # Создание динамических переменных
-- name: Step 5 - Create dynamic variables
+- name: Step 7 - Create dynamic variables
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   tags:
     - db_postgresql_create_dynamic_variables
 
 # Создание группы безопасности
-- name: Step 6 - Create a group for PostgreSQL access
+- name: Step 8 - Create a group for PostgreSQL access
   ansible.builtin.group:
     name: dbadmin
     state: present
@@ -54,7 +75,7 @@
     - db_postgresql_create_Postgresql_group_access
 
 # Добавление пользователей в группу безопасности
-- name: Step 7 - Add multiple users to dbadmin group
+- name: Step 9 - Add multiple users to dbadmin group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: dbadmin
@@ -68,7 +89,7 @@
     - db_postgresql_add_users_dbadmin_group
 
 # Смена владельцев директории
-- name: Step 8 - Change group ownership for PostgreSQL directories
+- name: Step 10 - Change group ownership for PostgreSQL directories
   become: true
   become_user: root
   ansible.builtin.file:
@@ -85,7 +106,7 @@
 
 
 # Установка разрешений для директории
-- name: Step 9 - Set permissions for PostgreSQL directories
+- name: Step 11 - Set permissions for PostgreSQL directories
   become: true
   become_user: root
   ansible.builtin.file:

@@ -210,3 +210,18 @@
     - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_ensure_postgresql_db_is_presents
 
 
+# # =================================================
+# # Блок с задачами patroni для Primary PostgreSQL db
+# # =================================================
+
+# # Копирование файла конфигурации patroni_primary.yml
+# - name: Step 16 - Copy patroni_primary.yml to /etc/patroni_primary.yml
+#   become: true
+#   become_user: root
+#   copy:
+#     src: "{{ role_path }}/files/patroni_primary.yml"
+#     dest: /etc/patroni_primary.yml
+#   when: db_hosts.primary in inventory_hostname
+#   tags:
+#     - setup_db_primary_postgresql_copy_patroni_primary
+#     - setup_db_primary_postgresql_add_secret_variables, setup_db_primary_postgresql_create_dynamic_variables, setup_db_primary_postgresql_copy_patroni_primary

@@ -315,3 +315,18 @@
     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_run_pgdump_py_cron_standby
 
 
+# # =================================================
+# # Блок с задачами patroni для Standby PostgreSQL db
+# # =================================================
+
+# # Копирование файла конфигурации patroni_standby.yml
+# - name: Step 19 - Copy patroni_standby.yml to /etc/patroni_standby.yml
+#   become: true
+#   become_user: root
+#   copy:
+#     src: "{{ role_path }}/files/patroni_standby.yml"
+#     dest: /etc/patroni_standby.yml
+#   when: db_hosts.standby in inventory_hostname
+#   tags:
+#     - setup_db_standby_postgresql_copy_patroni_standby
+#     - setup_db_standby_postgresql_add_secret_variables, setup_db_standby_postgresql_create_dynamic_variables, setup_db_standby_postgresql_copy_patroni_standby

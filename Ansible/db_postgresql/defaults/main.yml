@@ -8,4 +8,4 @@ target_groups:
 db_hosts:
   primary: vm-6-primary-db
   standby: vm-7-standby-db
-  zabbix-serer: vm-1-monitoring-system
+  zabbix_server: vm-1-monitoring-system
