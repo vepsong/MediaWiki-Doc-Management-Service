@@ -1,3 +1,14 @@
-site_name: My wiki docs
+site_name: Wikimedia project documentation 
+nav:
+  - Home: index.md
+  - About: about.md
 theme:
   name: readthedocs
+extra:
+  alternate:
+    - name: English
+      link: /en/ # (1)!
+      lang: en
+    - name: Deutsch
+      link: /de/
+      lang: de

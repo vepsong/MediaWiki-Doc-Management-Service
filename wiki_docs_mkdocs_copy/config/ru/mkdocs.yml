@@ -1,0 +1,34 @@
+site_name: Wikimedia проектная документация
+docs_dir: '../../docs/ru'  
+site_dir: '../../generated/ru'
+
+nav:
+  - Home: index.md
+  - About: about.md
+
+
+theme:
+  name: readthedocs
+  custom_dir: '../../overrides/' 
+  favicon: assets/images/favicon.ico  
+  language: ru 
+
+extra:                                              # Language Selection
+  alternate:  
+
+    # Switch to Russian
+    - name: Russian
+      link: /ru/
+      lang: ru
+      
+      # Switch to English
+    - name: English
+      link: /en/
+      lang: en
+
+
+
+
+plugins:
+  - search:                                         
+      lang: ru                                      # Set language for search
