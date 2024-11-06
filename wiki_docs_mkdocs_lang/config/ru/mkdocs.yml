@@ -26,9 +26,6 @@ extra:                                              # Language Selection
       link: /en/
       lang: en
 
-
-
-
 plugins:
   - search:                                         
       lang: ru                                      # Set language for search
