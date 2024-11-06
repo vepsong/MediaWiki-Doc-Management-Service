@@ -7,8 +7,5 @@ theme:
 extra:
   alternate:
     - name: English
-      link: /en/ # (1)!
+      link: /en/
       lang: en
-    - name: Deutsch
-      link: /de/
-      lang: de

@@ -1,17 +1,10 @@
-# Welcome to MkDocs
+# Запуск корпоративного сервиса ведения документации с помощью MediaWiki
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Яндекс Практикум | Курс "Системный Администратор" | Спринт-13  
 
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## Техническое описание проекта
+  - Проект предусматривает развертывание корпоративного сервиса ведения документации с использованием приложения MediaWiki. 
+  - Система должна функционировать на ОС Ubuntu 22.04 и поддерживать работу с PostgreSQL для хранения данных.  
+  - Основной задачей является обеспечение доступности сервиса для начальной нагрузки в 40 пользователей через веб-интерфейс, использующий HTTP-протокол. 
+  - Для балансировки нагрузки будет использоваться Nginx, а для мониторинга инфраструктуры — Zabbix.  
+  - Также требуется обеспечить регулярное резервное копирование базы данных с использованием pg_dump.
