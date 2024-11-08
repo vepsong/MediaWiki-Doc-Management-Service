@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>2. App deployment schema - Wikimedia project documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "2. App deployment schema";
+        var mkdocs_page_input_path = "2. app_deploy_schema_v4.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Wikimedia project documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../1.%20index/">1. Introduction</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">2. App deployment schema</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#components">Components</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#visualisation">Visualisation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#download-the-drawio-file">Download the .drawio-file</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Manual deployment</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3.1. Service VM Docker Configuration</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Wikimedia project documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">2. App deployment schema</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!-- ### App deployment schema -->
+<h1 id="application-deployment-schema">Application deployment schema</h1>
+<h3 id="components">Components</h3>
+<ol>
+<li>
+<p><strong>VM-0</strong> — Service <span class="tooltip" onclick="showTooltip(event)">VM<span class="tooltip-text">Vitrual Machine</span></span> (Administration and Deployment)<br />
+   Stack: Alpine Linux v3.20, Docker, GitHub, Terraform, Ansible, Python.  </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The administrator uses Docker containers and a GitHub repository for the automated deployment, management, and execution of Python scripts on a service VM.  </p>
+<p>The VM serves as an entry point for managing the entire system.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-1<span class="tooltip-text">vhdd-1-monitoring-system-db</span></span></strong> — Monitoring System (Zabbix + PostgreSQL) + External HDD drive.<br />
+   Stack: Ubuntu 22.04, Zabbix-Server, PostgreSQL.  </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The monitoring system is responsible for overseeing the state of all infrastructure components.
+The Zabbix server collects and analyzes data from the servers, while PostgreSQL stores the monitoring information.
+Data is written to a mounted hard disk <span class="tooltip" onclick="showTooltip(event)">(VHDD-1)<span class="tooltip-text">vhdd-1-monitoring-system-db</span></span> to prevent data loss in case of a system failure.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span></strong> — Proxy Server. User Requests to MediaWiki Servers<br />
+   Stack: Ubuntu 22.04, Nginx, PostgreSQL.  </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The Nginx proxy server distributes the load between the MediaWiki servers (<span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span> and <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span>) to ensure the smooth operation of the service.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span></strong> — MediaWiki servers<br />
+   Stack: Ubuntu 22.04, MediaWiki, Zabbix-agent.  </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The MediaWiki servers handle user requests and read from and write data to the PostgreSQL database.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span></strong> — Proxy Server. MediaWiki Requests to PostgreSQL db<br />
+   Stack: Ubuntu 22.04, HAProxy, Zabbix-agent. </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The HAProxy proxy server is responsible for distributing requests from the MediaWiki servers between the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> and <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQL<span class="tooltip-text">vm-7-standby-db</span></span> databases.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1-primary-db</span></span></strong> — Primary PostgreSQL db + External SSD-drive<br />
+   Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.  </p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> handles read/write requests coming through HAProxy. The data is stored on a dedicated <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1-primary-db</span></span> to enhance the speed of data processing.
+</details></p>
+</li>
+<li>
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span></strong> — Standby PostgreSQL db. Replication from the Primary db and <code>pg_dump</code> backup + 2 External HDD drives (replication data storage and backups)<br />
+   Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.</p>
+<p><details>
+<summary>Show description</summary></p>
+<p>The <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQL db<span class="tooltip-text">vm-7-standby-db</span></span> performs asynchronous data replication from the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> to <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span>.<br />
+This allows for a quick failover in case the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> fails.</p>
+<p>The <code>pg_dump</code> utility is used for backups on <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span>.<br />
+This enables restoring the database to a specific point in time, which can be useful if the database has been compromised by malware that has already replicated to both databases.
+</details></p>
+</li>
+</ol>
+<h3 id="visualisation">Visualisation</h3>
+<p><img src="/assets/images/2. app_deploy_schema_v4.svg" alt="Application deployment schema"/></p>
+<h3 id="download-the-drawio-file">Download the .drawio-file</h3>
+<p><a href="/assets/files/2. app_deploy_schema_v4.drawio" download="app_deploy_schema.drawio">Download the .drawio-file</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../1.%20index/" class="btn btn-neutral float-left" title="1. Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../3.1.%20service_vm_docker_setup/" class="btn btn-neutral float-right" title="3.1. Service VM Docker Configuration">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../1.%20index/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../3.1.%20service_vm_docker_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

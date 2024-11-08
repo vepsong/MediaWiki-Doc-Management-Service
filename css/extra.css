@@ -1,0 +1,55 @@
+.tooltip{
+    background: #f8f8f8;
+    border-radius: 4px;
+    box-shadow: inset 1px 0 #b3b3b3, inset 0 1px #b3b3b3, inset -1px 0 #b3b3b3, inset 0 -1px #b3b3b3;
+    cursor: pointer;
+    padding: 0 4px;
+    position: relative;
+    white-space: pre-wrap;
+    padding: 3px;
+}
+
+
+.tooltip-text {
+    visibility: hidden;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 5px 20px rgba(0, 0, 0, .2);
+    padding: 5px;
+    position: absolute;
+    width: max-content;
+    max-width: 250px;
+    white-space: normal; /* Allows wrapping to multiple lines */
+    word-wrap: break-word; /* Ensures long words are wrapped */
+    z-index: 1;
+    bottom: 125%;
+    font-size: initial;
+}
+
+
+.tooltip:hover .tooltip-text,
+.tooltip:focus .tooltip-text,
+.tooltip:active .tooltip-text {
+    visibility: visible;
+}
+
+
+details {
+    padding: 10px; 
+    border: 5px solid #f7f7f7;
+    border-radius: 3px;
+    background-color: #e4eaef;
+  }
+
+
+.rst-content pre code {
+    background-color: #dadada; /* Light gray background */
+    border-radius: 5px;        /* Rounded corners */
+    padding: 10px;             /* Padding around code */
+    white-space: pre-line;
+    line-height: normal;
+}
+
+.hljs-comment {
+    color: #6A7322;
+}
