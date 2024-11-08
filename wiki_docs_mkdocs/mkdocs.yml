@@ -1,4 +1,5 @@
 site_name: Wikimedia project documentation 
+site_url: https://vepsong.github.io/YP-sp13_MediaWiki/
 nav:
   - 1. Introduction: 1. index.md
   - 2. App deployment schema: 2. app_deploy_schema_v4.md
