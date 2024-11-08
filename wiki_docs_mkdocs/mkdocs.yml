@@ -1,11 +1,24 @@
 site_name: Wikimedia project documentation 
 nav:
-  - Home: index.md
-  - About: about.md
+  - 1. Introduction: 1. index.md
+  - 2. App deployment schema: 2. app_deploy_schema_v4.md
+  - 3. Manual deployment:
+      - 3.1. Service VM Docker Configuration: 3.1. service_vm_docker_setup.md
 theme:
   name: readthedocs
+  highlightjs: true
+  hljs_languages:
+      - yaml
+      - rust
+      - bash
+
 extra:
   alternate:
     - name: English
       link: /en/
       lang: en
+extra_css:
+    - css/extra.css
+plugins:
+  - search
+  - macros
