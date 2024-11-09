@@ -9,6 +9,7 @@ root.code-workspace
 .env.*.local
 myenv
 venv/
+pyvenv/
 
 # Файлы с секретами
 yc_meta.json
