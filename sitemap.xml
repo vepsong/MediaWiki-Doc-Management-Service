@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://vepsong.github.io/YP-sp13_MediaWiki/</loc>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/</loc>
          <lastmod>2024-11-09</lastmod>
     </url>
     <url>
-         <loc>https://vepsong.github.io/YP-sp13_MediaWiki/2.%20app_deploy_schema_v4/</loc>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/2.%20app_deploy_schema_v4/</loc>
          <lastmod>2024-11-09</lastmod>
     </url>
     <url>
-         <loc>https://vepsong.github.io/YP-sp13_MediaWiki/3.1.%20service_vm_docker_setup/</loc>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/3.1.%20service_vm_docker_setup/</loc>
          <lastmod>2024-11-09</lastmod>
     </url>
 </urlset>
