@@ -7,6 +7,8 @@ nav:
       - 2. App deployment schema: 2. app_deploy_schema_v4.md
   - Manual deployment:
       - 3. Service VM Docker Configuration: 3.1. service_vm_docker_setup.md
+      - 4. Yandex Cloud Setup: 4.1. yandex_cloud_setup.md
+
 theme:
   name: readthedocs
   highlightjs: true
