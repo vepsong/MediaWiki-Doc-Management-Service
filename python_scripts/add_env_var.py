@@ -1,6 +1,5 @@
 from utils import get_git_repo_info, find_directory_by_pattern, run_command, add_env_variable_to_bashrc
 
-
 # Шаг 1. Добавление данных папки git-репозитория в переменные окружения (~/.bashrc)
 def configure_bashrc_repo():
     """Добавление данных папки git-репозитория в переменные окружения (~/.bashrc)."""

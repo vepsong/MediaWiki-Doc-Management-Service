@@ -1,7 +1,7 @@
 from utils import run_command, load_and_check_env_vars, load_json_data
 
 # Имена переменных, которые нужно загрузить
-env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
+env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH"]
 
 # Проверяем наличие переменных окружения и добавляем их в словарь
 env_var_dic = load_and_check_env_vars(env_vars)

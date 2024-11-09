@@ -17,7 +17,7 @@ def generate_files(path_to_script):
 if __name__ == '__main__':
              
     # Список названий python-скриптов 
-    list_python_scripts_names = ["add_env_var.py","yc_service_account_configuration.py", "terraform_init.py", "update_terraform_meta.py"]
+    list_python_scripts_names = ["yc_service_account_configuration.py", "terraform_init.py", "update_terraform_meta.py"]
 
     for name in list_python_scripts_names:
         script_path = f'{env_var_dic["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]}/{name}'
