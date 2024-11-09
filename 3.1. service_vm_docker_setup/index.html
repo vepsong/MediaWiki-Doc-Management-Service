@@ -56,6 +56,8 @@
     <ul class="current">
     </ul>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../4.1.%20yandex_cloud_setup/">4. Yandex Cloud Setup</a>
+                  </li>
               </ul>
       </div>
     </div>
@@ -89,7 +91,7 @@
 <li>Install <a href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker">VScode Docker</a> extension</li>
 <li>
 <p>Create Dockerfile (<a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">GitHub</a>)</p>
-<p><details>
+<p><details class="external_code_rendering">
 <summary>Show Dockerfile</summary></p>
 <pre><code> # Using the Alpine Linux base image
  FROM alpine:latest
@@ -158,105 +160,29 @@
 <p><img src="../assets/images/3.1. service_vm_docker_setup.gif" alt="Attaching a Docker container to the VSCode workspace"/></p>
 </li>
 <li>
-<p>Clone the <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Git repository</a> to the VM (into the ~ directory).</p>
+<p>Clone the <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Git repository</a> to the <span class="tooltip" onclick="showTooltip(event)">VM-0<span class="tooltip-text">vm-0-service-virtual-machine</span></span> (into the <code>~</code> directory).</p>
+</li>
+<li>
+<p>Create a Python virtual environment in <code>~/repository_name</code> on the <span class="tooltip" onclick="showTooltip(event)">VM-0<span class="tooltip-text">vm-0-service-virtual-machine</span></span></p>
+<pre><code> # Create a Python virtual environment
+ python3 -m venv pyvenv
+ # Activate a Python virtual environment
+ source pyvenv/bin/activate
+ # Upgrade pip
+ python3 -m pip install --upgrade pip
+ # Install requirements
+ pip install -r python_scripts/requirements.txt
+ # Commit changes when adding additional pip packages
+ pip freeze &gt; python_scripts/requirements.txt
+</code></pre>
 </li>
 </ol>
-<!-- ```Dockerfile
-# Using the Alpine Linux base image
-FROM alpine:latest
-
-# Updating packages and installing dependencies
-RUN apk update && apk add --no-cache \
-    bash \
-    bash-completion \
-    curl \
-    wget \
-    git \
-    unzip \
-    python3 \
-    py3-pip \
-    gnupg \
-    ca-certificates \
-    sudo \
-    openssh \
-    sshpass \
-    ansible  
-
-# Generating SSH keys
-RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
-
-# Installing Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip && \
-    unzip terraform_1.5.7_linux_amd64.zip && \
-    mv terraform /usr/local/bin/ && \
-    rm terraform_1.5.7_linux_amd64.zip
-
-# Installing Yandex Cloud CLI
-RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-
-# Copying Yandex Cloud CLI binary files to /usr/bin/
-RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
-
-# Activating bash-completion
-RUN echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
-
-# Setting bash as the default shell.
-CMD ["/bin/bash"]
-``` -->
-
-<!-- <details>
-<summary>Show Dockerfile</summary>
-
-
-<pre><code class="language-Dockerfile"># Using the Alpine Linux base image
-FROM alpine:latest
-
-# Updating packages and installing dependencies
-RUN apk update &amp;&amp; apk add --no-cache \
-    bash \
-    bash-completion \
-    curl \
-    wget \
-    git \
-    unzip \
-    python3 \
-    py3-pip \
-    gnupg \
-    ca-certificates \
-    sudo \
-    openssh \
-    sshpass \
-    ansible  
-
-# Generating SSH keys
-RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N &quot;&quot;
-
-# Installing Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip &amp;&amp; \
-    unzip terraform_1.5.7_linux_amd64.zip &amp;&amp; \
-    mv terraform /usr/local/bin/ &amp;&amp; \
-    rm terraform_1.5.7_linux_amd64.zip
-
-# Installing Yandex Cloud CLI
-RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-
-# Copying Yandex Cloud CLI binary files to /usr/bin/
-RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
-
-# Activating bash-completion
-RUN echo &quot;source /usr/share/bash-completion/bash_completion&quot; &gt;&gt; ~/.bashrc
-
-# Setting bash as the default shell.
-CMD [&quot;/bin/bash&quot;]
-</code></pre>
-
-
-</details> -->
               
             </div>
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
           <a href="../2.%20app_deploy_schema_v4/" class="btn btn-neutral float-left" title="2. App deployment schema"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+          <a href="../4.1.%20yandex_cloud_setup/" class="btn btn-neutral float-right" title="4. Yandex Cloud Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
       </div>
   
     <hr/>
@@ -280,6 +206,8 @@ CMD [&quot;/bin/bash&quot;]
     
       <span><a href="../2.%20app_deploy_schema_v4/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../4.1.%20yandex_cloud_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

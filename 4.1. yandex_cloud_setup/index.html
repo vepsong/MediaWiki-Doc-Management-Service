@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_setup/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>4. Yandex Cloud Setup - MediaWiki Doc Management Service</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "4. Yandex Cloud Setup";
+        var mkdocs_page_input_path = "4.1. yandex_cloud_setup.md";
+        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_setup/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> MediaWiki Doc Management Service
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">1. Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../2.%20app_deploy_schema_v4/">2. App deployment schema</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Manual deployment</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3. Service VM Docker Configuration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">4. Yandex Cloud Setup</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">MediaWiki Doc Management Service</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Manual deployment</li>
+      <li class="breadcrumb-item active">4. Yandex Cloud Setup</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!-- # Yandex Cloud Setup-->
+
+<h3 id="yandex-cloud-setup">Yandex Cloud Setup</h3>
+<ol>
+<li>
+<p>Create <strong>yc_meta.json</strong> file with auth data in <code>~/repository_name/credentials</code> directory<br />
+<a href="https://yandex.cloud/en/docs/iam/operations/sa/get-id">service_account_id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/cloud/get-id">cloud-id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/folder/get-id">folder-id</a>, <a href="https://yandex.cloud/en/docs/cli/cli-ref/managed-yc/config/profile/">profile-name</a></p>
+<p><details class="external_code_rendering">
+<summary>Show yc_meta_EXAMPLE.json</summary></p>
+<pre><code> {
+     "service_account_id": "sadsdsdsd...",
+     "cloud-id": "asdsadasd.....",
+     "folder-id": "dadsad.....",
+     "profile-name": "test_name"
+ }
+</code></pre>
+</details>
+</li>
+<li>
+<p>Create <a href="https://yandex.cloud/en/docs/ydb/terraform/install"><strong>.terraformrc</strong></a> provider configuration file in <code>~/</code> directory    </p>
+</li>
+<li>
+<p>Create a <a href="https://yandex.cloud/en/docs/cli/quickstart#initialize">Yandex Cloud CLI profile</a> (if not already created)</p>
+</li>
+</ol>
+              
+            </div>
+          </div><footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+          <a href="../3.1.%20service_vm_docker_setup/" class="btn btn-neutral float-left" title="3. Service VM Docker Configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      </div>
+  
+    <hr/>
+  
+    <div role="contentinfo">
+        <p>Copyright &copy; 2024 <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Dmitry Kirsanov</a></p>
+    </div>
+  
+  </footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../3.1.%20service_vm_docker_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
