@@ -22,7 +22,7 @@ NGINX_CONF_FILE = os.getenv("NGINX_CONF_FILE")
 
 
 def get_rsync_mediawiki_folder():
-    """rsync удаленной директории на локальную ВМ."""
+    """rsync of a remote directory to the local VM."""
     try:
         command = [
             'rsync',
@@ -33,20 +33,20 @@ def get_rsync_mediawiki_folder():
             MEDIAWIKI_DESTINATION_PATH
         ]
         
-        # Выполнение команды rsync
+        # Executing the rsync command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Вывод результатов
-        print("Результат синхронизации:")
+        # Result output
+        print("Synchronization result:")
         print(result.stdout.decode('utf-8'))
 
     except subprocess.CalledProcessError as e:
-        print("Ошибка при синхронизации:")
+        print("Error during synchronization:")
         print(e.stderr.decode('utf-8'))
 
 
 def get_nginx_conf_file():
-    """rsync удаленной директории на локальную ВМ."""
+    """rsync of a remote directory to the local VM."""
     try:
         command = [
             'rsync',
@@ -57,21 +57,21 @@ def get_nginx_conf_file():
             '/etc/nginx/sites-available/'
         ]
         
-        # Выполнение команды rsync
+        # Executing the rsync command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Вывод результатов
-        print("Результат синхронизации:")
+        # Result output
+        print("Synchronization result:")
         print(result.stdout.decode('utf-8'))
 
     except subprocess.CalledProcessError as e:
-        print("Ошибка при синхронизации:")
+        print("Error during synchronization:")
         print(e.stderr.decode('utf-8'))
 
 
 
-def nginx_synlink_creation():
-    """Создание символической ссылки на конфиг nginx в /etc/nginx/sites-available/."""
+def nginx_symlink_creation():
+    """Create a symlink for the NGINX configuration file in /etc/nginx/sites-available/<nginx_conf_file_name>."""
     try:
         symlink_command = [
             'ln',
@@ -80,15 +80,15 @@ def nginx_synlink_creation():
             f"/etc/nginx/sites-enabled/{NGINX_CONF_FILE}"
         ]
         
-        # Выполнение symlink_command
+        # Symlink_command execution
         symlink_result  = subprocess.run(symlink_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Вывод результатов создания symlink
-        print("Символическая ссылка создана успешно:")
+        # Symlink creation results output
+        print("Symlink created successfully:")
         print(symlink_result.stdout.decode('utf-8'))
 
     except subprocess.CalledProcessError as e:
-        print("Ошибка при создании symlink:")
+        print("Error when creating symlink:")
         print(e.stderr.decode('utf-8'))
 
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         print(f"rsync nginx conf file was successfully ended: {NOW}")
 
         print(f"nginx symlink conf file started: {NOW}")
-        nginx_synlink_creation()
+        nginx_symlink_creation()
         print(f"nginx symlink conf file was successfully ended: {NOW}")
 
 

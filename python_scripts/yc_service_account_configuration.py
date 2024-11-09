@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # Получение данных из "yc_meta.json"
     yc_meta_file_data = load_json_data(yc_meta_file_path)
-    # Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud (для работы с Terraform)
+    # Создание файла с данными аутентификации сервисного аккаунта Yandex Cloud
     create_service_yc_account_ssh_key(yc_meta_file_data, yc_meta_key_file_path)
     # Создание локального профиля yc
     create_yc_profile(yc_meta_file_data)

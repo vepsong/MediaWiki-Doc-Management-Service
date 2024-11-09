@@ -1,9 +1,9 @@
 from utils import get_git_repo_info, find_directory_by_pattern, run_command, add_env_variable_to_bashrc
 
-# Шаг 1. Добавление данных папки git-репозитория в переменные окружения (~/.bashrc)
+# Step 1. Add the data from the Git repository folder to the environment variables (~/.bashrc)
 def configure_bashrc_repo():
-    """Добавление данных папки git-репозитория в переменные окружения (~/.bashrc)."""
-    # Получаем имя репозитория
+    """Add the data from the Git repository folder to the environment variables (~/.bashrc)."""
+    # Get repository name
     repo_name, repo_relative_path, repo_path = get_git_repo_info()
 
     if repo_name:
@@ -15,11 +15,11 @@ def configure_bashrc_repo():
         
     return repo_name, repo_relative_path, repo_path
 
-# Шаг 2. Добавление данных папки Terraform в переменные окружения (~/.bashrc)
+# Step 2. Add the data from the Terraform folder to the environment variables (~/.bashrc)
 def configure_bashrc_terraform(repo_path):
-    """Добавление данных папки Terraform в переменные окружения (~/.bashrc)."""
+    """Add the data from the Terraform folder to the environment variables (~/.bashrc)."""
 
-    # Получаем путь к папке Terraform
+    # Get path to Terraform folder
     terraform_folder_name, terraform_folder_relative_path, \
         terraform_folder_absolute_path = find_directory_by_pattern(
             repo_path, file_extension='.tf'
@@ -32,12 +32,11 @@ def configure_bashrc_terraform(repo_path):
     if terraform_folder_absolute_path:
         add_env_variable_to_bashrc('TERRAFORM_ABSOLUTE_PATH', terraform_folder_absolute_path)
 
-
-# Шаг 3. Добавление данных папки Ansible в переменные окружения (~/.bashrc)
+# Step 3. Add the data from the Ansible folder to the environment variables (~/.bashrc)
 def configure_bashrc_ansible(repo_path):
-    """Добавление данных папки Ansible в переменные окружения (~/.bashrc)."""
+    """Add the data from the Ansible folder to the environment variables (~/.bashrc)."""
 
-    # Получаем путь к папке Ansible
+    # Get path to Ansible folder
     ansible_dir_name, ansible_dir_relative_path, \
         ansible_dir_absolute_path = find_directory_by_pattern(
             repo_path, pattern='Ansible'
@@ -50,12 +49,11 @@ def configure_bashrc_ansible(repo_path):
     if ansible_dir_absolute_path:
         add_env_variable_to_bashrc('ANSIBLE_DIR_ABSOLUTE_PATH', ansible_dir_absolute_path)
 
-
-# Шаг 4. Добавление данных папки python_scripts в переменные окружения (~/.bashrc)
+# Step 4. Add the data from the python_scripts folder to the environment variables (~/.bashrc)
 def configure_bashrc_python_scripts(repo_path):
-    """Добавление данных папки python_scripts в переменные окружения (~/.bashrc)."""
+    """Add the data from the python_scripts folder to the environment variables (~/.bashrc)."""
 
-    # Получаем путь к папке python_scripts
+    # Get path to python_scripts folder
     python_scripts_dir_name, \
         python_scripts_dir_relative_path, \
         python_scripts_dir_absolute_path = \
@@ -69,11 +67,11 @@ def configure_bashrc_python_scripts(repo_path):
         add_env_variable_to_bashrc('PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH', python_scripts_dir_absolute_path)
 
 
-# Шаг 5. Добавление данных папки credentials в переменные окружения (~/.bashrc)
+# Step 5. Add the data from the credentials folder to the environment variables (~/.bashrc)
 def configure_bashrc_credentials(repo_path):
-    """Добавление данных папки credentials в переменные окружения (~/.bashrc)."""
+    """Add the data from the credentials folder to the environment variables (~/.bashrc)."""
 
-    # Получаем путь к папке credentials
+    # Get path to credentials folder
     credentials_dir_name, credentials_dir_relative_path, \
         credentials_dir_absolute_path = \
             find_directory_by_pattern(repo_path, pattern='credentials')
@@ -84,34 +82,33 @@ def configure_bashrc_credentials(repo_path):
         add_env_variable_to_bashrc('CREDENTIALS_DIR_RELATIVE_PATH', credentials_dir_relative_path)
     if credentials_dir_absolute_path:
         add_env_variable_to_bashrc('CREDENTIALS_DIR_ABSOLUTE_PATH', credentials_dir_absolute_path)
-        # Добавляем путь до terraform_meta.txt
+        # Adding path to terraform_meta.txt
         add_env_variable_to_bashrc('TF_VAR_TERRAFORM_META_DIR_ABSOLUTE_PATH', f'{credentials_dir_absolute_path}/{terraform_meta_file_name}')
 
-
-# Шаг 6. Добавление данных Yandex Cloud в переменные окружения (~/.bashrc)
+# Step 6. Add the data from the cYandex Cloud  to the environment variables (~/.bashrc)
 def configure_bashrc_yandex_cloud():
-    """Добавление данных Yandex Cloud в переменные окружения (~/.bashrc)."""
+    """Add the data from the cYandex Cloud  to the environment variables (~/.bashrc)."""
     add_env_variable_to_bashrc('YC_TOKEN', '$(yc iam create-token)')
     add_env_variable_to_bashrc('YC_CLOUD_ID', '$(yc config get cloud-id)')
     add_env_variable_to_bashrc('YC_FOLDER_ID', '$(yc config get folder-id)')
 
 
 
-# Шаг 7. Применение изменений в переменных окружения (~/.bashrc)
+# Step 7. Apply the changes to the environment variables (~/.bashrc)
 def apply_changes():
-    """Применение изменений в переменных окружения (~/.bashrc)."""
+    """Apply the changes to the environment variables (~/.bashrc)."""
 
     command = ['bash', '-c', f"source ~/.bashrc"]
     run_command(command)
 
 
-# Шаг 8. Проверка настроек после перезагрузки терминала
+# Step 8. Verify the settings after restarting the terminal
 def check_env_variables():
-    print("Для проверки переменных окружения перезапусти терминал и введи в командную строку следующие команды:")
-    print("echo $<ИМЯ ПЕРЕМЕННОЙ ОКРУЖЕНИЯ>")
+    print("To verify the environment variables, restart the terminal and enter the following commands in the command line:")
+    print("echo $<ENVIRONMENT VARIABLE NAME>")
 
 
-# Выполнение всех шагов
+# Executing all steps
 if __name__ == "__main__":
 
     terraform_meta_file_name = "terraform_meta.txt"
