@@ -90,9 +90,12 @@
                 <!-- ### App deployment schema -->
 <h1 id="application-deployment-schema">Application deployment schema</h1>
 <h3 id="components">Components</h3>
+<!-- 1. **VM-0** — Service <span class="tooltip" onclick="showTooltip(event)">VM<span class="tooltip-text">Vitrual Machine</span></span> (Administration and Deployment)  
+   Stack: Alpine Linux v3.20, Docker, GitHub, Terraform, Ansible, Python.   -->
+
 <ol>
 <li>
-<p><strong>VM-0</strong> — Service <span class="tooltip" onclick="showTooltip(event)">VM<span class="tooltip-text">Vitrual Machine</span></span> (Administration and Deployment)<br />
+<p><strong>VM-0</strong> — Service <span class="tooltip" onclick="showTooltip(event)">VM<span class="tooltip-text">Virtual Machine</span></span> (Administration and Deployment)<br />
    Stack: Alpine Linux v3.20, Docker, GitHub, Terraform, Ansible, Python.  </p>
 <p><details>
 <summary>Show description</summary></p>
@@ -131,7 +134,7 @@ Data is written to a mounted hard disk <span class="tooltip" onclick="showToolti
    Stack: Ubuntu 22.04, HAProxy, Zabbix-agent. </p>
 <p><details>
 <summary>Show description</summary></p>
-<p>The HAProxy proxy server is responsible for distributing requests from the MediaWiki servers between the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> and <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQL<span class="tooltip-text">vm-7-standby-db</span></span> databases.
+<p>The HAProxy proxy server is responsible for distributing requests from the MediaWiki servers between the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> and <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQLL<span class="tooltip-text">vm-7-standby-db</span></span> databases.
 </details></p>
 </li>
 <li>
@@ -139,11 +142,12 @@ Data is written to a mounted hard disk <span class="tooltip" onclick="showToolti
    Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.  </p>
 <p><details>
 <summary>Show description</summary></p>
-<p>The <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> handles read/write requests coming through HAProxy. The data is stored on a dedicated <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1-primary-db</span></span> to enhance the speed of data processing.
+<p>The <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> handles read/write requests coming through <span class="tooltip" onclick="showTooltip(event)">HAProxy proxy server<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span>. The data is stored on a dedicated <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1-primary-db</span></span> to enhance the speed of data processing.
 </details></p>
 </li>
 <li>
-<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span></strong> — Standby PostgreSQL db. Replication from the Primary db and <code>pg_dump</code> backup + 2 External HDD drives (replication data storage and backups)<br />
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span></strong> — Standby PostgreSQL db.<br />
+Replication from the Primary db and <code>pg_dump</code> backup + 2 External HDD drives (replication data storage and backups)<br />
    Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.</p>
 <p><details>
 <summary>Show description</summary></p>
@@ -169,8 +173,7 @@ This enables restoring the database to a specific point in time, which can be us
     <hr/>
   
     <div role="contentinfo">
-      <!-- Copyright etc -->
-        <p>Copyright &copy; 2024 <a href="https://vepsong.github.io/YP-sp13_MediaWiki/">Dmitrii Kirsanov</a></p>
+        <p>Copyright &copy; 2024 <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Dmitry Kirsanov</a></p>
     </div>
   
   </footer>
