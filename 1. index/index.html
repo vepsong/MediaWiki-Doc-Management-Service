@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/YP-sp13_MediaWiki/1.%20index/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://<slug>/<slug>/1.%20index/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>1. Introduction - Wikimedia project documentation</title>
+    <title>1. Introduction - Wikimedia Doc Management Service</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -15,7 +15,7 @@
         // Current page data
         var mkdocs_page_name = "1. Introduction";
         var mkdocs_page_input_path = "1. index.md";
-        var mkdocs_page_url = "/YP-sp13_MediaWiki/1.%20index/";
+        var mkdocs_page_url = "/\u003cslug\u003e/1.%20index/";
       </script>
     
     <!--[if lt IE 9]>
@@ -34,7 +34,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href=".." class="icon icon-home"> Wikimedia project documentation
+          <a href=".." class="icon icon-home"> Wikimedia Doc Management Service
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -43,8 +43,9 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting started</span></p>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">1. Introduction</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">1. Introduction</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#initial-project-term-of-reference">Initial Project Term of Reference</a>
     </li>
@@ -59,15 +60,13 @@
         </ul>
     </li>
     </ul>
-                </li>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../2.%20app_deploy_schema_v4/">2. App deployment schema</a>
+                  </li>
               </ul>
+              <p class="caption"><span class="caption-text">Manual deployment</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../2.%20app_deploy_schema_v4/">2. App deployment schema</a>
-                </li>
-              </ul>
-              <p class="caption"><span class="caption-text">3. Manual deployment</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3.1. Service VM Docker Configuration</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3. Service VM Docker Configuration</a>
                   </li>
               </ul>
       </div>
@@ -77,13 +76,14 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="..">Wikimedia project documentation</a>
+          <a href="..">Wikimedia Doc Management Service</a>
         
       </nav>
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Getting started</li>
       <li class="breadcrumb-item active">1. Introduction</li>
     <li class="wy-breadcrumbs-aside">
     </li>
@@ -108,7 +108,7 @@
 <p>Development of a deployment scheme for the corporate documentation service based on MediaWiki.<br />
 The scheme must include all key components (servers, databases, load balancers, and auxiliary services) and describe their interactions.</p>
 <h4 id="infrastructure-deployment">Infrastructure Deployment</h4>
-<p>Installation and configuration of MediaWiki, PostgreSQL, and auxiliary services (Nginx, Zabbix, Zabbix, etc.).</p>
+<p>Installation and configuration of MediaWiki, PostgreSQL, and auxiliary services (Nginx, Zabbix, etc.).</p>
 <h4 id="failover-testing">Failover Testing</h4>
 <p>Conducting system failover testing: verifying system functionality after server shutdowns, recovery from backups, and data replication checks.</p>
               
@@ -122,6 +122,7 @@ The scheme must include all key components (servers, databases, load balancers, 
 
   <div role="contentinfo">
     <!-- Copyright etc -->
+      <p>Copyright &copy; 2024 <a href="https://vepsong.github.io/YP-sp13_MediaWiki/">Dmitrii Kirsanov</a></p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
