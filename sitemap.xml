@@ -13,7 +13,15 @@
          <lastmod>2024-11-09</lastmod>
     </url>
     <url>
-         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_setup/</loc>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_cli_and_serv_acc_setup/</loc>
+         <lastmod>2024-11-09</lastmod>
+    </url>
+    <url>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/5.1.%20yandex_cloud_terraform_setup/</loc>
+         <lastmod>2024-11-09</lastmod>
+    </url>
+    <url>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/</loc>
          <lastmod>2024-11-09</lastmod>
     </url>
 </urlset>
