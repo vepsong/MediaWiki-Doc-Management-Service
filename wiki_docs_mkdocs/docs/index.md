@@ -1,6 +1,6 @@
 # Launching a corporate documentation management service using MediaWiki
 
-Dmitrii Kirsanov | [GitHub](https://github.com/vepsong/MediaWiki-Doc-Management-Service)
+{{config.extra.author_name}} | [GitHub]({{ github_link }})
 
 The project involves the deployment of a corporate documentation management service using the [MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) application.
 

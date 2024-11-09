@@ -33,4 +33,7 @@ copyright: Copyright &copy;
 plugins:
   - search
   - macros
+  - include-markdown
 
+markdown_extensions:
+    - pymdownx.snippets:
