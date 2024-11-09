@@ -1,6 +1,6 @@
 # Launching a corporate documentation management service using MediaWiki
 
-Dmitrii Kirsanov | [GitHub](https://github.com/vepsong/YP-sp13_MediaWiki)
+Dmitrii Kirsanov | [GitHub](https://github.com/vepsong/MediaWiki-Doc-Management-Service)
 
 The project involves the deployment of a corporate documentation management service using the [MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) application.
 
@@ -23,7 +23,7 @@ Development of a deployment scheme for the corporate documentation service based
 The scheme must include all key components (servers, databases, load balancers, and auxiliary services) and describe their interactions.
 
 #### Infrastructure Deployment
-Installation and configuration of MediaWiki, PostgreSQL, and auxiliary services (Nginx, Zabbix, Zabbix, etc.).
+Installation and configuration of MediaWiki, PostgreSQL, and auxiliary services (Nginx, Zabbix, etc.).
 
 #### Failover Testing
 Conducting system failover testing: verifying system functionality after server shutdowns, recovery from backups, and data replication checks.

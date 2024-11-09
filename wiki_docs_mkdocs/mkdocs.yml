@@ -1,13 +1,16 @@
-site_name: Wikimedia project documentation 
-site_url: https://vepsong.github.io/YP-sp13_MediaWiki/
+site_name: MediaWiki Doc Management Service
+site_url: https://vepsong.github.io/MediaWiki-Doc-Management-Service/
+
 nav:
-  - 1. Introduction: 1. index.md
-  - 2. App deployment schema: 2. app_deploy_schema_v4.md
-  - 3. Manual deployment:
-      - 3.1. Service VM Docker Configuration: 3.1. service_vm_docker_setup.md
+  - Getting started:
+      - 1. Introduction: index.md
+      - 2. App deployment schema: 2. app_deploy_schema_v4.md
+  - Manual deployment:
+      - 3. Service VM Docker Configuration: 3.1. service_vm_docker_setup.md
 theme:
   name: readthedocs
   highlightjs: true
+  custom_dir: overrides
   hljs_languages:
       - yaml
       - rust
@@ -18,8 +21,16 @@ extra:
     - name: English
       link: /en/
       lang: en
+  github_link: "https://github.com/vepsong/MediaWiki-Doc-Management-Service"
+  production_year: 2024
+  author_name: Dmitry Kirsanov
+
 extra_css:
     - css/extra.css
+
+copyright: Copyright &copy;
+
 plugins:
   - search
   - macros
+
