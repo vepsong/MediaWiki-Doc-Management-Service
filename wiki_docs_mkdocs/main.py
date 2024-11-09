@@ -8,16 +8,21 @@ def define_env(env):
     def price(unit_price, no):
         "Calculate price"
         return unit_price * no
-    
-    # Print all configuration variables for debugging
-    print("Available config variables:")
-    for key in env.config:
-        print(f"{key}: {env.config[key]}")
 
-    # Print all custom variables in env.variables
-    print("Available custom variables:")
-    for key, value in env.variables.items():
-        print(f"{key}: {value}")
+    @env.macro
+    def showTooltip(definition, description):
+        """Generates HTML for a tooltip with customizable text."""
+        return f'<span class="tooltip" onclick="showTooltip(event)">{definition}<span class="tooltip-text">{description}</span></span>'
+    
+    # # Print all configuration variables for debugging
+    # print("Available config variables:")
+    # for key in env.config:
+    #     print(f"{key}: {env.config[key]}")
+
+    # # Print all custom variables in env.variables
+    # print("Available custom variables:")
+    # for key, value in env.variables.items():
+    #     print(f"{key}: {value}")
 
 
 # def on_pre_page_macros(env):

@@ -87,7 +87,53 @@
 <ol>
 <li>Download and Install <a href="https://www.docker.com/products/docker-desktop/" title="Download Docker-desktop">Docker-desktop</a></li>
 <li>Install <a href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker">VScode Docker</a> extension</li>
-<li>Download Dockerfile from <a href="https://github.com/vepsong/YP-sp13_MediaWiki">GitHub</a></li>
+<li>
+<p>Create Dockerfile (<a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">GitHub</a>)</p>
+<p><details>
+<summary>Show Dockerfile</summary></p>
+<pre><code> # Using the Alpine Linux base image
+ FROM alpine:latest
+
+ # Updating packages and installing dependencies
+ RUN apk update &amp;&amp; apk add --no-cache \
+     bash \
+     bash-completion \
+     curl \
+     wget \
+     git \
+     unzip \
+     python3 \
+     py3-pip \
+     gnupg \
+     ca-certificates \
+     sudo \
+     openssh \
+     sshpass \
+     ansible
+
+ # Generating SSH keys
+ RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+
+ # Installing Terraform
+ RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip &amp;&amp; \
+     unzip terraform_1.5.7_linux_amd64.zip &amp;&amp; \
+     mv terraform /usr/local/bin/ &amp;&amp; \
+     rm terraform_1.5.7_linux_amd64.zip
+
+ # Installing Yandex Cloud CLI
+ RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+
+ # Copying Yandex Cloud CLI binary files to /usr/bin/
+ RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
+
+ # Activating bash-completion
+ RUN echo "source /usr/share/bash-completion/bash_completion" &gt;&gt; ~/.bashrc
+
+ # Setting bash as the default shell.
+ CMD ["/bin/bash"]
+</code></pre>
+</details>
+</li>
 <li>
 <p>Running a previously downloaded Dockerfile to create an <a href="https://alpinelinux.org/">Alpine Linux OS</a> image with the required packages and dependencies</p>
 <pre><code> # - docker build - create Docker-image  
@@ -98,7 +144,7 @@
 </code></pre>
 </li>
 <li>
-<p>Docker-container start using previously created Docker-image (<code>"Alpine Linux:latest"</code>)</p>
+<p>Start a Docker-container using the previously created Docker-image (<code>"Alpine Linux:latest"</code>)</p>
 <pre><code> # - --hostname &lt;hostname&gt; - arbitrary VM hostname  
  # - --name &lt;Docker-container name&gt; - arbitrary Docker-container name
  # - it &lt;Docker-image name&gt; - Docker-image name used for Docker-container building
@@ -111,7 +157,101 @@
 <p>Attaching a Docker container to the VSCode workspace for convenient work</p>
 <p><img src="../assets/images/3.1. service_vm_docker_setup.gif" alt="Attaching a Docker container to the VSCode workspace"/></p>
 </li>
+<li>
+<p>Clone the <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Git repository</a> to the VM (into the ~ directory).</p>
+</li>
 </ol>
+<!-- ```Dockerfile
+# Using the Alpine Linux base image
+FROM alpine:latest
+
+# Updating packages and installing dependencies
+RUN apk update && apk add --no-cache \
+    bash \
+    bash-completion \
+    curl \
+    wget \
+    git \
+    unzip \
+    python3 \
+    py3-pip \
+    gnupg \
+    ca-certificates \
+    sudo \
+    openssh \
+    sshpass \
+    ansible  
+
+# Generating SSH keys
+RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+
+# Installing Terraform
+RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip && \
+    unzip terraform_1.5.7_linux_amd64.zip && \
+    mv terraform /usr/local/bin/ && \
+    rm terraform_1.5.7_linux_amd64.zip
+
+# Installing Yandex Cloud CLI
+RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+
+# Copying Yandex Cloud CLI binary files to /usr/bin/
+RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
+
+# Activating bash-completion
+RUN echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
+
+# Setting bash as the default shell.
+CMD ["/bin/bash"]
+``` -->
+
+<!-- <details>
+<summary>Show Dockerfile</summary>
+
+
+<pre><code class="language-Dockerfile"># Using the Alpine Linux base image
+FROM alpine:latest
+
+# Updating packages and installing dependencies
+RUN apk update &amp;&amp; apk add --no-cache \
+    bash \
+    bash-completion \
+    curl \
+    wget \
+    git \
+    unzip \
+    python3 \
+    py3-pip \
+    gnupg \
+    ca-certificates \
+    sudo \
+    openssh \
+    sshpass \
+    ansible  
+
+# Generating SSH keys
+RUN ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N &quot;&quot;
+
+# Installing Terraform
+RUN wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip &amp;&amp; \
+    unzip terraform_1.5.7_linux_amd64.zip &amp;&amp; \
+    mv terraform /usr/local/bin/ &amp;&amp; \
+    rm terraform_1.5.7_linux_amd64.zip
+
+# Installing Yandex Cloud CLI
+RUN curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+
+# Copying Yandex Cloud CLI binary files to /usr/bin/
+RUN cp -r ~/yandex-cloud/bin/* /usr/bin/
+
+# Activating bash-completion
+RUN echo &quot;source /usr/share/bash-completion/bash_completion&quot; &gt;&gt; ~/.bashrc
+
+# Setting bash as the default shell.
+CMD [&quot;/bin/bash&quot;]
+</code></pre>
+
+
+</details> -->
               
             </div>
           </div><footer>
@@ -122,8 +262,7 @@
     <hr/>
   
     <div role="contentinfo">
-      <!-- Copyright etc -->
-        <p>Copyright &copy; 2024 <a href="https://vepsong.github.io/YP-sp13_MediaWiki/">Dmitrii Kirsanov</a></p>
+        <p>Copyright &copy; 2024 <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Dmitry Kirsanov</a></p>
     </div>
   
   </footer>
