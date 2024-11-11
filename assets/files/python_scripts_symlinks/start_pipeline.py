@@ -1,22 +1,22 @@
 from utils import run_command, load_and_check_env_vars
 
-# Имена переменных, которые нужно загрузить
+# Importing environment variables into the script
 env_vars = ["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]
 
-# Проверяем наличие переменных окружения и добавляем их в словарь
+# Checking for the presence of environment variables and adding them to the dictionary
 env_var_dic = load_and_check_env_vars(env_vars)
 
 
-# Шаг 1: Запуск скриптов yc_service_account_configuration.py и terraform_init.py
+# Шаг 1: Running external Python scripts
 def generate_files(path_to_script):
-    """Запуск внешних python-скриптов."""
+    """Running external Python scripts."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
 
 
 if __name__ == '__main__':
              
-    # Список названий python-скриптов 
+    # List of external Python scripts
     list_python_scripts_names = ["yc_service_account_configuration.py", "terraform_init.py", "update_terraform_meta.py"]
 
     for name in list_python_scripts_names:
