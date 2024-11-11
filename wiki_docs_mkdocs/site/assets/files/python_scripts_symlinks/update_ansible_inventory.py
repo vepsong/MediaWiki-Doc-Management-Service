@@ -3,32 +3,32 @@ from data_handler_update_ansible_inventory import create_group_vars, get_vm_info
 from ansible_structure import dynamic_groups
 
 
-# Importing environment variables into the script
+# Имена переменных, которые нужно загрузить
 env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "ANSIBLE_DIR_ABSOLUTE_PATH", \
             "PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
 
-# Checking for the presence of environment variables and adding them to the dictionary
+# Проверяем наличие переменных окружения и добавляем их в словарь
 env_var_dic = load_and_check_env_vars(env_vars)
 
+# Шаг 1: Cинхронизация состояния ресурсов с облачным провайдером
+def terraform_data_refresh(terraform_folder_path):
+    """Cинхронизация состояния ресурсов с облачным провайдером."""
 
-# # Step 1. Terraform data synchronization with a cloud provider
-# def terraform_data_refresh(terraform_folder_path):
-#     """Terraform data synchronization with a cloud provider."""
-
-#     command = ['terraform', 'apply', '-refresh-only']
-#     run_command(command, cwd=terraform_folder_path, capture_output=False)
+    # Выполняем команды перехода в директорию и инициализации Terraform
+    command = ['terraform', 'refresh']
+    run_command(command, cwd=terraform_folder_path, capture_output=False)
 
 
-# Step 1: Running external Python scripts
+# Шаг 2: Запуск скриптов get_terraform_vm_data.py и update_ansible_meta.py
 def generate_files(path_to_script):
-    """Running external Python scripts."""
+    """Запуск внешних python-скриптов."""
     comand = ["python3", path_to_script]
     run_command(comand, capture_output=False)
 
 
-# Step 2: Data creation for inventory.yaml
+# Шаг 3: Создание данных для будущего inventory.yaml
 def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
-    """Data creation for inventory.yaml."""
+    """Создание данных для будущего inventory.yaml."""
     inventory_data = {}
 
     for group_name, subgroups in dynamic_groups.items():
@@ -57,45 +57,45 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
 
 if __name__ == '__main__':
 
-    # Python scripts names
+    # Имена python-скриптов
     ansible_meta_script = "update_ansible_meta.py"
     terraform_vm_data_script = "get_terraform_vm_data.py"
 
-    # Data files names
+    # Имена файлов с данными
     ansible_meta_file = "ansible_meta.json"
     terraform_vm_data_file = "terraform_vm_data.json"
     
-    # Output data file name
+    # Имя файла вывода с данными
     inventory_output_file = "inventory.yaml"
 
-    # Absolute paths to Python scripts
+    # Абсолютные пути к python-скриптам
     ansible_meta_script_path = f'{env_var_dic["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_script}'
     terraform_vm_data_script_path = f'{env_var_dic["PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_script}'
 
-    # Absolute paths to data files
+    # Абсолютные пути к файлам данных
     ansible_meta_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{ansible_meta_file}'
     terraform_vm_data_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{terraform_vm_data_file}'
     terraform_folder_path = env_var_dic["TERRAFORM_ABSOLUTE_PATH"]
 
-    # Absolute paths to output data file
+    # Абсолютный путь к файлу вывода данных
     inventory_output_file_path_ansible =f'{env_var_dic["ANSIBLE_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
     inventory_output_file_path_credentials =f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{inventory_output_file}'
 
-    # # Terraform data synchronization with a cloud provider
-    # terraform_data_refresh(terraform_folder_path)
+    # Cинхронизация состояния ресурсов с облачным провайдером
+    terraform_data_refresh(terraform_folder_path)
     
-    # Running external Python scripts to generate: "ansible_meta.json" and "terraform_vm_data.json"
+    # Запуск python-скриптов для генерации файлов "ansible_meta.json" и "terraform_vm_data.json"
     generate_files(ansible_meta_script_path)
     generate_files(terraform_vm_data_script_path)
 
 
-    # Data loading from JSON files
+    # Загрузка данных из JSON-файлов
     ansible_meta = load_json_data(ansible_meta_file_path)
     terraform_vm_data = load_json_data(terraform_vm_data_file_path)
 
-    # Data creation inventory.yaml
+    # Формирование данных для inventory.yaml
     inventory_data = create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups)
 
-    # save data to inventory.yaml
+    # Запись данных в inventory.yaml
     write_yaml_to_file(inventory_data, inventory_output_file_path_ansible)
     write_yaml_to_file(inventory_data, inventory_output_file_path_credentials)

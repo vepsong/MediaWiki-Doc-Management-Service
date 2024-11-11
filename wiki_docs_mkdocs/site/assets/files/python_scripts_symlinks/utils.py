@@ -4,46 +4,45 @@ import re
 import json
 import yaml
 
-# Retrieve the Git repository name and paths
+# Функция для получения имени репозитория и путей
 def get_git_repo_info():
-    """Retrieve the Git repository name and paths."""
     try:
-        print("Running command to retrieve Git URL...")
+        print("Запуск команды для получения URL репозитория...")
         result = subprocess.run(['git', 'config', '--get', 'remote.origin.url'], capture_output=True, text=True)
         if result.returncode == 0:
             repo_url = result.stdout.strip()
             repo_name = repo_url.split('/')[-1].replace('.git', '')
-            print(f"Git repository name: {repo_name}")
+            print(f"Название репозитория: {repo_name}")
 
-            # Determining paths to the Git repository
+            # Определение путей к репозиторию
             home_dir = os.path.expanduser("~")
-            repo_relative_path = f"~/{repo_name}"  # Relative path to the Git repository, using '~'
-            repo_path = os.path.join(home_dir, repo_name)  # Absolute path to the Git repository
+            repo_relative_path = f"~/{repo_name}"  # Относительный путь с использованием '~'
+            repo_path = os.path.join(home_dir, repo_name)  # Полный путь к репозиторию
 
-            print(f"Relative path to the Git repository: {repo_relative_path}")
-            print(f"Absolute path to the Git repository: {repo_path}")
+            print(f"Относительный путь к репозиторию: {repo_relative_path}")
+            print(f"Полный путь к репозиторию: {repo_path}")
             
             return repo_name, repo_relative_path, repo_path
         else:
-            print("An error occurred while retrieving the Git repository URL")
+            print("Ошибка при получении URL репозитория Git.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Произошла ошибка: {e}")
 
-    # Ask the user to input the Git repository name in case automatic retrieval fails
+    # Запрашиваем ввод имени репозитория вручную, если автоматическое получение не удалось
     while True:
-        manual_repo_name = input("Failed to retrieve the repository name. Would you like to enter the Git repository name manually? (y/n): ").strip().lower()
+        manual_repo_name = input("Не удалось получить название репозитория. Хотите ввести имя вручную? (y/n): ").strip().lower()
         if manual_repo_name == 'y':
-            repo_name = input("Input Git repository name: ").strip()
+            repo_name = input("Введите название репозитория: ").strip()
             if repo_name:
-                print(f"Git repository name: {repo_name}")
+                print(f"Название репозитория: {repo_name}")
 
-                # Determining paths to the Git repository (after manual input)
+                # Определение путей для ручного ввода репозитория
                 home_dir = os.path.expanduser("~")
-                repo_relative_path = f"~/{repo_name}"  # Relative path to the Git repository, using '~' (after manual input)
-                repo_path = os.path.join(home_dir, repo_name)  # Absolute path to the Git repository (after manual input)
+                repo_relative_path = f"~/{repo_name}"  # Относительный путь
+                repo_path = os.path.join(home_dir, repo_name)  # Полный путь
 
-                print(f"Relative path to the Git repository (after manual input): {repo_relative_path}")
-                print(f"Absolute path to the Git repository (after manual input): {repo_path}")
+                print(f"Относительный путь к репозиторию: {repo_relative_path}")
+                print(f"Абсолютный путь к репозиторию: {repo_path}")
                 
                 return repo_name, repo_relative_path, repo_path
             else:

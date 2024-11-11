@@ -1,7 +1,7 @@
-# Auxiliary file for update_ansible_inventory.py
+# Вспомогательный файл для update_ansible_inventory.py
 
 def create_group_vars(ansible_meta):
-    """Creation of group variables from the ansible_meta.json file."""
+    """Создание переменных группы из ansible_meta.json."""
     return {
         "ansible_user": ansible_meta.get("ansible_user"),
         "ansible_password": ansible_meta.get("ansible_password"),
@@ -11,7 +11,7 @@ def create_group_vars(ansible_meta):
 
 
 def get_external_disks_info(vm_name, external_disks, terraform_vm_data):
-    """Retrieving information about external disks for a given VM."""
+    """Получение информации о внешних дисках для заданной VM."""
     disk_info_list = []
     for disk in external_disks:
         if isinstance(disk, dict):
@@ -33,7 +33,7 @@ def get_external_disks_info(vm_name, external_disks, terraform_vm_data):
 
 
 def get_vm_info(vm_name, terraform_vm_data, external_disks):
-    """Retrieving information about the VM, including external disks."""
+    """Получение информации о VM, включая внешние диски."""
     nat_ip = terraform_vm_data["vm_nat_ip"].get(vm_name)
     vm_info = {"ansible_host": nat_ip}
 

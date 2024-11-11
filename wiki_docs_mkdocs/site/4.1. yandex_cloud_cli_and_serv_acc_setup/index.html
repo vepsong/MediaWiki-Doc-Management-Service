@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_setup/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_cli_and_serv_acc_setup/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>4. Yandex Cloud Setup - MediaWiki Doc Management Service</title>
+    <title>4. Yandex Cloud CLI profile and Service Account Setup - MediaWiki Doc Management Service</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,9 +13,9 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "4. Yandex Cloud Setup";
-        var mkdocs_page_input_path = "4.1. yandex_cloud_setup.md";
-        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_setup/";
+        var mkdocs_page_name = "4. Yandex Cloud CLI profile and Service Account Setup";
+        var mkdocs_page_input_path = "4.1. yandex_cloud_cli_and_serv_acc_setup.md";
+        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_cli_and_serv_acc_setup/";
       </script>
     
     <!--[if lt IE 9]>
@@ -50,13 +50,15 @@
                   <li class="toctree-l1"><a class="reference internal" href="../2.%20app_deploy_schema_v4/">2. App deployment schema</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Manual deployment</span></p>
+              <p class="caption"><span class="caption-text">Service VM configuration</span></p>
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3. Service VM Docker Configuration</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">4. Yandex Cloud Setup</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">4. Yandex Cloud CLI profile and Service Account Setup</a>
     <ul class="current">
     </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../5.1.%20yandex_cloud_terraform_setup/">5. Yandex Cloud Terraform Setup</a>
                   </li>
               </ul>
       </div>
@@ -73,8 +75,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Manual deployment</li>
-      <li class="breadcrumb-item active">4. Yandex Cloud Setup</li>
+          <li class="breadcrumb-item">Service VM configuration</li>
+      <li class="breadcrumb-item active">4. Yandex Cloud CLI profile and Service Account Setup</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -83,12 +85,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <!-- # Yandex Cloud Setup-->
-
-<h3 id="yandex-cloud-setup">Yandex Cloud Setup</h3>
+                <h3 id="yandex-cloud-cli-profile-and-service-account-setup">Yandex Cloud CLI profile and Service Account Setup</h3>
 <ol>
 <li>
-<p>Create <strong>yc_meta.json</strong> file with auth data in <code>~/repository_name/credentials</code> directory<br />
+<p>Create <strong>yc_meta.json</strong> file with authentication data in <code>~/repository_name/credentials</code> directory<br />
 <a href="https://yandex.cloud/en/docs/iam/operations/sa/get-id">service_account_id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/cloud/get-id">cloud-id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/folder/get-id">folder-id</a>, <a href="https://yandex.cloud/en/docs/cli/cli-ref/managed-yc/config/profile/">profile-name</a></p>
 <p><details class="external_code_rendering">
 <summary>Show yc_meta_EXAMPLE.json</summary></p>
@@ -102,10 +102,46 @@
 </details>
 </li>
 <li>
-<p>Create <a href="https://yandex.cloud/en/docs/ydb/terraform/install"><strong>.terraformrc</strong></a> provider configuration file in <code>~/</code> directory    </p>
+<p>Create a <a href="https://yandex.cloud/en/docs/cli/quickstart#initialize">Yandex Cloud CLI profile</a> (if not already created)</p>
+<pre><code> # Verify the Yandex Cloud CLI installation and profile configuration
+ yc config list
+</code></pre>
 </li>
 <li>
-<p>Create a <a href="https://yandex.cloud/en/docs/cli/quickstart#initialize">Yandex Cloud CLI profile</a> (if not already created)</p>
+<p>Add environment variables to <span class="tooltip" onclick="showTooltip(event)"><code>~/.bashrc</code><span class="tooltip-text">user-specific configuration file for the Bash shell</span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>add_env_var.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/add_env_var.py</code></span></span>  </p>
+<ul>
+<li><strong>After running the script, you must restart the terminal</strong></li>
+</ul>
+<p><details class="external_code_rendering">
+<summary>Show .bashrc_EXAMPLE</summary></p>
+<pre><code> source /usr/share/bash-completion/bash_completion
+ export REPO_NAME="repository_name"
+ export REPO_RELATIVE_PATH="~/repository_name"
+ export REPO_PATH="/username/repository_name"
+ export TERRAFORM_FOLDER_NAME="Terraform_MediaWiki"
+ export TERRAFORM_RELATIVE_PATH="~/repository_name/Terraform_MediaWiki"
+ export TERRAFORM_ABSOLUTE_PATH="/username/repository_name/Terraform_MediaWiki"
+ export ANSIBLE_DIR_NAME="Ansible"
+ export ANSIBLE_DIR_RELATIVE_PATH="~/repository_name/Ansible"
+ export ANSIBLE_DIR_ABSOLUTE_PATH="/username/repository_name/Ansible"
+ export PYTHON_SCRIPTS_DIR_NAME="python_scripts"
+ export PYTHON_SCRIPTS_DIR_RELATIVE_PATH="~/repository_name/python_scripts"
+ export PYTHON_SCRIPTS_DIR_ABSOLUTE_PATH="/username/repository_name/python_scripts"
+ export CREDENTIALS_DIR_NAME="credentials"
+ export CREDENTIALS_DIR_RELATIVE_PATH="~/repository_name/credentials"
+ export CREDENTIALS_DIR_ABSOLUTE_PATH="/username/repository_name/credentials"
+ export TF_VAR_TERRAFORM_META_DIR_ABSOLUTE_PATH="/username/repository_name/credentials/terraform_meta.txt"
+ export YC_TOKEN="$(yc iam create-token)"
+ export YC_CLOUD_ID="$(yc config get cloud-id)"
+ export YC_FOLDER_ID="$(yc config get folder-id)"
+</code></pre>
+</details>
+</li>
+<li>
+<p>Set up Yandex Cloud service account configuration by running <span class="tooltip" onclick="showTooltip(event)"><strong>yc_service_account_configuration.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/yc_service_account_configuration.py</code></span></span>  </p>
+<ul>
+<li>Create and configure a local Yandex Cloud (yc) profile, and automatically generate the <span class="tooltip" onclick="showTooltip(event)"><strong>yc_meta.json</strong><span class="tooltip-text"><code>~/repository_name/credentials/yc_meta.json</code></span></span> file with authentication data.</li>
+</ul>
 </li>
 </ol>
               
@@ -113,6 +149,7 @@
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
           <a href="../3.1.%20service_vm_docker_setup/" class="btn btn-neutral float-left" title="3. Service VM Docker Configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+          <a href="../5.1.%20yandex_cloud_terraform_setup/" class="btn btn-neutral float-right" title="5. Yandex Cloud Terraform Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
       </div>
   
     <hr/>
@@ -136,6 +173,8 @@
     
       <span><a href="../3.1.%20service_vm_docker_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../5.1.%20yandex_cloud_terraform_setup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

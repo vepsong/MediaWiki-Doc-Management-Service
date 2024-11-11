@@ -1,41 +1,39 @@
-# Импортируем необходимые библиотеки
 import os
-# Импортируем функцию загрузки и проверки необходимых переменных окружения, записи данных в txt-файл
 from utils import load_and_check_env_vars, write_json_to_file
 
-# Имена переменных, которые нужно загрузить
+# Importing environment variables into the script
 env_vars = ["REPO_PATH", "CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
 
-# Проверяем наличие переменных окружения и добавляем их в словарь
+# Checking for the presence of environment variables and adding them to the dictionary
 env_var_dic = load_and_check_env_vars(env_vars)
 
 
-# Шаг 1. Формирование содержимого для файла ansible_meta.json
+# Step 1. Data creation for ansible_meta.json file
 def create_ansible_meta_content():
-    """Создает содержимое для файла ansible_meta.json."""
+    """Data creation for ansible_meta.json file."""
     try:
-        # Спрашиваем у пользователя, хочет ли он оставить данные по умолчанию или изменить их
-        print(f"Выполнение {file_name}")
-        choice = input("Нажмите enter, чтобы оставить данные по-умолчанию, или введите 'change', чтобы изменить их: ").strip().lower()
+        # Ask the user if they would like to keep the default data or modify it
+        print(f"Execution {file_name}")
+        choice = input("Press enter to keep the default data (ansible_user, ansible_password, connection_protocol, ansible_become), or type 'change' to modify it: ").strip().lower()
 
         if choice == 'change':
-            # Запрашиваем пользовательские значения
-            print("Пустой ввод оставит значение поля по-умолчанию")
-            ansible_user = input("Введите значение для 'ansible_user' (default: root): ") or "root"
-            ansible_password = input("Введите значение для 'ansible_password' (default: ""): ") or ""
-            connection_protocol = input("Введите значение для 'connection_protocol' (default: ssh): ") or "ssh"
+            # Requesting user values
+            print("Empty input will keep the the default data: 'ansible_user' (default: root), 'ansible_password' (default: ""), 'connection_protocol' (default: 'ssh')")
+            ansible_user = input("Input value for 'ansible_user' (default: root): ") or "root"
+            ansible_password = input("Input value for 'ansible_password' (default: ""): ") or ""
+            connection_protocol = input("Input value for  'connection_protocol' (default: 'ssh'): ") or "ssh"
             
-            # Для ansible_become: принимаем только True/False и преобразуем в булевое значение
+            # For ansible_become: accept only True/False and convert to a boolean value
             while True:
-                ansible_become_input = input("Введите значение для 'ansible_become' (True/False, default: False): ")
+                ansible_become_input = input("Input value for 'ansible_become' (True/False, default: False): ")
                 if ansible_become_input.lower() in ["true", "false", ""]:
                     ansible_become = ansible_become_input.lower() == "true" if ansible_become_input else False
                     break
                 else:
-                    print("Ошибка ввода! Введите 'True' или 'False'.")
+                    print("Input error! Type 'True' или 'False'.")
 
         else:
-            # Используем значения по умолчанию
+            # Using default values
             ansible_user = "root"
             ansible_password = ""
             connection_protocol = "ssh"
@@ -49,17 +47,17 @@ def create_ansible_meta_content():
         }
         return data
     except Exception as e:
-        print(f"Произошла ошибка при формировании содержимого файла: {e}")
+        print(f"An error occurred while generating the file content: {e}")
         exit(1)
 
 
 if __name__ == "__main__":
-    # Определение абсолютных путей к файлам и папкам
+    # Absolute paths to files and folders
     file_name = "ansible_meta.json"
     meta_file_in_credentials = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{file_name}'
 
-    # Формирование данных для записи в файл
+    # Generating data for writing to the file
     ansible_meta_content = create_ansible_meta_content() 
 
-    # Запись содержимого в файл "ansible_meta.json"
+    # Writing content to the "ansible_meta.json" file
     write_json_to_file(ansible_meta_content, meta_file_in_credentials) 
