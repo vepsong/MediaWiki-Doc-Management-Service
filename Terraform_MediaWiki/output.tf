@@ -1,14 +1,14 @@
-# Получение данных о внутренних ip-адресах
+# Retrieving data about internal IP addresses
 output "vm_ip" {
   value = { for k, v in  yandex_compute_instance.virtual_machine : v.name => v.network_interface.0.ip_address }
 }
 
-# Получение данных о nat ip-адресах
+# Retrieving data about external nat IP addresses
 output "vm_nat_ip" {
   value = { for k, v in yandex_compute_instance.virtual_machine : v.name => v.network_interface.0.nat_ip_address }
 }
 
-# Получение данных о boot дисках
+# Retrieving data about boot disks
 output "vm_boot_disk" {
   value = { 
     for k, v in yandex_compute_instance.virtual_machine : v.name => {
@@ -18,10 +18,9 @@ output "vm_boot_disk" {
   }
 }
 
+# Retrieving data about external disks
 
-# Получение данных о внешних жестких дисках
-
-# Создаём индекс для связи disk_id с именем
+# Creating an index to link disk_id with the name
 locals {
   disk_name_index = { for id, disk in yandex_compute_disk.external_disks : disk.id => disk.name }
 }

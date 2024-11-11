@@ -42,7 +42,7 @@ resource "yandex_compute_instance" "virtual_machine" {
     user-data = file(var.TERRAFORM_META_DIR_ABSOLUTE_PATH)
   }
 
-  # Подключаем внешние диски, если они указаны в external_disk
+  # Connect the external disks if they are mentioned in "external_disk"
   dynamic "secondary_disk" {
     for_each = try(each.value["external_disk"], [])
 

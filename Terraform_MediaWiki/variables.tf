@@ -7,78 +7,78 @@ variable "external_disks" {
 }
 
 variable "vm_cpu" {
-  description = "Количество ядер процессора для ВМ по умолчанию"
+  description = "Default number of processor cores for the VM"
   type        = number
   default     = 2
 }
 
 variable "core_fraction" {
-  description = "Гарантированная доля vCPU (%)"
+  description = "Guaranteed vCPU share (%)"
   type        = number
   default     = 100
 }
 
 variable "ram" {
-  description = "Объем оперативной памяти для ВМ по умолчанию"
+  description = "Default amount of RAM for the VM"
   type        = number
   default     = 2
 }
 
 variable "image_id" {
-  description = "Образ (шаблон) ОС для ВМ по умолчанию Ubuntu 22.04"
+  description = "Default OS image (template) for the VM: Ubuntu 22.04"
   type        = string
   default = "fd8903kfblsnlo483hoj"
 }
 
 variable "preemptible" {
-  description = "Прерываемость ВМ по умолчанию"
+  description = "Default preemptibility of the VM"
   type        = bool
   default     = "true"
 }
 
 variable "zone" {
-  description = "Зона для ВМ"
+  description = "VM availability zone"
   type        = string
   default     = "ru-central1-a"
 }
 
 variable "network_id" {
-  description = "Сеть для всех ВМ"
+  description = "Network for all the VMs"
   type        = string
   default     = "enpq8hrot41agq9ug68l"
 }
 
 variable "subnet_id" {
-  description = "Подсеть для всех ВМ"
+  description = "Subnet for all the VMs."
   type        = string
   default     = "e9bsdtj7vme4iddaq7qb"
 }
 
 variable "nat" {
-  description = "Внешний ip-адрес"
+  description = "External nat IP addresses"
   type        = bool
   default     = "true"
 }
 
 variable "disk_type" {
-  description = "Тип внешних жестких дисков"
+  description = "Type of the external hard drives"
   type        = string
   default = "network-hdd"
 }
 
 variable "disk_size" {
-  description = "Размер диска для ВМ по умолчанию"
+  description = "Default VM disk size"
   type        = number
   default = 15
 }
 
 variable "allow_stopping_for_update" {
-  description = "Разрешаем остановку ВМ для обновления"
+  description = "Allow VM to stop for updating"
   type        = bool
   default     = "true"
 }
 
 variable "TERRAFORM_META_DIR_ABSOLUTE_PATH" {
-  description = "Путь к файлу с метаданными для виртуальной машины - terraform_meta.txt"
+  description = "Path to the metadata file for the VM - terraform_meta.txt"
   type        = string
 }

@@ -16,7 +16,7 @@ def check_ssh_public_key(ssh_public_key_path):
             ssh_key = key_file.read().strip()
             return ssh_key
     except FileNotFoundError:
-        print(f"Файл с ключом не найден: {ssh_public_key_path}")
+        print(f"The file with the public SSH key was not found: {ssh_public_key_path}")
         exit(1)
 
 # Step 2. Data creation for terraform_meta.txt file
