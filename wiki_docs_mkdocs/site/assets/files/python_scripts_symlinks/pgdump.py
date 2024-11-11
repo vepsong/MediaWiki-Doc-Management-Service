@@ -33,31 +33,29 @@ BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\
 BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.tar\.gz")
 
 
-# BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.sql\.gz")
-# BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}_\d{2}_\d{4}_\d{2}_\d{2}_\d{2})\.tar\.gz")
-
-KEEP_LAST_N_BACKUPS = 10  # Количество бэкапов, которые нужно ост
+KEEP_LAST_N_BACKUPS = 10  # The number of backups that need to be retained
 
 
+# Archiving to .tar.gz
 def make_archive(dest_path, source_path):
-    """Архивирование .tar.gz."""
+    """Archiving to .tar.gz."""
 
     try:
-        # Команда для создания архива
+        # Command for creating an archive
         tar_command = ['tar', '-czvf', dest_path, '-C', source_path, '.']
-        # Выполнение команды архивации
+#         # Executing the archiving command
         tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        print(f"Архивация успешно завершена: {NOW}")
+        print(f"Archiving completed successfully: {NOW}")
         print(tar_result.stdout.decode('utf-8'))
 
     except subprocess.CalledProcessError as e:
-        print("Ошибка при создании архива:")
+        print("Error while creating the archive:")
         print(e.stderr.decode('utf-8'))
 
-
+# Executing rsync of the remote directory to the local VM and archiving
 def get_and_archive_remote_folder():
-    """rsync удаленной директории на локальную ВМ и архивация."""
+    """"rsync of the remote directory to the local VM and archiving."""
     try:
         command = [
             'rsync',
@@ -68,18 +66,18 @@ def get_and_archive_remote_folder():
             BACKUPS_PATH
         ]
         
-        # Выполнение команды rsync
+        # Executing the rsync command
         result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Вывод результатов
-        print("Результат синхронизации:")
+        # Outputting the results
+        print("Synchronization result:")
         print(result.stdout.decode('utf-8'))
 
     except subprocess.CalledProcessError as e:
-        print("Ошибка при синхронизации:")
+        print("Error during synchronization:")
         print(e.stderr.decode('utf-8'))
 
-    # Создание архива после синхронизации
+    # Creating an archive after synchronization
     dest_path = f'{BACKUPS_PATH}/{ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME}'
     source_path = f'{BACKUPS_PATH}/{MEDIAWIKI_FOLDER_NAME}'
         
@@ -90,7 +88,7 @@ def get_and_archive_remote_folder():
 
 # Создание sql-dump'a БД"
 def create_dump_postgres():
-    """Создание sql-dump'a БД"""
+    """Creating an SQL dump of the database."""
     try:
         dest_path = f'{BACKUPS_PATH}/{ARCHIVE_SQL_DUMP_FILE_NAME}'
 
@@ -109,49 +107,47 @@ def create_dump_postgres():
 
 
 def rotate_sql_backups(backups_by_db):
-    """Ротация SQL бэкапов."""
+    """Rotation of SQL backups."""
 
     for db_name, backups in backups_by_db.items():
-        # Сортируем бэкапы по времени создания (в имени файла)
+        # Sorting backups by creation time (according to the file name)
         backups.sort(key=lambda x: x[1], reverse=True)
 
-        # Если количество бэкапов больше, чем нужно сохранить
+        # If the number of backups is greater than the number to be retained:
         if len(backups) > KEEP_LAST_N_BACKUPS:
-            print(f"Удаляем старые бэкапы для {db_name}. Текущее количество: {len(backups)}")
+            print(f"Deleting old backups for {db_name}. Current count: {len(backups)}")
             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
-                print(f"Удаляю старый SQL бэкап: {backup_to_delete[0]}")
-                backup_to_delete[0].unlink()  # Удаление файла
+                print(f"Deleting old SQL backup: {backup_to_delete[0]}")
+                backup_to_delete[0].unlink()  # File deleting
         else:
-            print(f"Нет необходимости в ротации для {db_name}. Текущее количество: {len(backups)}")
+            print(f"No rotation needed for {db_name}. Current count: {len(backups)}")
 
 
 def rotate_mediawiki_backups(backups_by_remote):
-    """Ротация MediaWiki бэкапов."""
+    """Rotation of MediaWiki backups."""
     for remote_host, backups in backups_by_remote.items():
 
-        # Сортируем бэкапы по времени создания (в имени файла)
+        # Sorting backups by creation time (according to the file name)
         backups.sort(key=lambda x: x[1], reverse=True)
 
-        # Если количество бэкапов больше, чем нужно сохранить
+        # If the number of backups is greater than the number to be retained:
         if len(backups) > KEEP_LAST_N_BACKUPS:
-            print(f"Удаляем старые бэкапы для {remote_host}. Текущее количество: {len(backups)}")
+            print(f"Deleting old backups for {remote_host}. Current count: {len(backups)}")
             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
-                print(f"Удаляю старый MediaWiki бэкап: {backup_to_delete[0]}")
-                backup_to_delete[0].unlink()  # Удаление файла
+                print(f"Deleting old MediaWiki backup: {backup_to_delete[0]}")
+                backup_to_delete[0].unlink()  # # File deleting
         else:
-            print(f"Нет необходимости в ротации для {remote_host}. Текущее количество: {len(backups)}")
+            print(f"No rotation needed for {remote_host}. Current count {len(backups)}")
 
 def rotate_backups():
-    """
-    Функция для ротации файлов резервных копий, оставляет только последние N копий для каждой базы данных.
-    """
-    backups_by_db = {}  # Для хранения SQL бэкапов по БД
-    backups_by_remote = {}  # Для хранения MediaWiki бэкапов по удаленным серверам
+    """Rotating backup files and retaining only the last N copies for each database"""
+    backups_by_db = {}  # For storing SQL backups by database
+    backups_by_remote = {}  # For storing MediaWiki backups by remote servers
 
-    # Перебираем файлы в директории бэкапов
+    # Iterating through files in the backup directory
     for backup_file in BACKUPS_PATH.iterdir():
         if backup_file.is_file():
-            # Проверка на SQL дампы
+            # Checking for SQL dumps
             sql_match = BACKUP_SQL_PATTERN.match(backup_file.name)
             if sql_match:
                 db_name, timestamp = sql_match.groups()
@@ -159,17 +155,13 @@ def rotate_backups():
                     backups_by_db[db_name] = []
                 backups_by_db[db_name].append((backup_file, timestamp))
             
-            # Проверка на MediaWiki бэкапы
+            # Checking for MediaWiki dumps
             mediawiki_match = BACKUP_MEDIAWIKI_PATTERN.match(backup_file.name)
             if mediawiki_match:
                 remote_host, timestamp = mediawiki_match.groups()
                 if remote_host not in backups_by_remote:
                     backups_by_remote[remote_host] = []
                 backups_by_remote[remote_host].append((backup_file, timestamp))
-
-    # # Отладочная печать для проверки данных
-    # print(f"backups_by_db (SQL): {backups_by_db}")
-    # print(f"backups_by_remote (MediaWiki): {backups_by_remote}")
 
     try:           
         rotate_sql_backups(backups_by_db)

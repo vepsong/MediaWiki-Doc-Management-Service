@@ -1,18 +1,18 @@
 import os
 from utils import run_command, load_and_check_env_vars, copy_file
 
-# Имена переменных, которые нужно загрузить
+# Importing environment variables into the script
 env_vars = ["CREDENTIALS_DIR_ABSOLUTE_PATH", "TERRAFORM_ABSOLUTE_PATH"]
 
-# Проверяем наличие переменных окружения и добавляем их в словарь
+# Checking for the presence of environment variables and adding them to the dictionary
 env_var_dic = load_and_check_env_vars(env_vars)
 
 
-# Шаг 1: Инициализация Terraform
+# Step 1: Terraform initialization
 def terraform_init(terraform_folder_path):
-    """Инициализация Terraform."""
+    """Terraform initialization."""
 
-    # Выполняем команды перехода в директорию и инициализации Terraform
+    # Running Terraform initialization command
     command = ['terraform', 'init']
     run_command(command, cwd=terraform_folder_path, capture_output=False)
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     provider_conf_file_path = f'{env_var_dic["CREDENTIALS_DIR_ABSOLUTE_PATH"]}/{provider_conf_file_name}'
     terraform_folder_path = f'{env_var_dic["TERRAFORM_ABSOLUTE_PATH"]}'
 
-    # Копируем конфигурацию провайдера
+    # Copy of provider configuration
     copy_file(provider_conf_file_path, user_home_path)
-    # Инициализация Terraform
+    # Terraform initializatio
     terraform_init(terraform_folder_path)

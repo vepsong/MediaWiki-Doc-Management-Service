@@ -22,30 +22,30 @@ ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_sql_{DATABASE_NAME}_{NOW}.sql.gz'.replace('/
 
 BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.sql\.gz")
 
-KEEP_LAST_N_BACKUPS = 10  # Количество бэкапов, которые нужно оставить
+KEEP_LAST_N_BACKUPS = 10  # The number of backups that need to be retained
+
+# # Archiving to .tar.gz
+# def make_archive(dest_path, source_path):
+#     """Archiving to .tar.gz."""
+
+#     try:
+#         # Command for creating an archive
+#         tar_command = ['tar', '-czvf', dest_path, '-C', source_path, '.']
+#         # Executing the archiving command
+#         tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+#         print(f"Archiving completed successfully: {NOW}")
+#         print(tar_result.stdout.decode('utf-8'))
+
+#     except subprocess.CalledProcessError as e:
+#         print("Error while creating the archive:")
+#         print(e.stderr.decode('utf-8'))
 
 
-def make_archive(dest_path, source_path):
-    """Архивирование .tar.gz."""
 
-    try:
-        # Команда для создания архива
-        tar_command = ['tar', '-czvf', dest_path, '-C', source_path, '.']
-        # Выполнение команды архивации
-        tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        print(f"Архивация успешно завершена: {NOW}")
-        print(tar_result.stdout.decode('utf-8'))
-
-    except subprocess.CalledProcessError as e:
-        print("Ошибка при создании архива:")
-        print(e.stderr.decode('utf-8'))
-
-
-
-# Создание sql-dump'a БД"
+# Step 1. Creating an SQL dump of the database
 def create_dump_postgres():
-    """Создание sql-dump'a БД"""
+    """Creating an SQL dump of the database."""
     try:
         dest_path = f'{BACKUPS_PATH}/{ARCHIVE_SQL_DUMP_FILE_NAME}'
 
@@ -64,45 +64,38 @@ def create_dump_postgres():
 
 
 def rotate_sql_backups(backups_by_db):
-    """Ротация SQL бэкапов."""
+    """Rotation of SQL backups."""
 
     for db_name, backups in backups_by_db.items():
-        # Сортируем бэкапы по времени создания (в имени файла)
+        # Sorting backups by creation time (according to the file name)
         backups.sort(key=lambda x: x[1], reverse=True)
 
-        # Если количество бэкапов больше, чем нужно сохранить
+        # If the number of backups is greater than the number to be retained:
         if len(backups) > KEEP_LAST_N_BACKUPS:
-            print(f"Удаляем старые бэкапы для {db_name}. Текущее количество: {len(backups)}")
+            print(f"Deleting old backups for {db_name}. Current count: {len(backups)}")
             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
-                print(f"Удаляю старый SQL бэкап: {backup_to_delete[0]}")
-                backup_to_delete[0].unlink()  # Удаление файла
+                print(f"Deleting old SQL backup: {backup_to_delete[0]}")
+                backup_to_delete[0].unlink()  # File deleting
         else:
-            print(f"Нет необходимости в ротации для {db_name}. Текущее количество: {len(backups)}")
+            print(f"No rotation needed for {db_name}. Current count: {len(backups)}")
 
 
 
 def rotate_backups():
-    """
-    Функция для ротации файлов резервных копий, оставляет только последние N копий для каждой базы данных.
-    """
-    backups_by_db = {}  # Для хранения SQL бэкапов по БД
-    backups_by_remote = {}  # Для хранения MediaWiki бэкапов по удаленным серверам
+    """Rotating backup files and retaining only the last N copies for each database"""
+    backups_by_db = {}  # For storing SQL backups by database
+    backups_by_remote = {}  # For storing MediaWiki backups by remote servers
 
-    # Перебираем файлы в директории бэкапов
+    # Iterating through files in the backup directory
     for backup_file in BACKUPS_PATH.iterdir():
         if backup_file.is_file():
-            # Проверка на SQL дампы
+            # Checking for SQL dumps
             sql_match = BACKUP_SQL_PATTERN.match(backup_file.name)
             if sql_match:
                 db_name, timestamp = sql_match.groups()
                 if db_name not in backups_by_db:
                     backups_by_db[db_name] = []
                 backups_by_db[db_name].append((backup_file, timestamp))
-
-
-    # # Отладочная печать для проверки данных
-    # print(f"backups_by_db (SQL): {backups_by_db}")
-    # print(f"backups_by_remote (MediaWiki): {backups_by_remote}")
 
     try:           
         rotate_sql_backups(backups_by_db)
