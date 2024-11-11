@@ -1,11 +1,11 @@
 ---
 # tasks file for db_postgresql
 
-# =========================
-# Блок с общими задачами
-# =========================
+# =======================
+# Block with common tasks
+# =======================
 
-# Обновление пакетного репозитория 
+# Updating the apt repository
 - name: Step 1 - Update list of packages
   apt:
     update_cache: yes
@@ -13,7 +13,7 @@
   tags:
     - db_postgresql_apt_update
 
-# Установка пакетов
+# Installing packages
 - name: Step 2 - Packet installing
   apt:
     name: "{{ item }}" 
@@ -23,8 +23,7 @@
   tags:
     - db_postgresql_install_packages 
 
-
-# Установка пакета pip3 python-dotenv
+# Installing the pip3 package python-dotenv
 - name: Step 3 - Install python-dotenv using pip3
   become: true
   ansible.builtin.pip:
@@ -34,7 +33,7 @@
   tags:
     - db_postgresql_install_pip3_packages_python_dotenv
 
-# Установка пакета pip3 patroni
+# Installing the pip3 package patroni
 - name: Step 4 - Install patroni using pip3
   become: true
   ansible.builtin.pip:
@@ -44,7 +43,7 @@
   tags:
     - db_postgresql_install_pip3_packages_python_patroni
 
-# Запуск сервиса и добавление в автозапуск
+# Starting the postgresql service and adding it to startup
 - name: Step 5 - Start and enable services
   service: 
     name=postgresql
@@ -53,20 +52,20 @@
   tags:
     - db_postgresql_start_enable_service
 
-# Добавление секретных переменных
+# Adding secret variables
 - name: Step 6 - Include secret variables
   include_vars: secrets.yml
   tags:
     - db_postgresql_add_secret_variables
 
-# Создание динамических переменных
+# Creating dynamic variables
 - name: Step 7 - Create dynamic variables
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   tags:
     - db_postgresql_create_dynamic_variables
 
-# Создание группы безопасности
+# Creating a security group
 - name: Step 8 - Create a group for PostgreSQL access
   ansible.builtin.group:
     name: dbadmin
@@ -74,7 +73,7 @@
   tags:
     - db_postgresql_create_Postgresql_group_access
 
-# Добавление пользователей в группу безопасности
+# Adding users to the security group
 - name: Step 9 - Add multiple users to dbadmin group
   ansible.builtin.user:
     name: "{{ item }}"
@@ -88,7 +87,7 @@
   tags:
     - db_postgresql_add_users_dbadmin_group
 
-# Смена владельцев директории
+# Changing directory owners
 - name: Step 10 - Change group ownership for PostgreSQL directories
   become: true
   become_user: root
@@ -99,24 +98,24 @@
     state: directory
     recurse: true
   loop: 
-  - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
-  - "/opt"  # Указываем на родительскую директорию
+  - "{{ mount_point }}"  # Specifying the PostgreSQL directory
+  - "/opt"  # Specifying the parent directory
   tags:
     - db_postgresql_change_postgresql_path_ownership
 
 
-# Установка разрешений для директории
+# Setting permissions for the directory
 - name: Step 11 - Set permissions for PostgreSQL directories
   become: true
   become_user: root
   ansible.builtin.file:
     path: "{{ item }}"
-    mode: '0770'  # Права для владельца и группы: чтение, запись, выполнение
+    mode: '0770'  # Permissions for owner and group: read, write, execute
     recurse: true
   # loop: "{{ mount_point }}"
   loop: 
-    - "{{ mount_point }}"  # Указываем на директорию PostgreSQL
-    - "/opt"  # Указываем на родительскую директорию
+    - "{{ mount_point }}"  # Specifying the PostgreSQL directory
+    - "/opt"  # Specifying the parent directory
   tags:
     - db_postgresql_set_postgresql_permissions
 

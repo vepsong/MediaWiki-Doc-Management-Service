@@ -2,6 +2,6 @@
 # handlers file for change_hostname
 - name: "vm_reboot"
   reboot:
-    reboot_timeout: 100  # Время ожидания в сек.
-    test_command: uptime  # Команда для проверки доступности после перезагрузки
+    reboot_timeout: 100  # Timeout in seconds
+    test_command: uptime  # Command to check availability after reboot
   listen: "vm_reboot"
