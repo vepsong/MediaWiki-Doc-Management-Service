@@ -92,7 +92,16 @@
               
                 <h3 id="ansible-setup">Ansible setup</h3>
 <ol>
-<li>Review <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py.</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/ansible_structure.py.</code></span></span></li>
+<li>
+<p>Review the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/ansible_structure.py</code></span></span> file</p>
+<ul>
+<li>This file contains <code>dynamic_groups</code> dictionary which confugires the output <code>inventory.yaml</code> file</li>
+<li>The file is already configured. No changes are needed.</li>
+</ul>
+</li>
+<li>
+<p>Create <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_ansible_inventory.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/update_ansible_inventory.py</code></span></span></p>
+</li>
 </ol>
               
             </div>
