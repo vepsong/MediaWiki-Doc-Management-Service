@@ -1,0 +1,51 @@
+linuxVM:
+  children:
+    monitoringSystem:
+      hosts:
+        vm-1-monitoring-system:
+          ansible_host: 51.250.1.167
+          external_disks:
+          - disk_id: fhmmla0r5sm2j6c4le8l
+            disk_name: vhdd-1-monitoring-system-db
+            mount_point: /opt/vhdd-1-monitoring-system-db
+            filesystem: ext4
+    nginxProxyServer:
+      hosts:
+        vm-2-nginx-proxy-server:
+          ansible_host: 130.193.38.129
+    mediawikiServer:
+      hosts:
+        vm-3-mediawiki-server-1:
+          ansible_host: 130.193.37.91
+        vm-4-mediawiki-server-2:
+          ansible_host: 62.84.116.227
+    haproxyProxyServer:
+      hosts:
+        vm-5-haproxy-proxy-server:
+          ansible_host: 130.193.36.108
+    primaryDb:
+      hosts:
+        vm-6-primary-db:
+          ansible_host: 84.252.128.13
+          external_disks:
+          - disk_id: fhmvasqeieo3t7nqlol7
+            disk_name: vssd-1-primary-db
+            mount_point: /opt/vssd-1-primary-db
+            filesystem: ext4
+    standbyDb:
+      hosts:
+        vm-7-standby-db:
+          ansible_host: 51.250.67.113
+          external_disks:
+          - disk_id: fhm0653bevuv57f7ng16
+            disk_name: vhdd-2-standby-db
+            mount_point: /opt/vhdd-2-standby-db
+            filesystem: ext4
+          - disk_id: fhm9rbu6jc8q2ak0cni2
+            disk_name: vhdd-3-dump-db
+            mount_point: /opt/vhdd-3-dump-db
+            filesystem: ext4
+  vars:
+    ansible_user: root
+    ansible_password: ''
+    connection_protocol: ssh

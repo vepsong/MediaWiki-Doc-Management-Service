@@ -9,6 +9,8 @@ nav:
       - 3. Service VM Docker Configuration: 3.1. service_vm_docker_setup.md
       - 4. Yandex Cloud CLI profile and Service Account Setup: 4.1. yandex_cloud_cli_and_serv_acc_setup.md
       - 5. Yandex Cloud Terraform Setup: 5.1. yandex_cloud_terraform_setup.md
+  - Remote deployment using Ansible:
+      - 6. Ansible setup: 6.1. ansible_setup.md
 
 theme:
   name: readthedocs

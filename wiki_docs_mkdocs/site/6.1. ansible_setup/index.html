@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>6.1. ansible setup - MediaWiki Doc Management Service</title>
+    <title>6. Ansible setup - MediaWiki Doc Management Service</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,7 +13,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "6.1. ansible setup";
+        var mkdocs_page_name = "6. Ansible setup";
         var mkdocs_page_input_path = "6.1. ansible_setup.md";
         var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/";
       </script>
@@ -59,6 +59,19 @@
                   <li class="toctree-l1"><a class="reference internal" href="../5.1.%20yandex_cloud_terraform_setup/">5. Yandex Cloud Terraform Setup</a>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">6. Ansible setup</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#files-and-variables-setup">Files and Variables Setup</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dns-setup">DNS Setup</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#essential-ansible-commands">Essential Ansible commands</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
@@ -73,7 +86,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">6.1. ansible setup</li>
+          <li class="breadcrumb-item">Remote deployment using Ansible</li>
+      <li class="breadcrumb-item active">6. Ansible setup</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -82,29 +96,364 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h3 id="ansible-setup">Ansible setup</h3>
+                <h1 id="ansible-setup">Ansible setup</h1>
+<h3 id="files-and-variables-setup">Files and Variables Setup</h3>
 <ol>
 <li>
-<p>Create <a href="https://yandex.cloud/en/docs/ydb/terraform/install"><strong>.terraformrc</strong></a> provider configuration file in <code>~/</code> directory    </p>
-</li>
-<li>
-<p>Automatic Yandex Cloud Terraform provider installation by running <span class="tooltip" onclick="showTooltip(event)"><strong>terraform_init.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/terraform_init.py</code></span></span></p>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/ansible_structure.py</code></span></span> file</p>
 <ul>
-<li>The <span class="tooltip" onclick="showTooltip(event)"><strong>main.tf</strong><span class="tooltip-text"><code>~/repository_name/Terraform_MediaWiki/main.tf</code></span></span>, <span class="tooltip" onclick="showTooltip(event)"><strong>output.tf</strong><span class="tooltip-text"><code>~/repository_name/Terraform_MediaWiki/output.tf</code></span></span>, <span class="tooltip" onclick="showTooltip(event)"><strong>providers.tf</strong><span class="tooltip-text"><code>~/repository_name/Terraform_MediaWiki/providers.tf</code></span></span>, and <span class="tooltip" onclick="showTooltip(event)"><strong>terraform.tfstate</strong><span class="tooltip-text"><code>~/repository_name/Terraform_MediaWiki/terraform.tfstate</code></span></span> files are already configured.<br />
-No changes are needed  </li>
+<li>This file contains <code>dynamic_groups</code> dictionary which confugires the output <code>inventory.yaml</code> file</li>
+<li>The file is already configured. No changes are needed.</li>
 </ul>
 </li>
 <li>
-<p>Automatic authentication data file  <span class="tooltip" onclick="showTooltip(event)"><strong>(terraform_meta.txt)</strong><span class="tooltip-text"><code>~/repository_name/credentials/terraform_meta.txt</code></span></span> creation by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_terraform_meta.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/update_terraform_meta.py</code></span></span></p>
+<p>Create <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_ansible_inventory.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/update_ansible_inventory.py</code></span></span>   </p>
+<p><details class="external_code_rendering">
+<summary>Show inventory.yaml_EXAMPLE</summary></p>
+<pre><code> linuxVM:
+   children:
+     monitoringSystem:
+       hosts:
+         vm-1-monitoring-system:
+           ansible_host: 51.250.1.167
+           external_disks:
+           - disk_id: fhmmla0r5sm2j6c4le8l
+             disk_name: vhdd-1-monitoring-system-db
+             mount_point: /opt/vhdd-1-monitoring-system-db
+             filesystem: ext4
+     nginxProxyServer:
+       hosts:
+         vm-2-nginx-proxy-server:
+           ansible_host: 130.193.38.129
+     mediawikiServer:
+       hosts:
+         vm-3-mediawiki-server-1:
+           ansible_host: 130.193.37.91
+         vm-4-mediawiki-server-2:
+           ansible_host: 62.84.116.227
+     haproxyProxyServer:
+       hosts:
+         vm-5-haproxy-proxy-server:
+           ansible_host: 130.193.36.108
+     primaryDb:
+       hosts:
+         vm-6-primary-db:
+           ansible_host: 84.252.128.13
+           external_disks:
+           - disk_id: fhmvasqeieo3t7nqlol7
+             disk_name: vssd-1-primary-db
+             mount_point: /opt/vssd-1-primary-db
+             filesystem: ext4
+     standbyDb:
+       hosts:
+         vm-7-standby-db:
+           ansible_host: 51.250.67.113
+           external_disks:
+           - disk_id: fhm0653bevuv57f7ng16
+             disk_name: vhdd-2-standby-db
+             mount_point: /opt/vhdd-2-standby-db
+             filesystem: ext4
+           - disk_id: fhm9rbu6jc8q2ak0cni2
+             disk_name: vhdd-3-dump-db
+             mount_point: /opt/vhdd-3-dump-db
+             filesystem: ext4
+   vars:
+     ansible_user: root
+     ansible_password: ''
+     connection_protocol: ssh
+</code></pre>
+</details>
+</li>
+<li>
+<p>Review or Replace the <code>Private SSH Key</code> File in the <code>~/repository_name/Ansible/common_files</code> Directory</p>
 <ul>
-<li>Files with public and private SSH keys are automatically created in the <code>~/.ssh</code> folder during the image build and when a new container is launched</li>
-<li>If you need to use the same keys as on another already deployed VM, you must manually copy them from that VM to the new one and run the script</li>
+<li>
+<p>This <code>Private SSH Key</code> file is required to allow SSH connections between specific VMs</p>
+<pre><code># If there is no Private SSH Key file, or if you wish to replace the current one, run the following command
+cp ~/.ssh/id_ed25519 ~/repository_name/Ansible/common_files
+</code></pre>
+</li>
+<li>
+<p>File Encryption with Ansible Voult </p>
+<pre><code># Encrypting the Private SSH Key File Using Vault-ID: "private_ssh_key"
+ansible-vault encrypt --vault-id private_ssh_key@prompt "~/repository_name/Ansible/common_files/id_ed25519"
+</code></pre>
+</li>
+<li>
+<p>Write Ansible Voult password to file:</p>
+<pre><code>echo "password1" &gt; ~/repository_name/Ansible/vault_passwords/vault_private_ssh_key.txt
+</code></pre>
+</li>
 </ul>
+</li>
+<li>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_secrets.yml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/ansible_secrets.yml</code></span></span> File</p>
+<ul>
+<li>
+<p>The <code>ansible_secrets.yml</code> file contains secret variables, such as database connection credentials, IP addresses, and more</p>
+<p><details class="external_code_rendering">
+<summary>Show ansible_secrets.yml_EXAMPLE</summary></p>
+<pre><code> ---
+ # vars file for db_postgresql
+ postgres_vars:
+   db_name: my_wiki
+   db_tablespace_name: primary_tablespace
+   db_port: 5432
+   db_backups_dir: /opt/vhdd-3-dump-db
+
+ postgres_zabbix_server_vars:
+   db_name: zabbix
+   db_tablespace_name: primary_tablespace
+   db_port: 5432
+   db_backups_dir: /opt/vhdd-1-monitoring-system-db/zabbix_dump
+
+ postgres_wikiuser_user_vars:
+   db_user: wikiuser
+   db_user_password: password1
+   attr: 
+     - SUPERUSER
+     - CREATEDB
+     - CREATEROLE
+     - LOGIN
+     - INHERIT
+
+ postgres_replication_user_vars:
+   db_user: syncuser
+   db_user_password: password2 
+   attr: 
+     - REPLICATION
+
+ postgres_zabbix_server_user_vars:
+   db_user: zabbix
+   db_user_password: password1
+   attr: 
+     - SUPERUSER
+     - CREATEDB
+     - CREATEROLE
+     - LOGIN
+     - INHERIT
+
+ vm_7_standby_db_private_key_ssh:
+   remote_host: 192.168.10.13
+   remote_user: root
+   private_key_ssh_path: /root/.ssh/id_ed25519
+
+ secret_vm_3_mediawiki_server_1:
+   host_ip: 192.168.10.13
+   user: root
+
+ secret_vm_4_mediawiki_server_2:
+   host_ip: 192.168.10.14
+   user: root
+
+   remote_host_ip: 192.168.10.13
+   remote_user: root
+</code></pre>
+</details>
+</li>
+<li>
+<p>File Encryption with Ansible Voult </p>
+<pre><code># Encrypting the ansible_secrets.yml File Using Vault-ID: "ansible_secrets"
+ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansible/common_files/ansible_secrets.yaml"
+</code></pre>
+</li>
+<li>
+<p>Write Ansible Voult password to file:</p>
+<pre><code>echo "password2" &gt; ~/repository_name/Ansible/vault_passwords/vault_ansible_secrets.txt
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>LocalSettings.php</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
+<ul>
+<li>
+<p>The <code>LocalSettings.php</code> file contains the MediaWiki configuration</p>
+<p><details class="external_code_rendering">
+<summary>Show LocalSettings.php_EXAMPLE</summary></p>
+<pre><code> &lt;?php
+ # This file was automatically generated by the MediaWiki 1.42.3
+ # installer. If you make manual changes, please keep track in case you
+ # need to recreate them later.
+ #
+ # See includes/MainConfigSchema.php for all configurable settings
+ # and their default values, but don't forget to make changes in _this_
+ # file, not there.
+ #
+ # Further documentation for configuration settings may be found at:
+ # https://www.mediawiki.org/wiki/Manual:Configuration_settings
+
+ # Protect against web entry
+ if ( !defined( 'MEDIAWIKI' ) ) {
+    exit;
+ }
+
+ ## Uncomment this to disable output compression
+ # $wgDisableOutputCompression = true;
+
+ $wgSitename = 'sprint13_yp';
+ $wgMetaNamespace = 'Sprint13_yp';
+
+ ## The URL base path to the directory containing the wiki;
+ ## defaults for all runtime URL paths are based off of this.
+ ## For more information on customizing the URLs
+ ## (like /w/index.php/Page_title to /wiki/Page_title) please see:
+ ## https://www.mediawiki.org/wiki/Manual:Short_URL
+ $wgScriptPath = '';
+
+ ## The protocol and server name to use in fully-qualified URLs
+ $wgServer = 'http://130.193.39.49';
+
+ ## The URL path to static resources (images, scripts, etc.)
+ $wgResourceBasePath = $wgScriptPath;
+
+ ## The URL paths to the logo.  Make sure you change this from the default,
+ ## or else you'll overwrite your logo when you upgrade!
+ $wgLogos = [
+    '1x' =&gt; "$wgResourceBasePath/resources/assets/change-your-logo.svg",
+    'icon' =&gt; "$wgResourceBasePath/resources/assets/change-your-logo.svg",
+ ];
+
+ ## UPO means: this is also a user preference option
+
+ $wgEnableEmail = true;
+ $wgEnableUserEmail = true; # UPO
+
+ $wgEmergencyContact = '';
+ $wgPasswordSender = '';
+
+ $wgEnotifUserTalk = false; # UPO
+ $wgEnotifWatchlist = false; # UPO
+ $wgEmailAuthentication = true;
+
+ ## Database settings
+ $wgDBtype = 'postgres';
+ $wgDBserver = '192.168.10.16';
+ $wgDBname = 'my_wiki';
+ $wgDBuser = 'wikiuser';
+ $wgDBpassword = 'YOUR_SUPER_STRONG_PASSWORD';
+
+ # Postgres specific settings
+ $wgDBport = "5432";
+ $wgDBssl = false;
+ $wgDBmwschema = "mediawiki";
+
+ # Shared database table
+ # This has no effect unless $wgSharedDB is also set.
+ $wgSharedTables[] = "actor";
+
+ ## Shared memory settings
+ $wgMainCacheType = CACHE_ACCEL;
+ $wgMemCachedServers = [];
+
+ ## To enable image uploads, make sure the 'images' directory
+ ## is writable, then set this to true:
+ $wgEnableUploads = false;
+ #$wgUseImageMagick = true;
+ #$wgImageMagickConvertCommand = '/usr/bin/convert';
+
+ # InstantCommons allows wiki to use images from https://commons.wikimedia.org
+ $wgUseInstantCommons = false;
+
+ # Periodically send a pingback to https://www.mediawiki.org/ with basic data
+ # about this MediaWiki instance. The Wikimedia Foundation shares this data
+ # with MediaWiki developers to help guide future development efforts.
+ $wgPingback = true;
+
+ # Site language code, should be one of the list in ./includes/languages/data/Names.php
+ $wgLanguageCode = 'en';
+
+ # Time zone
+ $wgLocaltimezone = 'UTC';
+
+ ## Set $wgCacheDirectory to a writable directory on the web server
+ ## to make your wiki go slightly faster. The directory should not
+ ## be publicly accessible from the web.
+ #$wgCacheDirectory = "$IP/cache";
+
+ $wgSecretKey = '2d4a43e01b5d47793a1120c3cdff6440a6974780e8fe3b57504dfd388ddc3326';
+
+ # Changing this will log out all existing sessions.
+ $wgAuthenticationTokenVersion = '1';
+
+ # Site upgrade key. Must be set to a string (default provided) to turn on the
+ # web installer while LocalSettings.php is in place
+ $wgUpgradeKey = '09a43ca42d627f31';
+
+ ## For attaching licensing metadata to pages, and displaying an
+ ## appropriate copyright notice / icon. GNU Free Documentation
+ ## License and Creative Commons licenses are supported so far.
+ $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
+ $wgRightsUrl = '';
+ $wgRightsText = '';
+ $wgRightsIcon = "";
+
+ # Path to the GNU diff3 utility. Used for conflict resolution.
+ $wgDiff3 = '/usr/bin/diff3';
+
+ ## Default skin: you can change the default skin. Use the internal symbolic
+ ## names, e.g. 'vector' or 'monobook':
+ $wgDefaultSkin = 'monobook';
+
+ # Enabled skins.
+ # The following skins were automatically enabled:
+ wfLoadSkin( 'MinervaNeue' );
+ wfLoadSkin( 'MonoBook' );
+ wfLoadSkin( 'Timeless' );
+ wfLoadSkin( 'Vector' );
+
+ # End of automatically generated settings.
+ # Add more configuration options below.
+</code></pre>
+</details>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="dns-setup">DNS Setup</h3>
+<ol>
+<li>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>noip-duc</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
+<ul>
+<li>
+<p>The <code>noip-duc</code> file contains the MediaWiki configuration</p>
+<p><details class="external_code_rendering">
+<summary>Show noip-duc_EXAMPLE</summary></p>
+<pre><code> NOIP_USERNAME=myusername
+ NOIP_PASSWORD=mypassword
+ NOIP_HOSTNAMES=example.ddns.net,exampledomain.com,noiptest.redirectme.net
+</code></pre>
+</details>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="essential-ansible-commands">Essential Ansible commands</h3>
+<ol>
+<li>Ansible Vault<pre><code> # Encrypting File using Ansible Vault
+ #  
+ ansible-vault encrypt --vault-id &lt;vault-id-name&gt;@prompt "&lt;path to file&gt;"
+
+ # Change Vault Password
+ ansible-vault rekey "&lt;path to file&gt;"
+
+ # Edit Vault-Encrypted File
+ ansible-vault edit "&lt;path to file&gt;"
+
+ # Decrypting File 
+ ansible-vault decrypt "&lt;path to file&gt;"
+
+ # Viewing the Vault-Encrypted File
+ ansible-vault view "&lt;path to file&gt;"
+</code></pre>
 </li>
 </ol>
               
             </div>
           </div><footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+          <a href="../5.1.%20yandex_cloud_terraform_setup/" class="btn btn-neutral float-left" title="5. Yandex Cloud Terraform Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      </div>
   
     <hr/>
   
@@ -124,6 +473,8 @@ No changes are needed  </li>
   <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
+    
+      <span><a href="../5.1.%20yandex_cloud_terraform_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
   </span>
