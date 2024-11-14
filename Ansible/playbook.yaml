@@ -1,103 +1,102 @@
 --- 
 
-# Меняем имя ВМ, если имя в inventory.yaml отличается от фактического
-- name: Change VM hostname
+# Compare the current VM hostname with inventory.yaml and change it if it differs
+- name: Changing the hostnames of all VMs
   hosts: all
   roles:
     - role: change_hostname
   tags:
-    - change_hostname
+    - change_vms_hostname
 
-# Монтирование и инициализация внешних жестких дисков
-- name: Mount external disks 
+# Mounting external hard drives and initializing LVM
+- name: Mounting external hard drives 
   # hosts: vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
   hosts: "{{ target_groups }}"
   # hosts: all
   roles:
     - role: mount_disk
   tags:
-    - mount_external_disks
+    - mount_external_hard_drives
 
-# Размонтирование и деинициализация внешних жестких дисков
-- name: Unmount external disks 
+# Unmounting external hard drives and deinitializing LVM
+- name: Unmounting external hard drives 
   hosts: "{{ target_groups }}"
   roles:
     - role: unmount_disk
   tags:
-    - unmount_external_disks
+    - unmount_external_hard_drives
 
-# Инициализация и общая настройка postgresql
-- name: Set up db_postgresql
+# PostgreSQL Common Setup
+- name: PostgreSQL Common Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: db_postgresql
   tags:
-    - setup_db_postgresql
+    - postgresql_common_setup
 
-# Настройка primary postgresql
-- name: Set up primary db_postgresql
+# Primary PostgreSQL Setup
+- name: Primary PostgreSQL db Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: db_postgresql_primary
   tags:
-    - setup_db_primary_postgresql
+    - primary_postgresql_setup
 
-# Настройка standby postgresql
+# Standby PostgreSQL Setup
 - name: Set up standby db_postgresql
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: db_postgresql_standby
   tags:
-    - setup_db_standby_postgresql
+    - standby_postgresql_setup
 
-
-# Настройка zabbix-server postgresql
-- name: Set up zabbix-server db_postgresql
+# Zabbix-Server PostgreSQL Setup
+- name: Zabbix-Server PostgreSQL Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: db_postgresql_zabbix_server
   tags:
-    - setup_db_postgresql_zabbix_server
+    - zabbix_server_postgresql_setup
 
 
-# Настройка mediawiki
-- name: Set up mediawiki servers
+# MediaWiki Setup
+- name: MediaWiki Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: mediawiki
   tags:
-    - setup_mediawiki
+    - mediawiki_setup
 
-# Настройка nginx mediawiki proxy
-- name: Set up nginx mediawiki proxy
+# Nginx-proxy MediaWiki Setup
+- name: Nginx-proxy MediaWiki Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: nginx_mediawiki_proxy
   tags:
-    - setup_nginx_mediawiki_proxy
+    - nginx_proxy_mediawiki_setup
 
 
-# Настройка zabbix-server monitoring system
-- name: Set up zabbix-server monitoring system
+# Zabbix-Server Setup
+- name: Zabbix-Server Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: zabbix_server_monitoring_system
   tags:
-    - setup_zabbix_server_monitoring_system
+    - zabbix_server_setup
 
 
-# Настройка zabbix-agent monitoring system
-- name: Set up zabbix-agent monitoring system
+# Zabbix-Agent Setup
+- name: Zabbix-Agent Setup
   hosts: "{{ target_groups }}"
   become: true
   roles:
     - role: zabbix_agent_monitoring_system
   tags:
-    - setup_zabbix_agent_monitoring_system
+    - zabbix_agent_setup

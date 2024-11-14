@@ -13,38 +13,31 @@
   tags:
     - db_postgresql_apt_update
 
-# Installing packages
-- name: Step 2 - Packet installing
+# Installing apt packages
+- name: Step 2 - Apt packages installing
   apt:
     name: "{{ item }}" 
     state: present
   loop:
-    - "{{ packages_to_install }}"
+    - "{{ apt_packages_to_install }}"
   tags:
     - db_postgresql_install_packages 
 
-# Installing the pip3 package python-dotenv
-- name: Step 3 - Install python-dotenv using pip3
+# Installing the pip3 packages
+- name: Step 3 - Pip3 packages installing
   become: true
   ansible.builtin.pip:
-    name: python-dotenv
-    executable: pip3
-  when: db_hosts.standby in inventory_hostname or db_hosts.zabbix_server in inventory_hostname
+    name: "{{ item }}" 
+    # executable: pip3
+    state: latest
+  loop:
+    - "{{ pip3_packages_to_install }}"
+  # when: db_hosts.standby in inventory_hostname or db_hosts.zabbix_server in inventory_hostname
   tags:
     - db_postgresql_install_pip3_packages_python_dotenv
 
-# Installing the pip3 package patroni
-- name: Step 4 - Install patroni using pip3
-  become: true
-  ansible.builtin.pip:
-    name: python-dotenv
-    executable: pip3
-  when: db_hosts.primary in inventory_hostname or db_hosts.standby in inventory_hostname
-  tags:
-    - db_postgresql_install_pip3_packages_python_patroni
-
-# Starting the postgresql service and adding it to startup
-- name: Step 5 - Start and enable services
+# Starting and enabling the postgresql service
+- name: Step 4 - Starting and enabling the postgresql service
   service: 
     name=postgresql
     state=started 
@@ -53,28 +46,29 @@
     - db_postgresql_start_enable_service
 
 # Adding secret variables
-- name: Step 6 - Include secret variables
-  include_vars: secrets.yml
+- name: Step 5 - Adding secret variables
+  include_vars: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
+    # file: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
   tags:
-    - db_postgresql_add_secret_variables
+    - db_postgresql_adding_secret_variables
 
 # Creating dynamic variables
-- name: Step 7 - Create dynamic variables
+- name: Step 6 - Creating dynamic variables
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   tags:
-    - db_postgresql_create_dynamic_variables
+    - db_postgresql_creating_dynamic_variables
 
 # Creating a security group
-- name: Step 8 - Create a group for PostgreSQL access
+- name: Step 7 - Creating a "dbadmin" security group
   ansible.builtin.group:
     name: dbadmin
     state: present
   tags:
     - db_postgresql_create_Postgresql_group_access
 
-# Adding users to the security group
-- name: Step 9 - Add multiple users to dbadmin group
+# Adding multiple users to the security group
+- name: Step 8 - Adding multiple users to "dbadmin" group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: dbadmin
@@ -87,8 +81,8 @@
   tags:
     - db_postgresql_add_users_dbadmin_group
 
-# Changing directory owners
-- name: Step 10 - Change group ownership for PostgreSQL directories
+# Changing group ownership for PostgreSQL directories
+- name: Step 9 - Changing group ownership for PostgreSQL directories
   become: true
   become_user: root
   ansible.builtin.file:
@@ -105,7 +99,7 @@
 
 
 # Setting permissions for the directory
-- name: Step 11 - Set permissions for PostgreSQL directories
+- name: Step 10 - Setting permissions for PostgreSQL directories
   become: true
   become_user: root
   ansible.builtin.file:
@@ -120,7 +114,87 @@
     - db_postgresql_set_postgresql_permissions
 
 
+# Stopping the PostgreSQL service
+- name: Step 11 - Stopping the PostgreSQL service
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: stopped
+  tags:
+    - db_postgresql_stopping_postgresql_service
 
 
+# Creating a backup archive of the main PostgreSQL directory
+- name: Step 12 - Creating a backup archive of the main PostgreSQL directory
+  become: true
+  become_user: root
+  command: >
+    tar -czvf /tmp/postgres_initial_main_backup_{{ ansible_date_time.iso8601_basic }}.tar.gz
+    -C /var/lib/postgresql/14/ main
+  tags:
+    - db_postgresql_create_backup_archive
 
 
+# Checking for the presence of a mount point
+- name: Step 13 - Checking for the presence of a mount point
+  become: true
+  become_user: root
+  command: ls -a {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
+  tags:
+    - db_postgresql_checking_mount_point_presence
+
+
+# Copying (with -a flag) the current main database directory to the mount point
+- name: Step 14 - Copying (with -a flag) the current main database directory to the mount point
+  become: true
+  become_user: root
+  command: >
+    cp -a /var/lib/postgresql/ {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
+  tags:
+    - db_postgresql_copying_current_main_db_dir_to_mount_point
+
+# Deleting the old main Postresql directory
+- name: Step 15 - Deleting the old main Postresql directory
+  become: true
+  become_user: root
+  command: rm -rf /var/lib/postgresql/14/main
+  tags:
+    - db_postgresql_deleting_the_old_main_postgresql_dir
+
+
+# Configuring the data_directory in /etc/postgresql/14/main/postgresql.conf
+- name: Step 16 - Configuring the data_directory in /etc/postgresql/14/main/postgresql.conf
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*data_directory\s*=\s*.*'
+    replace: "data_directory = '{{ hostvars[inventory_hostname].external_disks[0].mount_point }}/postgresql/14/main'"
+  notify: restart_postgresql
+  tags:
+    - db_postgresql_configuring_data_dir_postgresql_conf
+
+
+# Configuring the listen_addresses in /etc/postgresql/14/main/postgresql.conf
+- name: Step 17 - Configuring the listen_addresses in /etc/postgresql/14/main/postgresql.conf
+  become: true
+  become_user: postgres
+  replace:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: '^#?\s*listen_addresses\s*=\s*.*'
+    replace: "listen_addresses = '*'"
+  notify: restart_postgresql
+  tags:
+    - db_postgresql_listen_addresses_postgresql_conf
+
+
+# Restarting the PostgreSQL service
+- name: Step 18 - Restarting the PostgreSQL service
+  become: true
+  become_user: root
+  systemd:
+    name: postgresql
+    state: restarted
+  tags:
+    - db_postgresql_restart_postgresql_service

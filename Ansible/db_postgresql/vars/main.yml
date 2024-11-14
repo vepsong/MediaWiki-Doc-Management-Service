@@ -1,6 +1,6 @@
 ---
 # vars file for db_postgresql
-packages_to_install:
+apt_packages_to_install:
   - postgresql
   - postgresql-contrib
   - python3-psycopg2
@@ -10,3 +10,6 @@ packages_to_install:
   - python3-venv
   - python3-pip
 
+pip3_packages_to_install:
+  - pip>=24.3.1
+  - python-dotenv

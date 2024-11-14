@@ -204,7 +204,7 @@ mount /dev/&lt;VG_name&gt;/&lt;LV_name&gt; &lt;mount_point&gt;
 </code></pre>
 </li>
 <li>
-<p>Create an entry in `/etc/fstab to automount the disk after a VM restart</p>
+<p>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart</p>
 <pre><code># Example: echo "/dev/vg-db-storage/lv-db /opt/db_mount/ ext4 defaults 0 0" | sudo tee -a /etc/fstab
 echo "/dev/&lt;VG_name&gt;/&lt;LV_name&gt; ext4 defaults 0 0" | sudo tee -a /etc/fstab
 

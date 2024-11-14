@@ -24,13 +24,13 @@ def create_ansible_meta_content():
             connection_protocol = input("Input value for  'connection_protocol' (default: 'ssh'): ") or "ssh"
             
             # For ansible_become: accept only True/False and convert to a boolean value
-            while True:
-                ansible_become_input = input("Input value for 'ansible_become' (True/False, default: False): ")
-                if ansible_become_input.lower() in ["true", "false", ""]:
-                    ansible_become = ansible_become_input.lower() == "true" if ansible_become_input else False
-                    break
-                else:
-                    print("Input error! Type 'True' или 'False'.")
+            # while True:
+            #     ansible_become_input = input("Input value for 'ansible_become' (True/False, default: False): ")
+            #     if ansible_become_input.lower() in ["true", "false", ""]:
+            #         ansible_become = ansible_become_input.lower() == "true" if ansible_become_input else False
+            #         break
+            #     else:
+            #         print("Input error! Type 'True' или 'False'.")
 
         else:
             # Using default values
@@ -43,7 +43,7 @@ def create_ansible_meta_content():
             "ansible_user": ansible_user,
             "ansible_password": ansible_password,
             "connection_protocol": connection_protocol,
-            "ansible_become": ansible_become
+            # "ansible_become": ansible_become
         }
         return data
     except Exception as e:

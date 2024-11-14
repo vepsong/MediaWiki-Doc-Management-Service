@@ -11,7 +11,7 @@ env_var_dic = load_and_check_env_vars(env_vars)
 # Step 1. Terraform data synchronization with a cloud provider
 def update_terraform_vm_data(terraform_folder_path):
     """Terraform data synchronization with a cloud provider."""
-    command = ['terraform', 'apply', '-refresh-only']
+    command = ['terraform', 'apply', '-refresh-only', '-auto-approve']
     run_command(command, cwd=terraform_folder_path, capture_output=True)
 
 
