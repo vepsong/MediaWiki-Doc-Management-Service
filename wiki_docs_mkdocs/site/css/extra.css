@@ -46,14 +46,16 @@ details {
     background-color: #dadada; /* Light gray background */
     border-radius: 5px;        /* Rounded corners */
     padding: 10px;             /* Padding around code */
-    white-space: pre-line;
+    /* white-space: pre-line; */
+    white-space: pre-wrap;
     line-height: normal;
+    word-wrap: break-word;
 }
 
 .hljs-comment {
     color: #6A7322;
 }
 
-.rst-content .external_code_rendering pre code {
+/* .rst-content .external_code_rendering pre code {
     white-space: unset;
-}
+} */

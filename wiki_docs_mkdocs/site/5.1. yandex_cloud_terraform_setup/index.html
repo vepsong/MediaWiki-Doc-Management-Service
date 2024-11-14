@@ -63,7 +63,9 @@
               </ul>
               <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible setup</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../7.1.%20ansible_pipeline/">7. Run the Ansible pipeline</a>
                   </li>
               </ul>
       </div>
@@ -111,29 +113,29 @@ No changes are needed  </li>
 </li>
 <li>
 <p>Essential Terraform commands (execute in Terraform core folder)</p>
-<pre><code> # Syntax check of all .tf files
- terraform validate
+<pre><code># Syntax check of all .tf files
+terraform validate
 
- # Planning and reviewing what Terraform will do
- terraform plan
+# Planning and reviewing what Terraform will do
+terraform plan
 
- # Getting started and deploying with Terraform
- terraform apply -auto-approve
+# Getting started and deploying with Terraform
+terraform apply -auto-approve
 
- # Synchronizing the state of resources with the cloud provider (the terraform.tfstate file will be updated)
- terraform apply -refresh-only
+# Synchronizing the state of resources with the cloud provider (the terraform.tfstate file will be updated)
+terraform apply -refresh-only
 
- # Deleting all created resources
- terraform destroy -auto-approve
+# Deleting all created resources
+terraform destroy -auto-approve
 
- # Retrieving the list of VMs
- yc compute instance list
+# Retrieving the list of VMs
+yc compute instance list
 
- # Stopping the specified VM
- yc compute instance stop --id &lt;instance-id&gt;
+# Stopping the specified VM
+yc compute instance stop --id &lt;instance-id&gt;
 
- # Mark a resource as 'tainted' for subsequent recreation
- terraform taint 'yandex_compute_instance.group&lt;GROUP NUMBER&gt;["vm-&lt;VM NUMBER&gt;"]'
+# Mark a resource as 'tainted' for subsequent recreation
+terraform taint 'yandex_compute_instance.group&lt;GROUP NUMBER&gt;["vm-&lt;VM NUMBER&gt;"]'
 </code></pre>
 </li>
 </ol>
@@ -142,7 +144,7 @@ No changes are needed  </li>
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
           <a href="../4.1.%20yandex_cloud_cli_and_serv_acc_setup/" class="btn btn-neutral float-left" title="4. Yandex Cloud CLI profile and Service Account Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-          <a href="../6.1.%20ansible_setup/" class="btn btn-neutral float-right" title="6. Ansible setup">Next <span class="icon icon-circle-arrow-right"></span></a>
+          <a href="../6.1.%20ansible_setup/" class="btn btn-neutral float-right" title="6. Ansible Setup">Next <span class="icon icon-circle-arrow-right"></span></a>
       </div>
   
     <hr/>

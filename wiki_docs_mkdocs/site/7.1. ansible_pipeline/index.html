@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/7.1.%20ansible_pipeline/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>7. Run the Ansible pipeline - MediaWiki Doc Management Service</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "7. Run the Ansible pipeline";
+        var mkdocs_page_input_path = "7.1. ansible_pipeline.md";
+        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/7.1.%20ansible_pipeline/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> MediaWiki Doc Management Service
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="..">1. Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../2.%20app_deploy_schema_v4/">2. App deployment schema</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Service VM configuration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../3.1.%20service_vm_docker_setup/">3. Service VM Docker Configuration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../4.1.%20yandex_cloud_cli_and_serv_acc_setup/">4. Yandex Cloud CLI profile and Service Account Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../5.1.%20yandex_cloud_terraform_setup/">5. Yandex Cloud Terraform Setup</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible Setup</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">7. Run the Ansible pipeline</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual">Manual</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible_1">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual_1">Manual</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">MediaWiki Doc Management Service</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Remote deployment using Ansible</li>
+      <li class="breadcrumb-item active">7. Run the Ansible pipeline</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ansible-pipeline">Ansible pipeline</h1>
+<h2 id="changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</h2>
+<h3 id="ansible">Ansible</h3>
+<ul>
+<li>Compare the current VM hostname with <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> and change it if it differs.<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
+</code></pre>
+</li>
+</ul>
+<h3 id="manual">Manual</h3>
+<pre><code># Check the current VM hostname
+hostnamectl
+# Set a New Hostname
+hostnamectl set-hostname new-hostname
+</code></pre>
+<h2 id="mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</h2>
+<h3 id="ansible_1">Ansible</h3>
+<ul>
+<li>Creating a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and a <code>mount point</code> in <code>/opt</code> directory</li>
+<li>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
+</code></pre>
+</li>
+</ul>
+<h3 id="manual_1">Manual</h3>
+<ul>
+<li>
+<p>Display information about disks and partitions</p>
+<pre><code>lsblk -f
+</code></pre>
+</li>
+<li>
+<p>Partitioning the disk with new partitions</p>
+<pre><code># Example: fdisk /dev/vdb
+fdisk /dev/&lt;device_name&gt;
+
+# The "fdisk" console opens
+    - g — create a GPT partition table
+    - n — create a disk partition &gt;
+      &gt; specify the partition number (usually 1) &gt;
+      &gt; press Enter (when prompted about sectors)
+    - w — save changes and exit
+</code></pre>
+</li>
+<li>
+<p>Initializing the Physical Volume</p>
+<pre><code># Display information about disks and partitions
+lsblk -f
+
+# Create PV
+# Example: pvcreate /dev/vdb1
+pvcreate /dev/&lt;partition_name&gt;
+</code></pre>
+</li>
+<li>
+<p>Creating a Volume Group</p>
+<pre><code># Create VG
+# Example: vgcreate vg-db-storage /dev/vdb1
+vgcreate &lt;volume_group_name&gt; /dev/&lt;partition_name&gt;
+
+# Check that the VG is created
+vgs
+</code></pre>
+</li>
+<li>
+<p>Creating a Logical Volume</p>
+<pre><code># Check the number of physical extents
+vgdisplay
+
+# Create LV
+# Example: lvcreate -n lv-db -l 5119 vg-db-storage
+lvcreate -n &lt;LV_name&gt; -l &lt;number of extents&gt; &lt;VG_name&gt;
+
+# Check that the VG is created
+lvs
+</code></pre>
+</li>
+<li>
+<p>Formatting the LV and creating an ext4 file system</p>
+<pre><code># Example: mkfs.ext4 /dev/vg-db-storage/lv-db
+mkfs.ext4 /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
+</code></pre>
+</li>
+<li>
+<p>Creating a Mount Point</p>
+<pre><code># Example: mkdir /opt/db_mount/
+mkdir /opt/&lt;directory_name&gt;/
+</code></pre>
+</li>
+<li>
+<p>Mounting the LV</p>
+<pre><code># Example: mount /dev/vg-db-storage/lv-db /opt/db_mount/
+mount /dev/&lt;VG_name&gt;/&lt;LV_name&gt; &lt;mount_point&gt;
+</code></pre>
+</li>
+<li>
+<p>Create an entry in `/etc/fstab to automount the disk after a VM restart</p>
+<pre><code># Example: echo "/dev/vg-db-storage/lv-db /opt/db_mount/ ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/&lt;VG_name&gt;/&lt;LV_name&gt; ext4 defaults 0 0" | sudo tee -a /etc/fstab
+
+# Check automount
+cat /etc/fstab or mount -a
+</code></pre>
+</li>
+</ul>
+<h2 id="unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</h2>
+              
+            </div>
+          </div><footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+          <a href="../6.1.%20ansible_setup/" class="btn btn-neutral float-left" title="6. Ansible Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      </div>
+  
+    <hr/>
+  
+    <div role="contentinfo">
+        <p>Copyright &copy; 2024 <a href="https://github.com/vepsong/MediaWiki-Doc-Management-Service">Dmitry Kirsanov</a></p>
+    </div>
+  
+  </footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../6.1.%20ansible_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
