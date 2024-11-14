@@ -63,7 +63,9 @@
               </ul>
               <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible setup</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../7.1.%20ansible_pipeline/">7. Run the Ansible pipeline</a>
                   </li>
               </ul>
       </div>
@@ -145,19 +147,19 @@
 </li>
 <li>
 <p>Running a previously downloaded Dockerfile to create an <a href="https://alpinelinux.org/">Alpine Linux OS</a> image with the required packages and dependencies</p>
-<pre><code> # - docker build - create Docker-image  
- # - -t mediawiki_service_alpine - arbitrary Docker-image name  
- # - . - build context (where to look for the Dockerfile). In this case, it refers to the current directory
+<pre><code># - docker build - create Docker-image  
+# - -t mediawiki_service_alpine - arbitrary Docker-image name  
+# - . - build context (where to look for the Dockerfile). In this case, it refers to the current directory
 
- docker build -t mediawiki_service_alpine .
+docker build -t mediawiki_service_alpine .
 </code></pre>
 </li>
 <li>
 <p>Start a Docker-container using the previously created Docker-image (<code>"Alpine Linux:latest"</code>)</p>
-<pre><code> # - --hostname &lt;hostname&gt; - arbitrary VM hostname  
- # - --name &lt;Docker-container name&gt; - arbitrary Docker-container name
- # - it &lt;Docker-image name&gt; - Docker-image name used for Docker-container building
- # - bash - shell
+<pre><code># - --hostname &lt;hostname&gt; - arbitrary VM hostname  
+# - --name &lt;Docker-container name&gt; - arbitrary Docker-container name
+# - it &lt;Docker-image name&gt; - Docker-image name used for Docker-container building
+# - bash - shell
 
  docker run --hostname vm-0-service --name mediawiki_service_alpine-container -it mediawiki_service_alpine bash
 </code></pre>
@@ -171,16 +173,16 @@
 </li>
 <li>
 <p>Create a Python virtual environment in <code>~/repository_name</code> on the <span class="tooltip" onclick="showTooltip(event)">VM-0<span class="tooltip-text">vm-0-service-virtual-machine</span></span></p>
-<pre><code> # Create a Python virtual environment
- python3 -m venv pyvenv
- # Activate a Python virtual environment
- source pyvenv/bin/activate
- # Upgrade pip
- python3 -m pip install --upgrade pip
- # Install requirements
- pip install -r python_scripts/requirements.txt
- # Commit changes when adding additional pip packages
- pip freeze &gt; python_scripts/requirements.txt
+<pre><code># Create a Python virtual environment
+python3 -m venv pyvenv
+# Activate a Python virtual environment
+source pyvenv/bin/activate
+# Upgrade pip
+python3 -m pip install --upgrade pip
+# Install requirements
+pip install -r python_scripts/requirements.txt
+# Commit changes when adding additional pip packages
+pip freeze &gt; python_scripts/requirements.txt
 </code></pre>
 </li>
 </ol>

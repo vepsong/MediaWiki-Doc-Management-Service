@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>6. Ansible setup - MediaWiki Doc Management Service</title>
+    <title>6. Ansible Setup - MediaWiki Doc Management Service</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,7 +13,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "6. Ansible setup";
+        var mkdocs_page_name = "6. Ansible Setup";
         var mkdocs_page_input_path = "6.1. ansible_setup.md";
         var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/";
       </script>
@@ -61,15 +61,19 @@
               </ul>
               <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
               <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">6. Ansible setup</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">6. Ansible Setup</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#files-and-variables-setup">Files and Variables Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ddns-setup">DDNS Setup</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#dns-setup">DNS Setup</a>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#essential-ansible-commands">Essential Ansible commands</a>
     </li>
     </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../7.1.%20ansible_pipeline/">7. Run the Ansible pipeline</a>
                   </li>
               </ul>
       </div>
@@ -87,7 +91,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Remote deployment using Ansible</li>
-      <li class="breadcrumb-item active">6. Ansible setup</li>
+      <li class="breadcrumb-item active">6. Ansible Setup</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -267,8 +271,15 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansib
 <li>
 <p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>LocalSettings.php</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
 <ul>
+<li>The <code>LocalSettings.php</code> file contains the MediaWiki configuration</li>
 <li>
-<p>The <code>LocalSettings.php</code> file contains the MediaWiki configuration</p>
+<p>Pay attention to the following blocks and lines in the file:</p>
+<ul>
+<li>line: <span class="tooltip" onclick="showTooltip(event)"><code>$wgServer = 'http://nginx-proxy server IP or URL address';</code><span class="tooltip-text">The address that users will use to access the MediaWiki service</span></span></li>
+<li>line: <span class="tooltip" onclick="showTooltip(event)"><code>$wgDefaultSkin = 'monobook';</code><span class="tooltip-text">The theme MediaWiki service</span></span></li>
+<li>block: <span class="tooltip" onclick="showTooltip(event)">Database settings<span class="tooltip-text">Credentials for Database Connection</span></span></li>
+<li>block: <span class="tooltip" onclick="showTooltip(event)">Postgres specific settings<span class="tooltip-text">Database Connection Settings</span></span></li>
+</ul>
 <p><details class="external_code_rendering">
 <summary>Show LocalSettings.php_EXAMPLE</summary></p>
 <pre><code> &lt;?php
@@ -407,23 +418,63 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansib
 </code></pre>
 </details>
 </li>
+<li>
+<p>File Encryption with Ansible Voult </p>
+<pre><code># Encrypting the LocalSettings.php File Using Vault-ID: "mediawiki_localsettings"
+ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/repository_name/Ansible/common_files/LocalSettings.php"
+</code></pre>
+</li>
+<li>
+<p>Write Ansible Voult password to file:</p>
+<pre><code>echo "password3" &gt; ~/repository_name/Ansible/vault_passwords/vault_mediawiki_localsettings.txt
+</code></pre>
+</li>
+</ul>
+<h4 id="ddns-setup">DDNS Setup</h4>
+<ul>
+<li>DDNS is used to eliminate the need to change IP addresses in configuration files.</li>
+<li>To configure DDNS, follow these steps:<ul>
+<li>Register with a DDNS provider, such as <a href="https://www.noip.com/">noip.com</a></li>
+<li>Creating a custom hostname</li>
+<li>Configuring the <a href="https://www.noip.com/support/knowledgebase/install-linux-3-x-dynamic-update-client-duc#install_from_source">Dynamic Update Client (DUC)</a><ul>
+<li>DUC configuration is performed during Ansible tasks, so there is no need to configure it manually</li>
 </ul>
 </li>
-</ol>
-<h3 id="dns-setup">DNS Setup</h3>
-<ol>
+</ul>
+</li>
+</ul>
+</li>
 <li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>noip-duc</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
+<p>Review or modify the two <code>noip-duc</code> files:</p>
 <ul>
+<li>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_nginx_mediawiki</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/duc_nginx_mediawiki</code></span></span> File</li>
 <li>
-<p>The <code>noip-duc</code> file contains the MediaWiki configuration</p>
+<p>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_zabbix_server</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/duc_zabbix_server</code></span></span> File</p>
+</li>
+<li>
+<p>The <code>noip-duc</code> file contains the <a href="https://www.noip.com/">noip.com</a> credentials for automatically updating the NAT IP address with the DDNS provider</p>
 <p><details class="external_code_rendering">
 <summary>Show noip-duc_EXAMPLE</summary></p>
 <pre><code> NOIP_USERNAME=myusername
  NOIP_PASSWORD=mypassword
- NOIP_HOSTNAMES=example.ddns.net,exampledomain.com,noiptest.redirectme.net
+ NOIP_HOSTNAMES=example.ddns.net
 </code></pre>
 </details>
+</li>
+<li>
+<p>File Encryption with Ansible Voult </p>
+<pre><code># Encrypting the duc_nginx_mediawiki File Using Vault-ID: "duc_nginx_mediawiki"
+ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/repository_name/Ansible/common_files/duc_nginx_mediawiki"
+
+# Encrypting the duc_zabbix_server File Using Vault-ID: "duc_zabbix_server"
+ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/repository_name/Ansible/common_files/duc_zabbix_server"
+</code></pre>
+</li>
+<li>
+<p>Write Ansible Voult password to file:</p>
+<pre><code>echo "password4" &gt; ~/repository_name/Ansible/vault_passwords/vault_duc_zabbix_server.txt
+echo "password5" &gt; ~/repository_name/Ansible/vault_passwords/vault_duc_nginx_mediawiki.txt
+</code></pre>
 </li>
 </ul>
 </li>
@@ -453,6 +504,7 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansib
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
           <a href="../5.1.%20yandex_cloud_terraform_setup/" class="btn btn-neutral float-left" title="5. Yandex Cloud Terraform Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+          <a href="../7.1.%20ansible_pipeline/" class="btn btn-neutral float-right" title="7. Run the Ansible pipeline">Next <span class="icon icon-circle-arrow-right"></span></a>
       </div>
   
     <hr/>
@@ -476,6 +528,8 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansib
     
       <span><a href="../5.1.%20yandex_cloud_terraform_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../7.1.%20ansible_pipeline/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
