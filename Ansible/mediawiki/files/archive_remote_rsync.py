@@ -1,1 +1,0 @@
-/root/YP-sp13_MediaWiki/python_scripts/archive_remote_rsync.py

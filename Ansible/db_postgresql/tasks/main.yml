@@ -28,11 +28,9 @@
   become: true
   ansible.builtin.pip:
     name: "{{ item }}" 
-    # executable: pip3
     state: latest
   loop:
     - "{{ pip3_packages_to_install }}"
-  # when: db_hosts.standby in inventory_hostname or db_hosts.zabbix_server in inventory_hostname
   tags:
     - db_postgresql_install_pip3_packages_python_dotenv
 
@@ -48,7 +46,6 @@
 # Adding secret variables
 - name: Step 5 - Adding secret variables
   include_vars: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
-    # file: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
   tags:
     - db_postgresql_adding_secret_variables
 

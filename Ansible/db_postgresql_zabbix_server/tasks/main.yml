@@ -1,46 +1,37 @@
 ---
-# tasks file for db_postgresql_zabbix_server
+# =========================================
+# Block with Zabbix-Server PostgreSQL tasks
+# =========================================
 
-# Добавление секретных переменных
-- name: Step 1 - Include secret variables
-  include_vars: secrets.yml
+# Adding secret variables
+- name: Step 1 - Adding secret variables
+  include_vars: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
   tags:
-    - setup_db_postgresql_zabbix_server_add_secret_variables
+    - zabbix_server_postgresql_setup_adding_secret_variables
 
-# Создание динамических переменных
-- name: Step 2 - Create dynamic variables
+# Creating dynamic variables
+- name: Step 2 - Creating dynamic variables
   set_fact:
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   tags:
-    - setup_db_postgresql_zabbix_server_create_dynamic_variables
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables
+    - zabbix_server_postgresql_setup_creating_dynamic_variables
 
-# Остановка сервиса PostgreSQL
-- name: Step 3 - Stop PostgreSQL service immediately
+# Stopping the PostgreSQL service
+- name: Step 3 - Stopping the PostgreSQL service
   become: true
   become_user: root
   systemd:
     name: postgresql
     state: stopped
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_stop_postgresql
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_stop_postgresql
-
-# Проверка наличия mount point
-- name: Step 4 - Check contents of the mount point
-  become: true
-  become_user: root
-  command: ls -a {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
-  register: mount_point_contents
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_check_existance_mount_point
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_check_existance_mount_point
+    - zabbix_server_postgresql_setup_stopping_postgresql_service
 
 
-# Создание директории /zabbix_dump, в которой будут хранится dump'ы БД zabbix-server
-- name: Step 5 - create /zabbix_dump for db zabbix-server dumps
+# Creating the /zabbix_dump directory, where db_dumps will be stored with '0755' permissions
+# Owner: rwx (read, write, and execute)
+# Group: r-x (read and execute)
+# Others: r-x (read and execute)
+- name: Step 4 - Creating the /zabbix_dump directory, where db_dumps will be stored with '0755' permissions
   become: true
   ansible.builtin.file:
     path: "{{ postgres_zabbix_server_vars.db_backups_dir }}"
@@ -49,125 +40,42 @@
     mode: '0755'
   when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_create_path_scripts
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_create_path_scripts
+    - zabbix_server_postgresql_setup_creating_zabbix_dump_directory
 
 
-# Копирование текущей директории БД в mount point
-- name: Step 6 - Copy current db_path to mount_point
-  become: true
-  become_user: root
-  command: >
-    cp -a /var/lib/postgresql/ {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_current_db_path_to_mount_point
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_current_db_path_to_mount_point
-
-# Создание архива с бэкапом
-- name: Step 7 - Create a archive backup of the main directory
-  become: true
-  become_user: root
-  command: >
-    tar -czvf /var/lib/postgresql/14/main_{{ ansible_date_time.iso8601_basic }}.bak.tar.gz -C /var/lib/postgresql/14/ main
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  ignore_errors: yes
-  tags:
-    - setup_db_postgresql_zabbix_server_create_archive
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_create_archive
-
-
-# Удаление старой директории
-- name: Step 8 - Remove old main directory data
-  become: true
-  become_user: root
-  command: rm -rf /var/lib/postgresql/14/main
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_remove_primary_db_old_path
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_remove_primary_db_old_path
-
-# Настройка data_directory в /etc/postgresql/14/main/postgresql.conf в zabbix-server Postgresql
-- name: Step 9 - Ensure data_directory is mount point in postgresql.conf in zabbix-server Postgresql
-  become: true
-  become_user: postgres
-  replace:
-    path: /etc/postgresql/14/main/postgresql.conf
-    regexp: '^#?\s*data_directory\s*=\s*.*'
-    replace: "data_directory = '{{ hostvars['vm-1-monitoring-system'].external_disks[0].mount_point }}/postgresql/14/main'"
-  notify: restart_postgresql
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_add_data_directory_primary_on_postgresql_conf
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_add_data_directory_primary_on_postgresql_conf
-
-
-# Добавление разрешений в pg_hba.conf на подключение к zabbix-server Postgresql
-- name: Step 10 - Add entries to pg_hba.conf for zabbix-server Postgresql
+# Adding permissions to pg_hba.conf for connecting to the Zabbix-Server Postgresql
+- name: Step 5 - Adding permissions to pg_hba.conf for connecting to the Zabbix-Server Postgresql
   become: true
   become_user: postgres
   blockinfile:
     path: /etc/postgresql/14/main/pg_hba.conf
     block: |
-      host zabbix        zabbix         77.137.79.100/32           scram-sha-256
-      host zabbix        zabbix         212.179.174.196/32         scram-sha-256
-      host zabbix        zabbix         5.29.11.237/32             scram-sha-256
-      host zabbix        zabbix         {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32          scram-sha-256
-      # host replication   syncuser       77.137.79.100/32           scram-sha-256
-      # host replication   syncuser       212.179.174.196/32           scram-sha-256
-      # host replication   syncuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32          scram-sha-256
+      host zabbix       zabbix       77.137.79.100/32                                                scram-sha-256
+      host zabbix       zabbix       212.179.174.196/32                                              scram-sha-256
+      host zabbix       zabbix       5.29.11.237/32                                                  scram-sha-256
+      host zabbix       zabbix       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32        scram-sha-256
+      host zabbix       zabbix       192.168.10.11/32                                                scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
   notify: restart_postgresql
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_add_ip_pg_hba_conf
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_add_ip_pg_hba_conf
-
-# Настройка  listen_addresses в /etc/postgresql/14/main/postgresql.conf в zabbix-server Postgresql
-- name: Step 11 - Ensure listen_addresses is set to '*' in postgresql.conf in zabbix-server Postgresql
-  become: true
-  become_user: postgres
-  replace:
-    path: /etc/postgresql/14/main/postgresql.conf
-    regexp: '^#?\s*listen_addresses\s*=\s*.*'
-    replace: "listen_addresses = '*'"
-  notify: restart_postgresql
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_add_listen_addresses_primary_postgresql_conf
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_add_listen_addresses_primary_postgresql_conf
-
-# # Настройка  wal_level в /etc/postgresql/14/main/postgresql.conf в zabbix-server Postgresql
-# - name: Step 12 - Ensure wal_level is set to replica in postgresql.conf in zabbix-server Postgresql
-#   become: true
-#   become_user: postgres
-#   replace:
-#     path: /etc/postgresql/14/main/postgresql.conf
-#     regexp: '^#?\s*wal_level\s*=\s*\w+'
-#     replace: 'wal_level = replica'
-#   notify: restart_postgresql
-#   when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-#   tags:
-#     - setup_db_postgresql_zabbix_server_add_wal_level_primary_postgresql_conf
-#     - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_add_wal_level_primary_postgresql_conf
+    - zabbix_server_postgresql_setup_configuring_connect_permissions_dir_pg_hba_conf
 
 
-# Немедленный перезапуск сервиса PostgreSQL
-- name: Step 13 - Restart PostgreSQL service immediately
+
+# Restarting the PostgreSQL service
+- name: Step 6 - Restarting the PostgreSQL service
   become: true
   become_user: root
   systemd:
     name: postgresql
     state: restarted
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_restart_postgresql
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_restart_postgresql
+    - zabbix_server_postgresql_setup_restart_postgresql_service
 
 
-# Создание пользователя zabbix для zabbix-server Postgresql
-- name: Step 14 - create user - zabbix - in zabbix-server Postgresql
+# Creating the "zabbix" user for the Zabbix-Server Postgresql
+- name: Step 7 - Creating the "zabbix" user for the Zabbix-Server Postgresql
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -175,67 +83,80 @@
     password: "{{ postgres_zabbix_server_user_vars.db_user_password }}"
     role_attr_flags: "{{ postgres_zabbix_server_user_vars.attr | join(',') }}"
     state: present
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   notify: restart_postgresql
   tags:
-    - setup_db_postgresql_zabbix_server_create_user_zabbix
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_create_user_zabbix
+    - zabbix_server_postgresql_setup_creating_user_zabbix
 
 
 
-# Проверка существования БД (если ее нет, то создание)
-- name: Step 15 - Ensure the PostgreSQL database is present
+# Checking if the database exists (and creating it if it doesn't)
+- name: Step 8 - Checking if the database exists (and creating it if it doesn't)
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
     name: "{{ postgres_zabbix_server_vars.db_name }}"
     owner: "{{ postgres_zabbix_server_user_vars.db_user }}"
     state: present
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_ensure_postgresql_db_is_presents
-    - setup_db_postgresql_zabbix_server_add_secret_variables, setup_db_postgresql_zabbix_server_create_dynamic_variables, setup_db_postgresql_zabbix_server_ensure_postgresql_db_is_presents
+    - zabbix_server_postgresql_setup_checking_postgresql_database_existsance
 
 
-# =======================================================
-# Блок с задачами zabbix-server db для создания dump
-# =======================================================
 
-# Установка python-библиотек
-# Создание директории /scripts, в которой будут хранится скрипты для dump'a
-# Cоздание пустого файла .env для дальнейшего наполнения значениями из secrets.yml
-- name: Step 16 - create path for scripts zabbix-server
+
+# =============================================================
+# Block with Zabbix-Server PostgreSQL tasks for creating a dump
+# =============================================================
+
+
+# Creating the /scripts directory with '0755' permissions, where scripts for the dump will be stored
+# Owner: rwx (read, write, and execute)
+# Group: r-x (read and execute)
+# Others: r-x (read and execute)
+- name: Step 9 - Creating the /scripts directory with '0755' permissions
   become: true
   become_user: root
-  shell: |
-    pip3 install python-dotenv
-    mkdir /scripts 
-    touch /scripts/.env
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_create_path_script
-
-
-# Копирование скрипта pgdump_zabbix_server.py в /scripts
-- name: Step 17 - Copy pgdump_zabbix_server.py to /scripts
-  copy:
-    src: "{{ role_path }}/files/pgdump_zabbix_server.py"
-    dest: /scripts/
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - setup_db_postgresql_zabbix_server_copy_pgdump_py_to_scripts
-
-# Добавление скрипту pgdump_zabbix_server.py прав на исполнение 
-- name: Step 18 - Make pgdump_zabbix_server.py executable
-  file:
-    path: /scripts/pgdump_zabbix_server.py
+  ansible.builtin.file:
+    path: /scripts 
+    state: directory
+    group: dbadmin
     mode: '0755'
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_add_exec_to_pgdump_zabbix_server
+    - zabbix_server_postgresql_setup_creating_scripts_directory
 
-# Наполнение .env
-- name: Step 19 - Fill up .env
+
+
+# Creating the .env file in /scripts directory with '0740' permissions
+# Owner: rwx (read, write, and execute)
+# Group: r-- (read only)
+# Others: --- (no access)
+- name: Step 10 - Creating the .env file in /scripts directory with '0740' permissions
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: "/scripts/.env"
+    state: touch
+    group: dbadmin
+    mode: '0740'
+  tags:
+    - zabbix_server_postgresql_setup_creating_env_file
+
+
+# Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+# Owner: rwx (read, write, and execute)
+# Group: r-x (read and execute)
+# Others: r-x (read and execute)
+- name: Step 11 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+  become: true
+  become_user: root
+  copy:
+    src: "{{ playbook_dir }}/common_files/pgdump_zabbix_server.py"
+    dest: /scripts/
+    mode: '0755'
+  tags:
+    - zabbix_server_postgresql_setup_copy_pgdump_zabbix_server_py
+
+# Filling the .env file with data
+- name: Step 12 - Filling the .env file with data
   become: true
   become_user: root
   blockinfile:
@@ -248,51 +169,50 @@
       DATABASE_PORT={{ postgres_zabbix_server_vars.db_port }}
 
     marker: "# {mark} Ansible managed block for .env"
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_fill_up_env
+    - zabbix_server_postgresql_setup_filling_env_data
 
 
-# Копирование файла конфигурации /etc/logrotate.d/logrotate_pgdump
-# Управление файлами логов в /scripts/pgdump.log
-# Команда для принудительного запуска logrotate - logrotate -f /etc/logrotate.conf
-- name: Step 20 - Copy logrotate to /etc/logrotate.d/logrotate_pgdump
+# Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
+# Command for forcing logrotate to run: logrotate -f /etc/logrotate.conf
+- name: Step 13 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
   become: true
   become_user: root
   copy:
-    src: "{{ role_path }}/files/logrotate_pgdump"
-    dest: /etc/logrotate.d/logrotate_pgdump
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+    src: "{{ playbook_dir }}/common_files/logrotate_pgdump_zabbix_server"
+    dest: /etc/logrotate.d/
   tags:
-    - setup_db_postgresql_zabbix_server_copy_logrotate
+    - zabbix_server_postgresql_setup_logrotate_pgdump_zabbix_server
+    
 
-
-# Запуск сервиса logrotate и добавление в автозапуск
-- name: Step 21 - Start and enable logrotate service
-  become: true
-  become_user: root
-  # ansible.builtin.service:  ansible.builtin.systemd:
-  ansible.builtin.systemd:
-    name: logrotate
-    state: started 
-    enabled: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+# Starting and enabling the logrotate service
+- name: Step 14 - Starting and enabling the logrotate service
+  service:
+    name=logrotate
+    state=started 
+    enabled=yes
   tags:
-    - setup_db_postgresql_zabbix_server_start_enable_logrotate_service
+    - zabbix_server_postgresql_setup_start_enable_logrotate_service
 
 
-# Добавление запуска pgdump_zabbix_server.py в планировшик задания cron
-# minute: "0" - запуск в начале часа
-# hour: "*/4" - запуск каждые 4 часа
-- name: Step 22 - Run pgdump_zabbix_server.py script
+
+# Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
+# minute: '0' - run at the beginning of the hour
+# hour: '*/4' - run every 4 hours"
+
+- name: Step 15 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
   become: true
   become_user: root
   ansible.builtin.cron:
-    name: "Run pgdump script"
+    name: "Run pgdump_zabbix_server.py script"
     minute: "0"
     hour: "*/4"
     job: "/usr/bin/python3 /scripts/pgdump_zabbix_server.py >> /scripts/pgdump_zabbix_server.log 2>&1"
   notify: restart_cron
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
-    - setup_db_postgresql_zabbix_server_run_pgdump_zabbix_server_py_cron
+    - zabbix_server_postgresql_setup_adding_execution_pgdump_zabbix_server_py_cron_job_scheduler
+
+
+
+
+

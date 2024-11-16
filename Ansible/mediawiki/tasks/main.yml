@@ -1,52 +1,68 @@
 ---
-# tasks file for mediawiki
+# =================================
+# Block with MediaWiki common tasks
+# =================================
 
-# =========================
-# Блок с общими задачами
-# =========================
-
-# Добавление секретных переменных
-- name: Step 1 - Include secret variables
-  include_vars: secrets.yml
-  tags:
-    - setup_mediawiki_add_secret_variables
-
-
-# Обновление пакетного репозитория 
-- name: Step 2 - Update list of packages
+# Updating the apt repository
+- name: Step 1 - Update list of packages
   apt:
     update_cache: yes
-  become: yes
-  tags:
-    - setup_mediawiki_apt_update
-
-# Установка пакетов
-- name: Step 3 - Install packages
   become: true
-  become_user: root
+  tags:
+    - mediawiki_setup_apt_update
+
+# Installing apt packages
+- name: Step 2 - Apt packages installing
   apt:
     name: "{{ item }}" 
     state: present
   loop:
-    - "{{ packages_to_install }}"
+    - "{{ apt_packages_to_install }}"
   tags:
-    - setup_mediawiki_install_packages 
+    - mediawiki_setup_install_apt_packages 
 
 
-# Запуск сервиса nginx и добавление в автозапуск
-- name: Step 4 - Start and enable nginx services
+# Installing the pip3 packages
+- name: Step 3 - Pip3 packages installing
   become: true
-  become_user: root
+  ansible.builtin.pip:
+    name: "{{ item }}" 
+    state: latest
+  loop:
+    - "{{ pip3_packages_to_install }}"
+  tags:
+    - mediawiki_setup_install_pip3_packages
+
+
+# Adding secret variables
+- name: Step 4 - Adding secret variables
+  include_vars: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
+  tags:
+    - mediawiki_setup_adding_secret_variables
+
+
+# Starting and enabling the nginx services
+- name: Step 5 - Starting and enabling the nginx services
   service: 
     name=nginx
     state=started 
     enabled=yes
   tags:
-    - setup_mediawiki_start_enable_nginx_service
+    - mediawiki_setup_start_enable_nginx_service
 
 
-# Удаление symlink (символической ссылки) "default" из /etc/nginx/sites-enabled/default
-- name: Step 5 - Remove symlink to default nginx conf from /etc/nginx/sites-enabled/default
+# Starting and enabling the postgresql service
+- name: Step 6 - Starting and enabling the postgresql service
+  service: 
+    name=postgresql
+    state=started 
+    enabled=yes
+  tags:
+    - mediawiki_setup_start_enable_postgresql_service
+
+
+# Removing the "default" symlink from /etc/nginx/sites-enabled/default
+- name: Step 7 - Removing the "default" symlink from /etc/nginx/sites-enabled/default
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
@@ -54,16 +70,7 @@
     - setup_mediawiki_remove_symlink_default_nginx_conf
 
 
-# Запуск сервиса postgresql и добавление в автозапуск
-- name: Step 6 - Start and enable postgresql services
-  become: true
-  become_user: root
-  service: 
-    name=postgresql
-    state=started 
-    enabled=yes
-  tags:
-    - setup_mediawiki_start_enable_postgresql_service
+
 
 
 # # Копирование конфигурационного файла nginx в /etc/nginx/sites-available/nginx_mediawiki 
@@ -90,9 +97,9 @@
 #     - setup_mediawiki_symlink_creation_mediawiki
 
 
-# =======================================
-# Блок с задачами vm-3-mediawiki-server-1
-# =======================================
+# =============================================================
+# Block with MediaWiki Server-1 tasks (vm-3-mediawiki-server-1)
+# =============================================================
 
 
 # Копирование конфигурационного файла nginx в /etc/nginx/sites-available/nginx_mediawiki 
@@ -199,19 +206,6 @@
 # Блок с задачами vm-4-mediawiki-server-2
 # =======================================
 
-# Установка pip3 пакетов
-- name: Step 15 - Install pip3 packages
-  become: true
-  become_user: "{{ secret_vm_4_mediawiki_server_2.user }}"
-  ansible.builtin.pip:
-    name: "{{ item }}" 
-    state: present
-    executable: pip3
-  loop: "{{ pip3_packages_to_install }}"
-  when: mediawiki_hosts.server2 in inventory_hostname
-  tags:
-    - setup_mediawiki_install_pip3_packages
-    - setup_mediawiki_add_secret_variables, setup_mediawiki_install_pip3_packages
 
 # Создание директории /scripts, в которой будут хранится скрипты для rsync папки mediawiki
 - name: Step 16 - Create directory /scripts for scripts on vm-4-mediawiki-server-2

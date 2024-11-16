@@ -82,6 +82,36 @@
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible_2">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual_2">Manual</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#postgresql-common-setup">PostgreSQL Common Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible_3">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual_3">Manual</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#primary-postgresql-setup">Primary Postgresql Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible_4">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual_4">Manual</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#standby-postgresql-setup">Standby Postgresql Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ansible_5">Ansible</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#manual_5">Manual</a>
+    </li>
+        </ul>
     </li>
     </ul>
                   </li>
@@ -114,7 +144,7 @@
 <h2 id="changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</h2>
 <h3 id="ansible">Ansible</h3>
 <ul>
-<li>Compare the current VM hostname with <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> and change it if it differs.<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="change_hostname"
+<li>Compare the current VM hostname with <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> and change it if it differs.<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="change_vms_hostname"
 </code></pre>
 </li>
 </ul>
@@ -128,7 +158,7 @@ hostnamectl set-hostname new-hostname
 <h3 id="ansible_1">Ansible</h3>
 <ul>
 <li>Creating a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and a <code>mount point</code> in <code>/opt</code> directory</li>
-<li>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_disks"
+<li>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_hard_drives"
 </code></pre>
 </li>
 </ul>
@@ -181,7 +211,7 @@ vgdisplay
 # Example: lvcreate -n lv-db -l 5119 vg-db-storage
 lvcreate -n &lt;LV_name&gt; -l &lt;number of extents&gt; &lt;VG_name&gt;
 
-# Check that the VG is created
+# Check that the LV is created
 lvs
 </code></pre>
 </li>
@@ -214,6 +244,314 @@ cat /etc/fstab or mount -a
 </li>
 </ul>
 <h2 id="unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</h2>
+<h3 id="ansible_2">Ansible</h3>
+<ul>
+<li>Deleting a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and unmount a <code>mount point</code> in <code>/opt</code> directory<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_hard_drives"
+</code></pre>
+</li>
+</ul>
+<h3 id="manual_2">Manual</h3>
+<ul>
+<li>
+<p>Display information about disks and partitions</p>
+<pre><code>lsblk -f
+</code></pre>
+</li>
+<li>
+<p>Unmounting the LV  </p>
+<pre><code># Example: umount /opt/db_mount/
+umount &lt;path_to_mount_point&gt;
+</code></pre>
+</li>
+<li>
+<p>Removing a Logical Volume</p>
+<pre><code># Display information about LV
+lvdisplay
+
+# Remove LV
+# Example: lvremove /dev/vg-db-storage/lv-db
+lvremove /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
+</code></pre>
+</li>
+<li>
+<p>Removing a Volume Group</p>
+<pre><code># Display information about VG
+vgdisplay
+
+# Remove VG
+# Example: vgremove /dev/vg-db-storage
+vgremove /dev/&lt;VG_name&gt;
+</code></pre>
+</li>
+<li>
+<p>Removing a Partition and Physical Volume</p>
+<pre><code># Display information about Partition
+fdisk -l or sblk -f
+
+# Example: fdisk /dev/vdb
+fdisk /dev/&lt;device_name&gt;
+
+# The "fdisk" console opens
+    - g — display current partitions
+    - d — remove a disk partition &gt;
+      &gt; specify the partition number (usually 1)
+    - w — save changes and exit
+</code></pre>
+</li>
+</ul>
+<h2 id="postgresql-common-setup">PostgreSQL Common Setup</h2>
+<p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span> </p>
+<h3 id="ansible_3">Ansible</h3>
+<ul>
+<li>
+<p>Tasks:</p>
+<pre><code># Step 1 - Update list of packages
+# Step 2 - Apt packages installing
+# Step 3 - Pip3 packages installing
+# Step 4 - Starting and enabling the postgresql service
+# Step 5 - Adding secret variables
+# Step 6 - Creating dynamic variables
+# Step 7 - Creating a "dbadmin" security group
+# Step 8 - Adding multiple users to "dbadmin" group
+# Step 9 - Changing group ownership for PostgreSQL directories
+# Step 10 - Setting permissions for PostgreSQL directories
+# Step 11 - Stopping the PostgreSQL service
+# Step 12 - Creating a backup archive of the main PostgreSQL directory
+# Step 13 - Checking for the presence of a mount point
+# Step 14 - Copying (with -a flag) the current main database directory to the mount point
+# Step 15 - Deleting the old main Postresql directory
+# Step 16 - Configuring the data_directory in /etc/postgresql/14/main/postgresql.conf
+# Step 17 - Configuring the listen_addresses in /etc/postgresql/14/main/postgresql.conf
+# Step 18 - Restarting the PostgreSQL service
+</code></pre>
+</li>
+<li>
+<p>Running playbook:</p>
+<pre><code>ansible-playbook playbook.yaml \
+--vault-id ansible_secrets@~/repository_name/Ansible/vault_passwords/vault_ansible_secrets.txt \
+-i inventory.yaml --tags="postgresql_common_setup"
+</code></pre>
+</li>
+</ul>
+<h3 id="manual_3">Manual</h3>
+<ul>
+<li>
+<p>Steps 1, 2, 3 - Upgrage apt, install apt packages, install pip3 packages</p>
+<p><details class="external_code_rendering">
+<summary>Show apt and pip3 packages to install</summary></p>
+<pre><code> ---
+ # vars file for db_postgresql
+ apt_packages_to_install:
+   - postgresql
+   - postgresql-contrib
+   - python3-psycopg2
+   - acl
+   - rsync
+   - python3
+   - python3-venv
+   - python3-pip
+
+ pip3_packages_to_install:
+   - pip&gt;=24.3.1
+   - python-dotenv
+</code></pre>
+</details>
+</li>
+<li>
+<p>Step 4 - Enable postgresql services</p>
+<pre><code>systemctl is-enabled postgresql
+
+# Check postgresql services status
+systemctl status postgresql
+</code></pre>
+</li>
+<li>
+<p>Steps 5, 6 - Skipping</p>
+</li>
+<li>
+<p>Step 7 - Creating security group</p>
+<pre><code># Example: groupadd dbadmin
+groupadd &lt;group_name&gt;
+
+# verify the group
+getent group &lt;group_name&gt;
+</code></pre>
+</li>
+<li>
+<p>Step 8 - Adding multiple users: postgres, sudo, wikiuser and zabbix to the new security group</p>
+<pre><code># adding users to security group one by one
+usermod -aG &lt;group_name&gt; &lt;username&gt;
+</code></pre>
+</li>
+<li>
+<p>Steps 9, 10 - Changing the directory's security group, ownership and permissions</p>
+<pre><code>chown -R root:dbadmin &lt;mount point&gt;
+sudo chmod -R 0770 &lt;mount point&gt;
+
+chown -R root:dbadmin /opt
+chmod -R 0770 /opt
+
+# Verify the group, ownership and permissions change
+ls -ld &lt;mount point&gt; /opt
+ls -ld /opt
+</code></pre>
+</li>
+<li>
+<p>Step 11 - Stopping the PostgreSQL service</p>
+<pre><code>systemctl stop postgresql
+</code></pre>
+</li>
+<li>
+<p>Step 12 - Creating a backup archive of the main PostgreSQL directory</p>
+<pre><code>tar -czvf /tmp/postgres_initial_main_backup_$(date +%Y%m%d%H%M%S).tar.gz -C /var/lib/postgresql/14/ main
+</code></pre>
+</li>
+<li>
+<p>Step 13- Skipping</p>
+</li>
+<li>
+<p>Step 14 - Copying (with -a flag) the current main database directory to the mount point</p>
+<pre><code>cp -a /var/lib/postgresql/ /path/to/mount/point/
+</code></pre>
+</li>
+<li>
+<p>Step 15 - Deleting the old main Postresql directory</p>
+<pre><code>rm -rf /var/lib/postgresql/14/main
+</code></pre>
+</li>
+<li>
+<p>Step 16, 17 - Configuring the <code>data_directory</code> and <code>listen_addresses</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
+<pre><code>data_directory = '/opt/&lt;mount_point&gt;/postgresql/14/main'
+listen_addresses = '*'
+</code></pre>
+</li>
+<li>
+<p>Step 18 - Restarting the PostgreSQL service</p>
+<pre><code>systemctl restart postgresql
+</code></pre>
+</li>
+</ul>
+<h2 id="primary-postgresql-setup">Primary Postgresql Setup</h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span></p>
+<h3 id="ansible_4">Ansible</h3>
+<ul>
+<li>
+<p>Tasks:</p>
+<pre><code># Step 1 - Adding secret variables
+# Step 2 - Stopping the PostgreSQL service
+# Step 3 - Adding permissions to pg_hba.conf for connecting to the primary PostgreSQL
+# Step 4 - Configuring the ``wal_level`` in ``/etc/postgresql/14/main/postgresql.conf`` - Primary Postgresql
+# Step 5 - Restarting the PostgreSQL service
+# Step 6 - Creating the "wikiuser" user for the Primary PostgreSQL
+# Step 7 - Creating the "syncuser" user for the Primary PostgreSQL
+# Step 8 - Checking if the database exists (and creating it if it doesn't)
+</code></pre>
+</li>
+<li>
+<p>Running playbook:</p>
+<pre><code>ansible-playbook playbook.yaml \
+--vault-id ansible_secrets@~/repository_name/Ansible/vault_passwords/vault_ansible_secrets.txt \
+-i inventory.yaml --tags="primary_postgresql_setup"
+</code></pre>
+</li>
+</ul>
+<h3 id="manual_4">Manual</h3>
+<ul>
+<li>
+<p>Step 1 - Skipping</p>
+</li>
+<li>
+<p>Step 2 - Stopping the PostgreSQL service</p>
+<pre><code>systemctl stop postgresql
+</code></pre>
+</li>
+<li>
+<p>Step 3 - Adding permissions to <code>pg_hba.conf</code> for connecting to the primary PostgreSQL</p>
+<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32           scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32           scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32           scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32           scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+
+                                  # Internal IP address  
+host my_wiki       wikiuser       192.168.10.11/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.13/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.14/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.15/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.16/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.17/32                   scram-sha-256
+
+host replication   syncuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
+host replication   syncuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+
+                                  # Internal IP address  
+host replication   syncuser       192.168.10.16/32                   scram-sha-256
+host replication   syncuser       192.168.10.17/32                   scram-sha-256
+</code></pre>
+</li>
+<li>
+<p>Step 4 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
+<pre><code>wal_level = replica
+</code></pre>
+</li>
+<li>
+<p>Step 5 - Restarting the PostgreSQL service</p>
+<pre><code>systemctl restart postgresql
+</code></pre>
+</li>
+<li>
+<p>Step 6 - Creating the "wikiuser" user for the Primary PostgreSQL</p>
+<pre><code>sudo -u postgres psql
+
+CREATE USER wikiuser WITH PASSWORD 'wikiuser_password' 
+SUPERUSER CREATEDB CREATEROLE LOGIN INHERIT;
+
+\q
+</code></pre>
+</li>
+<li>
+<p>Step 7 - Creating the "syncuser" user for the Primary PostgreSQL</p>
+<pre><code>sudo -u postgres psql
+
+CREATE USER syncuser WITH PASSWORD 'syncuser_password' 
+REPLICATION;
+
+\q
+</code></pre>
+</li>
+<li>
+<p>Step 8 - Checking if the database exists (and creating it if it doesn't)</p>
+<pre><code>sudo -u postgres psql
+
+# Checking if the database exists
+\l
+
+CREATE DATABASE my_wiki WITH OWNER = wikiuser;
+
+\q
+</code></pre>
+</li>
+</ul>
+<h2 id="standby-postgresql-setup">Standby Postgresql Setup</h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span></p>
+<h3 id="ansible_5">Ansible</h3>
+<ul>
+<li>
+<p>Tasks:</p>
+<pre><code># Step 1 -
+</code></pre>
+</li>
+<li>
+<p>Running playbook:</p>
+<pre><code>ansible-playbook
+</code></pre>
+</li>
+</ul>
+<h3 id="manual_5">Manual</h3>
+<ul>
+<li>Step 1 - </li>
+</ul>
               
             </div>
           </div><footer>

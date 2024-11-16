@@ -1,6 +1,6 @@
 ---
 # vars file for mediawiki
-packages_to_install:
+apt_packages_to_install:
   - nginx
   - php 
   - php-intl
