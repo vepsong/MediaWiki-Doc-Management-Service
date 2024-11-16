@@ -1,0 +1,4 @@
+---
+# vars file for nginx_mediawiki_proxy
+apt_packages_to_install:
+  - nginx

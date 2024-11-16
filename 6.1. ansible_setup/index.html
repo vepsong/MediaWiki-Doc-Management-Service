@@ -104,14 +104,14 @@
 <h3 id="files-and-variables-setup">Files and Variables Setup</h3>
 <ol>
 <li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/ansible_structure.py</code></span></span> file</p>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/ansible_structure.py</code></span></span> file</p>
 <ul>
 <li>This file contains <code>dynamic_groups</code> dictionary which confugires the output <code>inventory.yaml</code> file</li>
 <li>The file is already configured. No changes are needed.</li>
 </ul>
 </li>
 <li>
-<p>Create <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/inventory.yaml</code></span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_ansible_inventory.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/update_ansible_inventory.py</code></span></span>   </p>
+<p>Create <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/inventory.yaml</code></span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_ansible_inventory.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/update_ansible_inventory.py</code></span></span>   </p>
 <p><details class="external_code_rendering">
 <summary>Show inventory.yaml_EXAMPLE</summary></p>
 <pre><code> linuxVM:
@@ -169,29 +169,29 @@
 </details>
 </li>
 <li>
-<p>Review or Replace the <code>Private SSH Key</code> File in the <code>~/repository_name/Ansible/common_files</code> Directory</p>
+<p>Review or Replace the <code>Private SSH Key</code> File in the <code>~/MediaWiki-Doc-Management-Service/Ansible/common_files</code> Directory</p>
 <ul>
 <li>
 <p>This <code>Private SSH Key</code> file is required to allow SSH connections between specific VMs</p>
 <pre><code># If there is no Private SSH Key file, or if you wish to replace the current one, run the following command
-cp ~/.ssh/id_ed25519 ~/repository_name/Ansible/common_files
+cp ~/.ssh/id_ed25519 ~/MediaWiki-Doc-Management-Service/Ansible/common_files
 </code></pre>
 </li>
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the Private SSH Key File Using Vault-ID: "private_ssh_key"
-ansible-vault encrypt --vault-id private_ssh_key@prompt "~/repository_name/Ansible/common_files/id_ed25519"
+ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/id_ed25519"
 </code></pre>
 </li>
 <li>
 <p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password1" &gt; ~/repository_name/Ansible/vault_passwords/vault_private_ssh_key.txt
+<pre><code>echo "password1" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_private_ssh_key.txt
 </code></pre>
 </li>
 </ul>
 </li>
 <li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_secrets.yml</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/ansible_secrets.yml</code></span></span> File</p>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_secrets.yml</strong><span class="tooltip-text"><code>~/{{repository_name}}/Ansible/common_files/ansible_secrets.yml</code></span></span> File</p>
 <ul>
 <li>
 <p>The <code>ansible_secrets.yml</code> file contains secret variables, such as database connection credentials, IP addresses, and more</p>
@@ -258,18 +258,18 @@ ansible-vault encrypt --vault-id private_ssh_key@prompt "~/repository_name/Ansib
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the ansible_secrets.yml File Using Vault-ID: "ansible_secrets"
-ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansible/common_files/ansible_secrets.yaml"
+ansible-vault encrypt --vault-id ansible_secrets@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/ansible_secrets.yaml"
 </code></pre>
 </li>
 <li>
 <p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password2" &gt; ~/repository_name/Ansible/vault_passwords/vault_ansible_secrets.txt
+<pre><code>echo "password2" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_ansible_secrets.txt
 </code></pre>
 </li>
 </ul>
 </li>
 <li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>LocalSettings.php</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
+<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>LocalSettings.php</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
 <ul>
 <li>The <code>LocalSettings.php</code> file contains the MediaWiki configuration</li>
 <li>
@@ -421,12 +421,12 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt "~/repository_name/Ansib
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the LocalSettings.php File Using Vault-ID: "mediawiki_localsettings"
-ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/repository_name/Ansible/common_files/LocalSettings.php"
+ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/LocalSettings.php"
 </code></pre>
 </li>
 <li>
 <p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password3" &gt; ~/repository_name/Ansible/vault_passwords/vault_mediawiki_localsettings.txt
+<pre><code>echo "password3" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_mediawiki_localsettings.txt
 </code></pre>
 </li>
 </ul>
@@ -447,9 +447,9 @@ ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/repository_na
 <li>
 <p>Review or modify the two <code>noip-duc</code> files:</p>
 <ul>
-<li>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_nginx_mediawiki</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/duc_nginx_mediawiki</code></span></span> File</li>
+<li>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_nginx_mediawiki</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_nginx_mediawiki</code></span></span> File</li>
 <li>
-<p>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_zabbix_server</strong><span class="tooltip-text"><code>~/repository_name/Ansible/common_files/duc_zabbix_server</code></span></span> File</p>
+<p>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_zabbix_server</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_zabbix_server</code></span></span> File</p>
 </li>
 <li>
 <p>The <code>noip-duc</code> file contains the <a href="https://www.noip.com/">noip.com</a> credentials for automatically updating the NAT IP address with the DDNS provider</p>
@@ -464,16 +464,16 @@ ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/repository_na
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the duc_nginx_mediawiki File Using Vault-ID: "duc_nginx_mediawiki"
-ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/repository_name/Ansible/common_files/duc_nginx_mediawiki"
+ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_nginx_mediawiki"
 
 # Encrypting the duc_zabbix_server File Using Vault-ID: "duc_zabbix_server"
-ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/repository_name/Ansible/common_files/duc_zabbix_server"
+ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_zabbix_server"
 </code></pre>
 </li>
 <li>
 <p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password4" &gt; ~/repository_name/Ansible/vault_passwords/vault_duc_zabbix_server.txt
-echo "password5" &gt; ~/repository_name/Ansible/vault_passwords/vault_duc_nginx_mediawiki.txt
+<pre><code>echo "password4" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_zabbix_server.txt
+echo "password5" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_nginx_mediawiki.txt
 </code></pre>
 </li>
 </ul>
@@ -481,21 +481,45 @@ echo "password5" &gt; ~/repository_name/Ansible/vault_passwords/vault_duc_nginx_
 </ol>
 <h3 id="essential-ansible-commands">Essential Ansible commands</h3>
 <ol>
-<li>Ansible Vault<pre><code> # Encrypting File using Ansible Vault
- #  
- ansible-vault encrypt --vault-id &lt;vault-id-name&gt;@prompt "&lt;path to file&gt;"
+<li>
+<p>Ansible</p>
+<pre><code># Checking syntax and availability of cloud resources
+ansible all -m ping -i inventory.yaml
 
- # Change Vault Password
- ansible-vault rekey "&lt;path to file&gt;"
+# Installing or updating the collection 
+ansible-galaxy collection install &lt;collection name&gt;
 
- # Edit Vault-Encrypted File
- ansible-vault edit "&lt;path to file&gt;"
+# List of installed collections
+ansible-galaxy collection list
 
- # Decrypting File 
- ansible-vault decrypt "&lt;path to file&gt;"
+# Creating a role (used to separate tasks that will be executed within the playbook)
+ansible-galaxy init &lt;role name&gt;
 
- # Viewing the Vault-Encrypted File
- ansible-vault view "&lt;path to file&gt;"
+# List of used roles
+ansible-galaxy role list
+
+# Running the playbook
+ansible-playbook &lt;playbook&gt;.yaml name&gt; -i &lt;inventory&gt;.yaml name&gt; --tags="&lt;tag&gt;"
+#Example:
+ansible-playbook mount_disks_playbook.yaml -i inventory.yaml --tags="mount"
+</code></pre>
+</li>
+<li>
+<p>Ansible Vault</p>
+<pre><code># Encrypting File using Ansible Vault 
+ansible-vault encrypt --vault-id &lt;vault-id-name&gt;@prompt "&lt;path to file&gt;"
+
+# Change Vault Password
+ansible-vault rekey "&lt;path to file&gt;"
+
+# Edit Vault-Encrypted File
+ansible-vault edit "&lt;path to file&gt;"
+
+# Decrypting File 
+ansible-vault decrypt "&lt;path to file&gt;"
+
+# Viewing the Vault-Encrypted File
+ansible-vault view "&lt;path to file&gt;"
 </code></pre>
 </li>
 </ol>

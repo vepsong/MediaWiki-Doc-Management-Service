@@ -1,0 +1,37 @@
+---
+# vars file for mediawiki
+apt_packages_to_install:
+  - nginx
+  - php 
+  - php-intl
+  - php-mbstring
+  - php-xml
+  - php-apcu 
+  - php-curl
+  - php8.1-fpm
+  - php8.1-pgsql
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+  - acl
+  - rsync
+  - python3
+  - python3-venv
+  - python3-pip
+
+pip3_packages_to_install:
+  - pip>=24.3.1
+  - python-dotenv
+
+mediawiki_server:
+  mediawiki_parent_path: /var/www/
+  mediawiki_folder_name: mediawiki
+  mediawiki_archive_name: mediawiki.tar.gz
+  mediawiki_local_settings_file_name: LocalSettings.php
+  mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
+  nginx_conf_name: nginx_mediawiki
+
+server_2:
+  private_key_ssh_path: /root/.ssh/id_ed25519
+  remote_rsync_script_name: remote_rsync_mediawiki.py
+

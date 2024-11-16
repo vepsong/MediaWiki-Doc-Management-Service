@@ -1,0 +1,8 @@
+---
+# vars file for zabbix_agent_monitoring_system
+
+apt_packages_to_install:
+  - zabbix-agent
+
+packages_to_restart:
+  - zabbix-agent
