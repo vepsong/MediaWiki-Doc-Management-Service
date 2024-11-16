@@ -1,0 +1,6 @@
+---
+# defaults file for ddns_duc
+
+ddns_hosts:
+  zabbix_server: vm-1-monitoring-system
+  nginx_mediawiki: vm-2-nginx-proxy-server

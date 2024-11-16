@@ -62,6 +62,15 @@
   tags:
     - zabbix_server_postgresql_setup
 
+# DDNS Noip DUC Setup 
+- name: DDNS Noip DUC Setup 
+  hosts: "{{ ddns_hosts }}"
+  become: true
+  roles:
+    - role: ddns_duc
+  tags:
+    - ddns_duc_setup
+
 
 # MediaWiki Setup
 - name: MediaWiki Setup

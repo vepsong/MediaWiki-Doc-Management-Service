@@ -1,93 +1,87 @@
 ---
 # tasks file for zabbix_agent_monitoring_system
 
+# =========================
+# Block Zabbix-Agent setup
+# =========================
 
-
-
-# Скачивание репозитория zabbix
-- name: Step 1 - Download Zabbix repository package
+# Downloading the Zabbix repository
+- name: Step 1 - Downloading the Zabbix repository
   ansible.builtin.get_url:
     url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb
-    dest: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+    dest: /tmp/zabbix_all.deb
   tags:
-    - zabbix_server_download_zabbix_repository
+    - zabbix_agent_setup_download_zabbix_repository
 
-# Установка репозитория zabbix
-- name: Step 2 - Install Zabbix repository package
+# Installing the Zabbix repository
+- name: Step 2 - Installing the Zabbix repository
   ansible.builtin.apt:
     deb: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
   tags:
-    - zabbix_agent_install_zabbix_repository
+    - zabbix_agent_setup_install_zabbix_repository
 
-# Обновление пакетного репозитория 
-- name: Step 3 - Update list of packages
+# Updating the apt repository
+- name: Step 3 - Updating the apt repository
   apt:
     update_cache: yes
   become: true
   tags:
-    - zabbix_agent_apt_update
+    - zabbix_agent_setup_apt_update
 
-# Установка пакетов
+# Installing apt packages
 - name: Step 4 - Install packages
   become: true
   ansible.builtin.apt:
     name: "{{ item }}" 
     state: present
-    # state: absent
   loop: "{{ packages_to_install }}"
   tags:
-    - zabbix_agent_install_packages
+    - zabbix_agent_setup_install_packages
 
 
-# Конфигурация Server в /etc/zabbix/zabbix_agentd.conf 
-- name: Step 5 - Ensure Server is set in /etc/zabbix/zabbix_agentd.conf 
+# Configuring the "Server" in /etc/zabbix/zabbix_agentd.conf 
+- name: Step 5 - Configuring the "Server" in /etc/zabbix/zabbix_agentd.conf 
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_agentd.conf 
     regexp: '^Server=.*$'
     replace: 'Server=192.168.10.11'
   tags:
-    - zabbix_agent_add_server_name
+    - zabbix_agent_setup_add_server_name
 
 
-# Конфигурация ServerActive в /etc/zabbix/zabbix_agentd.conf 
-- name: Step 6 - Ensure ServerActive is set in /etc/zabbix/zabbix_agentd.conf 
+# Configuring the "ServerActive" in /etc/zabbix/zabbix_agentd.conf 
+- name: Step 6 - Configuring the "ServerActive" in /etc/zabbix/zabbix_agentd.conf 
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_agentd.conf 
     regexp: '^ServerActive=.*$'
     replace: 'ServerActive=192.168.10.11'
   tags:
-    - zabbix_agent_add_server_active
+    - zabbix_agent_setup_add_server_active
 
 
-# Конфигурация Hostname в /etc/zabbix/zabbix_agentd.conf 
-- name: Step 7 - Ensure Hostname is set in /etc/zabbix/zabbix_agentd.conf 
+
+
+# Configuring the "Hostname" in /etc/zabbix/zabbix_agentd.conf 
+- name: Step 7 - Configuring the "Hostname" in /etc/zabbix/zabbix_agentd.conf 
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_agentd.conf 
     regexp: '^Hostname=.*$'
     replace: "Hostname={{ ansible_hostname }}"
   tags:
-    - zabbix_agent_add_server_active
+    - zabbix_agent_setup_add_server_active
 
-# Перезапуск сервисов
-- name: Step 8 - Restart packages
+
+
+# Restarting and enabling packages
+- name: Step 8 - Restarting and enabling packages
   become: true
   ansible.builtin.systemd:
     name: "{{ item }}" 
     state: restarted
+    enabled: yes
   loop: "{{ packages_to_restart }}"
   tags:
-    - zabbix_agent_restart_packages
-
-
-# Автозагрузка сервисов
-- name: Step 9 - Enable packages
-  become: true
-  ansible.builtin.systemd:
-    name: "{{ item }}" 
-    enabled: yes
-  loop: "{{ packages_to_enable }}"
-  tags:
-    - zabbix_agent_enable_packages
+    - zabbix_agent_setup_restarting_enabling_packages

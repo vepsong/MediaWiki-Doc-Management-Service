@@ -1,0 +1,1 @@
+../../../python_scripts/remote_rsync_mediawiki.py

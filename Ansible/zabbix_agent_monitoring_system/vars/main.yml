@@ -1,10 +1,7 @@
 ---
 # vars file for zabbix_agent_monitoring_system
 
-packages_to_install:
-  - zabbix-agent
-
-packages_to_enable:
+apt_packages_to_install:
   - zabbix-agent
 
 packages_to_restart:

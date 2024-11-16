@@ -1,1 +1,0 @@
-../../python_scripts/pgdump_zabbix_server.py

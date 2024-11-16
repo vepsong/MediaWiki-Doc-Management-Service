@@ -95,7 +95,7 @@
                 <h3 id="yandex-cloud-cli-profile-and-service-account-setup">Yandex Cloud CLI profile and Service Account Setup</h3>
 <ol>
 <li>
-<p>Create <strong>yc_meta.json</strong> file with authentication data in <code>~/repository_name/credentials</code> directory<br />
+<p>Create <strong>yc_meta.json</strong> file with authentication data in <code>~/MediaWiki-Doc-Management-Service/credentials</code> directory<br />
 <a href="https://yandex.cloud/en/docs/iam/operations/sa/get-id">service_account_id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/cloud/get-id">cloud-id</a>, <a href="https://yandex.cloud/en/docs/resource-manager/operations/folder/get-id">folder-id</a>, <a href="https://yandex.cloud/en/docs/cli/cli-ref/managed-yc/config/profile/">profile-name</a></p>
 <p><details class="external_code_rendering">
 <summary>Show yc_meta_EXAMPLE.json</summary></p>
@@ -115,7 +115,7 @@
 </code></pre>
 </li>
 <li>
-<p>Add environment variables to <span class="tooltip" onclick="showTooltip(event)"><code>~/.bashrc</code><span class="tooltip-text">user-specific configuration file for the Bash shell</span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>add_env_var.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/add_env_var.py</code></span></span>  </p>
+<p>Add environment variables to <span class="tooltip" onclick="showTooltip(event)"><code>~/.bashrc</code><span class="tooltip-text">user-specific configuration file for the Bash shell</span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>add_env_var.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/add_env_var.py</code></span></span>  </p>
 <ul>
 <li><strong>After running the script, you must restart the terminal</strong></li>
 </ul>
@@ -145,9 +145,9 @@
 </details>
 </li>
 <li>
-<p>Set up Yandex Cloud service account configuration by running <span class="tooltip" onclick="showTooltip(event)"><strong>yc_service_account_configuration.py</strong><span class="tooltip-text"><code>~/repository_name/python_scripts/yc_service_account_configuration.py</code></span></span>  </p>
+<p>Set up Yandex Cloud service account configuration by running <span class="tooltip" onclick="showTooltip(event)"><strong>yc_service_account_configuration.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/yc_service_account_configuration.py</code></span></span>  </p>
 <ul>
-<li>Create and configure a local Yandex Cloud (yc) profile, and automatically generate the <span class="tooltip" onclick="showTooltip(event)"><strong>key.json</strong><span class="tooltip-text"><code>~/repository_name/credentials/key.json</code></span></span> file with authentication data.</li>
+<li>Create and configure a local Yandex Cloud (yc) profile, and automatically generate the <span class="tooltip" onclick="showTooltip(event)"><strong>key.json</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/credentials/key.json</code></span></span> file with authentication data.</li>
 </ul>
 </li>
 </ol>

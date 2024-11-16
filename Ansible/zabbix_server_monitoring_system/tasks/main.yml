@@ -1,210 +1,103 @@
 ---
 # tasks file for zabbix_server_monitoring_system
 
-# ==================================
-# Блок с настройками DDNS (noip.com)
-# ==================================
+# =========================
+# Block Zabbix-Server setup
+# =========================
 
-
-# Копирование noip-duc_3.3.0.tar.gz в /root
-- name: Step 1 - Copy noip-duc_3.3.0.tar.gz to /root
-  become: true
-  copy:
-    src: "{{ role_path }}/files/noip-duc_3.3.0.tar.gz" 
-    dest: /root
-    force: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+# Adding secret variables
+- name: Step 1 - Adding secret variables
+  include_vars: "{{ playbook_dir }}/common_files/ansible_secrets.yaml"
   tags:
-    - zabbix_server_copy_noip_duc_archive
+    - zabbix_server_setup_adding_secret_variables
 
-
-# Разархивирование noip-duc_3.3.0.tar.gz в /root
-- name: Step 2 - Extract noip-duc_3.3.0.tar.gz
-  become: true
-  ansible.builtin.unarchive:
-    src: /root/noip-duc_3.3.0.tar.gz
-    dest: /root
-    remote_src: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_unzip_noip_duc
-
-# Установка noip-duc_3.3.0
-- name: Step 3 - Install noip-duc_3.3.0_amd64.deb package
-  become: true
-  ansible.builtin.apt:
-    deb: /root/noip-duc_3.3.0/binaries/noip-duc_3.3.0_amd64.deb
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_install_noip_duc
-
-# Копирование папки /root/noip-duc_3.3.0/debian/service в /etc/systemd/system/noip-duc.service
-- name: Step 4 - Copy noip-duc service file to systemd directory
-  become: true
-  ansible.builtin.copy:
-    src: /root/noip-duc_3.3.0/debian/service
-    dest: /etc/systemd/system/noip-duc.service
-    remote_src: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_copy_noip_duc_service
-
-
-# Копирование конфигурационного файла noip-duc в /etc/default/noip-duc
-- name: Step 5 - Copy noip-duc to /etc/default/noip-duc
-  become: true
-  copy:
-    src: "{{ role_path }}/files/noip-duc"
-    dest: /etc/default/noip-duc
-    force: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_copy_noip_duc_config
-
-
-# Перезагрузка systemd daemon
-- name: Step 6 - Reload systemd daemon
-  become: true
-  ansible.builtin.systemd:
-    daemon_reload: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_reload_systemd_daemon
-
-# Автозагрузка сервиса noip-duc
-- name: Step 7 - Enable noip-duc service to start on boot
-  become: true
-  ansible.builtin.systemd:
-    name: noip-duc
-    enabled: yes
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_enable_noip_service
-
-# Запуск сервиса noip-duc
-- name: Step 8 - Start noip-duc service
-  become: true
-  ansible.builtin.systemd:
-    name: noip-duc
-    state: started
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_start_noip_service
-
-# ================================
-# Блок с настройками zabbix-server
-# ================================
-
-# Добавление секретных переменных
-- name: Step 9 - Include secret variables
-  include_vars: secrets.yml
-  tags:
-    - zabbix_server_add_secret_variables
-
-# Скачивание репозитория zabbix
-- name: Step 10 - Download Zabbix repository package
+# Downloading the Zabbix repository
+- name: Step 2 - Downloading the Zabbix repository
   ansible.builtin.get_url:
     url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb
-    dest: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+    dest: /tmp/zabbix_all.deb
   tags:
-    - zabbix_server_download_zabbix_repository
+    - zabbix_server_setup_downloading_zabbix_repository
 
-# Установка репозитория zabbix
-- name: Step 11 - Install Zabbix repository package
+# Installing Zabbix repository
+- name: Step 3 - Installing Zabbix repository
   ansible.builtin.apt:
-    deb: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+    deb: /tmp/zabbix_all.deb
   tags:
-    - zabbix_server_install_zabbix_repository
+    - zabbix_server_setup_installing_zabbix_repository
 
-# Обновление пакетного репозитория 
-- name: Step 12 - Update list of packages
+
+# Updating the apt repository
+- name: Step 4 - Update list of packages
   apt:
     update_cache: yes
   become: true
   tags:
-    - zabbix_server_apt_update
+    - zabbix_server_setup_apt_updating
 
-
-# Установка пакетов
-- name: Step 13 - Install packages
-  become: true
-  ansible.builtin.apt:
+# Installing apt packages
+- name: Step 5 - Apt packages installing
+  apt:
     name: "{{ item }}" 
     state: present
-  loop: "{{ packages_to_install }}"
+  loop:
+    - "{{ apt_packages_to_install }}"
   tags:
-    - zabbix_server_install_packages
+    - zabbix_server_setup_apt_installing
 
 
-# Импорт схемы и данных для Zabbix server
-- name: Step 14 - Import initial schema and data for Zabbix server
+# Importing initial schema for Zabbix server
+- name: Step 6 - Importing initial schema for Zabbix server
   become_user: zabbix
   ansible.builtin.shell: |
     PGPASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }} zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | psql -U zabbix -d zabbix
   tags:
-    - zabbix_server_import_initial_schema
-    - zabbix_server_add_secret_variables, zabbix_server_import_initial_schema
+    - zabbix_server_setup_import_initial_schema
 
-# Конфигурация DBPassword в /etc/zabbix/zabbix_server.conf 
-- name: Step 15 - Ensure DBPassword is set in /etc/zabbix/zabbix_server.conf 
+
+# Configuring the "DBPassword" in /etc/zabbix/zabbix_server.conf 
+- name: Step 7 - Configuring the "DBPassword" in /etc/zabbix/zabbix_server.conf 
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_server.conf
     regexp: '^#?\s*DBPassword\s*=.*'
     replace: "DBPassword = {{ postgres_zabbix_server_user_vars.db_user_password }}"
-  # notify: restart_zabbix
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  notify: restart_zabbix_server
   tags:
-    - zabbix_server_add_dbpassword
-    - zabbix_server_add_secret_variables, zabbix_server_add_dbpassword
+    - zabbix_server_setup_add_dbpassword
 
 
-# Конфигурация listen в /etc/zabbix/nginx.conf
-- name: Step 16 - Ensure listen is set in /etc/zabbix/nginx.conf
+# Configuring the "listen" in /etc/zabbix/nginx.conf
+- name: Step 8 - Configuring the "listen" in /etc/zabbix/nginx.conf
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/nginx.conf
     regexp: '^#?\s*listen\s*.*'
     replace: '        listen 8080;'
-  # notify: restart_zabbix
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  notify: restart_zabbix_server
   tags:
-    - zabbix_server_add_listen
+    - zabbix_server_setup_add_listen
 
-
-# Конфигурация server_name в /etc/zabbix/nginx.conf
-- name: Step 17 - Ensure server_name is set in /etc/zabbix/nginx.conf
+# Configuring the "server_name" in /etc/zabbix/nginx.conf
+- name: Step 9 - Configuring the "server_name" in /etc/zabbix/nginx.conf
   become: true
   ansible.builtin.replace:
     path: /etc/zabbix/nginx.conf
     regexp: '^#?\s*server_name\s*.*'
     replace: '        server_name monitoring-wiki.ddns.net;'
-  # notify: restart_zabbix
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  notify: restart_zabbix_server
   tags:
-    - zabbix_server_add_server_name
+    - zabbix_server_setup_add_server_name
 
 
-# Перезапуск сервисов
-- name: Step 18 - Restart packages
+# Restarting and enabling packages
+- name: Step 10 - Restarting and enabling packages
   become: true
   ansible.builtin.systemd:
     name: "{{ item }}" 
     state: restarted
-  loop: "{{ packages_to_restart }}"
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
-  tags:
-    - zabbix_server_restart_packages
-
-
-# Автозагрузка сервисов
-- name: Step 19 - Enable packages
-  become: true
-  ansible.builtin.systemd:
-    name: "{{ item }}" 
     enabled: yes
-  loop: "{{ packages_to_enable }}"
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
+  loop: "{{ packages_to_restart }}"
   tags:
-    - zabbix_server_enable_packages
+    - zabbix_server_setup_restarting_enabling_packages
 

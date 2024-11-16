@@ -1,0 +1,119 @@
+---
+# ================================
+# Block with DDNS setup (noip.com)
+# ================================
+
+# Copying the noip-duc_3.3.0.tar.gz archive to root/
+- name: Step 1 - Copying the noip-duc_3.3.0.tar.gz archive to root/
+  become: true
+  become_user: root
+  copy:
+    src: "{{ playbook_dir }}/common_files/noip-duc_3.3.0.tar.gz"
+    dest: "root/noip-duc.tar.gz"
+    force: yes
+  tags:
+    - ddns_duc_setup_copying_noip_duc_archive
+
+
+# Unzipping the noip-duc.tar.gz archive to root/
+- name: Step 2 - Unzipping the noip-duc.tar.gz archive to root/
+  become: true
+  become_user: root
+  ansible.builtin.unarchive:
+    src: "root/noip-duc.tar.gz"
+    dest: "/root"
+    remote_src: yes
+  tags:
+    - ddns_duc_setup_unzipping_noip_duc_archive
+
+
+# Removing the noip-duc.tar.gz archive from root/
+- name: Step 3 - Removing the noip-duc.tar.gz archive from root/
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: "root/noip-duc.tar.gz"
+    state: absent
+  tags:
+    - nddns_duc_setup_removing_mediaWiki_archive
+
+
+# Installing noip-duc_3.3.0
+- name: Step 4 - Installing noip-duc_3.3.0_amd64.deb package
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    deb: /root/noip-duc/binaries/noip-duc_3.3.0_amd64.deb
+  tags:
+    - ddns_duc_setup_install_noip_duc
+
+
+# Copying noip-duc service file to /etc/systemd/system/noip-duc.service
+- name: Step 5 - Copying noip-duc service file to /etc/systemd/system/noip-duc.service
+  become: true
+  become_user: root
+  ansible.builtin.copy:
+    src: /root/noip-duc/debian/service
+    dest: /etc/systemd/system/noip-duc.service
+    remote_src: yes
+  tags:
+    - ddns_duc_setup_copy_noip_duc_service
+
+
+# Copying duc_zabbix_server credential file to /etc/default/noip-duc
+- name: Step 6 - Copying dduc_zabbix_server credential file to /etc/default/noip-ducs
+  become: true
+  become_user: root
+  copy:
+    src: "{{ playbook_dir }}/common_files/zabbix/duc_zabbix_server"
+    dest: /etc/default/noip-duc
+    force: yes
+  when: ddns_hosts.zabbix_server in inventory_hostname
+  tags:
+    - ddns_duc_setup_copying_duc_credentials_zabbix
+
+    
+# Copying duc_nginx_mediawiki credential file to /etc/default/noip-duc
+- name: Step 7 - Copying duc_nginx_mediawiki credential file to /etc/default/noip-ducs
+  become: true
+  become_user: root
+  copy:
+    src: "{{ playbook_dir }}/common_files/nginx_proxy/duc_nginx_mediawiki"
+    dest: /etc/default/noip-duc
+    force: yes
+  when: ddns_hosts.nginx_mediawiki in inventory_hostname
+  tags:
+    - ddns_duc_setup_copying_duc_credentials_nginx
+
+
+# Reloading systemd daemon
+- name: Step 8 - Reloading systemd daemon
+  become: true
+  become_user: root
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags:
+    - ddns_duc_setup_copy_noip_duc_config
+
+
+# # Starting and enabling the noip-duc services
+# - name: Step 8 - Starting and enabling the noip-duc services
+#   service: 
+#     name=noip-duc
+#     state=started 
+#     enabled=yes
+#   tags:
+#     - nginx_proxy_mediawiki_setup_starting_enabling_nginx_service
+
+
+# Starting and enabling the noip-duc services
+- name: Step 9 - Starting and enabling the noip-duc services
+  become: true
+  become_user: root
+  ansible.builtin.service: 
+    name: noip-duc
+    state: started 
+    enabled: yes
+  tags:
+    - ddns_duc_setup_starting_enabling_noip_duc_service
+
