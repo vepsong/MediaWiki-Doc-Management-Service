@@ -9,7 +9,7 @@
   become_user: root
   copy:
     src: "{{ playbook_dir }}/common_files/noip-duc_3.3.0.tar.gz"
-    dest: "root/noip-duc.tar.gz"
+    dest: "/root/noip-duc.tar.gz"
     force: yes
   tags:
     - ddns_duc_setup_copying_noip_duc_archive
@@ -20,8 +20,8 @@
   become: true
   become_user: root
   ansible.builtin.unarchive:
-    src: "root/noip-duc.tar.gz"
-    dest: "/root"
+    src: "/root/noip-duc.tar.gz"
+    dest: "/root/"
     remote_src: yes
   tags:
     - ddns_duc_setup_unzipping_noip_duc_archive
@@ -32,7 +32,7 @@
   become: true
   become_user: root
   ansible.builtin.file:
-    path: "root/noip-duc.tar.gz"
+    path: "/root/noip-duc.tar.gz"
     state: absent
   tags:
     - nddns_duc_setup_removing_mediaWiki_archive
@@ -43,7 +43,7 @@
   become: true
   become_user: root
   ansible.builtin.apt:
-    deb: /root/noip-duc/binaries/noip-duc_3.3.0_amd64.deb
+    deb: /root/noip-duc_3.3.0/binaries/noip-duc_3.3.0_amd64.deb
   tags:
     - ddns_duc_setup_install_noip_duc
 
@@ -53,7 +53,7 @@
   become: true
   become_user: root
   ansible.builtin.copy:
-    src: /root/noip-duc/debian/service
+    src: /root/noip-duc_3.3.0/debian/service
     dest: /etc/systemd/system/noip-duc.service
     remote_src: yes
   tags:
@@ -68,7 +68,7 @@
     src: "{{ playbook_dir }}/common_files/zabbix/duc_zabbix_server"
     dest: /etc/default/noip-duc
     force: yes
-  when: ddns_hosts.zabbix_server in inventory_hostname
+  when: ddns_hosts_dict.zabbix_server in inventory_hostname
   tags:
     - ddns_duc_setup_copying_duc_credentials_zabbix
 
@@ -81,7 +81,7 @@
     src: "{{ playbook_dir }}/common_files/nginx_proxy/duc_nginx_mediawiki"
     dest: /etc/default/noip-duc
     force: yes
-  when: ddns_hosts.nginx_mediawiki in inventory_hostname
+  when: ddns_hosts_dict.nginx_mediawiki in inventory_hostname
   tags:
     - ddns_duc_setup_copying_duc_credentials_nginx
 

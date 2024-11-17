@@ -71,11 +71,19 @@
     replace: 'hot_standby = on'
   notify: restart_postgresql
   tags:
-    - primary_postgresql_setup_configuring_hot_standby_postgresql_conf
+    - standby_postgresql_setup_configuring_hot_standby_postgresql_conf
+
+# Deleting all contents inside the PostgreSQL Replication directory
+- name: Step 6 - Deleting all contents inside the PostgreSQL Replication directory ({{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main)
+  become: true
+  become_user: root
+  command: rm -rf {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main/
+  tags:
+    - standby_postgresql_setup_deleting_contents_in_replication_directory
 
 
 # Restarting the PostgreSQL service
-- name: Step 6 - Restarting the PostgreSQL service
+- name: Step 7 - Restarting the PostgreSQL service
   become: true
   become_user: root
   systemd:
@@ -95,7 +103,7 @@
 # - v — outputs a detailed log of the command execution
 # - R — creates a standby.signal file in the database folder. This is a marker for the PostgreSQL server to start in standby mode
 
-- name: Step 7 - Starting pg_basebackup for replication
+- name: Step 8 - Starting pg_basebackup for replication
   become: true
   become_user: postgres
   shell: |
@@ -121,7 +129,7 @@
 # Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-- name: Step 8 - Creating the /scripts directory with '0755' permissions
+- name: Step 9 - Creating the /scripts directory with '0755' permissions
   become: true
   become_user: root
   ansible.builtin.file:
@@ -135,7 +143,7 @@
 # Owner: rwx (read, write, and execute)
 # Group: r-- (read only)
 # Others: --- (no access)
-- name: Step 9 - Creating the .env file in /scripts directory with '0740' permissions
+- name: Step 10 - Creating the .env file in /scripts directory with '0740' permissions
   become: true
   become_user: root
   ansible.builtin.file:
@@ -150,20 +158,19 @@
 # Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-- name: Step 10 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
+- name: Step 11 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
   become: true
   become_user: root
   copy:
-    src: "{{ playbook_dir }}/common_files/postresql_standby/pgdump_standby_postgresql.py"
+    src: "{{ playbook_dir }}/common_files/postgresql_standby/pgdump_standby_postgresql.py"
     dest: /scripts/
     mode: '0755'
   tags:
     - standby_postgresql_setup_copy_pgdump_standby_posgresql_py
 
 
-
 # Filling the .env file with data
-- name: Step 11 - Filling the .env file with data
+- name: Step 12 - Filling the .env file with data
   become: true
   become_user: root
   blockinfile:
@@ -186,7 +193,7 @@
 
 # Copying the private SSH key to ~/.ssh with '600' permissions
 # Owner: rw- (read, write)
-- name: Step 12 - Copying Private ssh-key to ~/.ssh with '600' permissions
+- name: Step 13 - Copying Private ssh-key to ~/.ssh with '600' permissions
   become: true
   become_user: root
   copy:
@@ -199,7 +206,7 @@
 
 # Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
 # Command for forcing logrotate to run: logrotate -f /etc/logrotate.conf
-- name: Step 13 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
+- name: Step 14 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
   become: true
   become_user: root
   copy:
@@ -209,7 +216,7 @@
     - standby_postgresql_setup_logrotate_pgdump_standby_posgresql
     
 # Starting and enabling the logrotate service
-- name: Step 14 - Starting and enabling the logrotate service
+- name: Step 15 - Starting and enabling the logrotate service
   service:
     name=logrotate
     state=started 
@@ -222,7 +229,7 @@
 # minute: '0' - run at the beginning of the hour
 # hour: '*/4' - run every 4 hours"
 
-- name: Step 15 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
+- name: Step 16 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
   become: true
   become_user: root
   ansible.builtin.cron:
