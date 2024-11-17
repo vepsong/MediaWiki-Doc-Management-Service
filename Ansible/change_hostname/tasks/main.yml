@@ -1,7 +1,6 @@
 ---
-# tasks file for change_hostname
-# Меняем имя ВМ, если имя в inventory.yaml отличается от фактического
-- name: Изменение имени ВМ
+# Compare the current VM hostname with inventory.yaml and change it if it differs.
+- name: Changing the hostnames of all VMs
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
   notify: "vm_reboot"
