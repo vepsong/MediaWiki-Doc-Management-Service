@@ -238,7 +238,7 @@ ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Managem
      - INHERIT
 
  vm_7_standby_db_private_key_ssh:
-   remote_host: 192.168.10.13
+   remote_host: 192.168.10.16
    remote_user: root
    private_key_ssh_path: /root/.ssh/id_ed25519
 
@@ -258,7 +258,7 @@ ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Managem
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the ansible_secrets.yml File Using Vault-ID: "ansible_secrets"
-ansible-vault encrypt --vault-id ansible_secrets@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/ansible_secrets.yaml"
+ansible-vault encrypt --vault-id ansible_secrets@prompt ~/MediaWiki-Doc-Management-Service/Ansible/common_files/ansible_secrets.yaml
 </code></pre>
 </li>
 <li>

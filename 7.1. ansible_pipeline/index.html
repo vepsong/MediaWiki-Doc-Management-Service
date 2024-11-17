@@ -419,22 +419,21 @@ systemctl is-enabled postgresql
 <p>Steps 5, 6 - Skipping</p>
 </li>
 <li>
-<p>Step 7 - Creating security group</p>
-<pre><code># Example: groupadd dbadmin
-groupadd &lt;group_name&gt;
+<p>Step 7 - Creating security group - <strong>dbadmin</strong></p>
+<pre><code>groupadd dbadmin
 
 # verify the group
-getent group &lt;group_name&gt;
+getent group dbadmin
 </code></pre>
 </li>
 <li>
-<p>Step 8 - Adding multiple users: postgres, sudo, wikiuser and zabbix to the new security group</p>
-<pre><code># adding users to security group one by one
-usermod -aG &lt;group_name&gt; &lt;username&gt;
+<p>Step 8 - Adding multiple users: <strong>postgres</strong>, <strong>sudo</strong>, <strong>wikiuser</strong> and <strong>zabbix</strong> to the new security group</p>
+<pre><code># adding users to "dbadmin" security group one by one
+usermod -aG dbadmin &lt;username&gt;
 </code></pre>
 </li>
 <li>
-<p>Steps 9, 10 - Changing the directory's security group, ownership and permissions</p>
+<p>Steps 9, 10 - Changing the directory's <strong>security group</strong>, <strong>ownership</strong> and <strong>permissions</strong></p>
 <pre><code>chown -R root:dbadmin &lt;mount point&gt;
 sudo chmod -R 0770 &lt;mount point&gt;
 
@@ -517,27 +516,27 @@ listen_addresses = '*'
 </li>
 <li>
 <p>Step 3 - Adding permissions to <code>pg_hba.conf</code> for connecting to the primary PostgreSQL</p>
-<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
                                   # Internal IP address  
-host my_wiki       wikiuser       192.168.10.11/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.13/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.14/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.15/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.16/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.17/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.12/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.13/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.14/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.15/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.16/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.17/32             scram-sha-256
 
-host replication   syncuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
-host replication   syncuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+host replication   syncuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host replication   syncuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
                                   # Internal IP address  
-host replication   syncuser       192.168.10.16/32                   scram-sha-256
-host replication   syncuser       192.168.10.17/32                   scram-sha-256
+host replication   syncuser       192.168.10.16/32             scram-sha-256
+host replication   syncuser       192.168.10.17/32             scram-sha-256
 </code></pre>
 </li>
 <li>
@@ -551,7 +550,7 @@ host replication   syncuser       192.168.10.17/32                   scram-sha-2
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Creating the "wikiuser" user for the Primary PostgreSQL</p>
+<p>Step 6 - Creating the "<strong>wikiuser</strong>" user for the Primary PostgreSQL</p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER wikiuser WITH PASSWORD 'wikiuser_password' 
@@ -561,7 +560,7 @@ SUPERUSER CREATEDB CREATEROLE LOGIN INHERIT;
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Creating the "syncuser" user for the Primary PostgreSQL</p>
+<p>Step 7 - Creating the "<strong>syncuser</strong>" user for the Primary PostgreSQL</p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER syncuser WITH PASSWORD 'syncuser_password' 
@@ -594,17 +593,18 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 # Step 3 - Stopping the PostgreSQL service
 # Step 4 - Adding permissions to pg_hba.conf for connecting to the Standby PostgreSQL
 # Step 5 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
-# Step 6 - Restarting the PostgreSQL service
-# Step 7 - Starting pg_basebackup for replication
+# Step 6 - Deleting all contents inside the PostgreSQL Replication directory
+# Step 7 - Restarting the PostgreSQL service
+# Step 8 - Starting pg_basebackup for replication
 
-# Step 8 - Creating the /scripts directory with '0755' permissions
-# Step 9 - Creating the .env file in /scripts directory with '0740' permissions
-# Step 10 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
-# Step 11 - Filling the .env file with data
-# Step 12 - Copying Private ssh-key to ~/.ssh with '600' permissions
-# Step 13 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
-# Step 14 - Starting and enabling the logrotate service
-# Step 15 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
+# Step 9 - Creating the /scripts directory with '0755' permissions
+# Step 10 - Creating the .env file in /scripts directory with '0740' permissions
+# Step 11 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
+# Step 12 - Filling the .env file with data
+# Step 13 - Copying Private ssh-key to ~/.ssh with '600' permissions
+# Step 14 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
+# Step 15 - Starting and enabling the logrotate service
+# Step 16 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
 </code></pre>
 </li>
 <li>
@@ -628,27 +628,27 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 </li>
 <li>
 <p>Step 4 - Adding permissions to <code>pg_hba.conf</code> for connecting to the Standby PostgreSQL</p>
-<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
                                   # Internal IP address  
-host my_wiki       wikiuser       192.168.10.11/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.13/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.14/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.15/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.16/32                   scram-sha-256
-host my_wiki       wikiuser       192.168.10.17/32                   scram-sha-256
+host my_wiki       wikiuser       192.168.10.12/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.13/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.14/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.15/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.16/32             scram-sha-256
+host my_wiki       wikiuser       192.168.10.17/32             scram-sha-256
 
-host replication   syncuser       &lt;Nat IP address VM-6&gt;/32           scram-sha-256
-host replication   syncuser       &lt;Nat IP address VM-7&gt;/32           scram-sha-256
+host replication   syncuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host replication   syncuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
                                   # Internal IP address  
-host replication   syncuser       192.168.10.16/32                   scram-sha-256
-host replication   syncuser       192.168.10.17/32                   scram-sha-256
+host replication   syncuser       192.168.10.16/32             scram-sha-256
+host replication   syncuser       192.168.10.17/32             scram-sha-256
 </code></pre>
 </li>
 <li>
@@ -657,12 +657,17 @@ host replication   syncuser       192.168.10.17/32                   scram-sha-2
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Restarting the PostgreSQL service</p>
+<p>Step 6 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-2-standby-db/postgresql/14/main</code>       </p>
+<pre><code>rm -rf /opt/vhdd-2-standby-db/postgresql/14/main
+</code></pre>
+</li>
+<li>
+<p>Step 7 - Restarting the PostgreSQL service</p>
 <pre><code>systemctl restart postgresql
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Starting pg_basebackup for replication</p>
+<p>Step 8 - Starting pg_basebackup for replication</p>
 <pre><code>sudo -u postgres
 
 pg_basebackup -h 192.168.10.16 -D /otc/mount_point/postgresql/14/main \
@@ -671,7 +676,7 @@ pg_basebackup -h 192.168.10.16 -D /otc/mount_point/postgresql/14/main \
 </code></pre>
 </li>
 <li>
-<p>Step 8 - Creating the /scripts directory with '0755' permissions</p>
+<p>Step 9 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
@@ -680,7 +685,7 @@ chmod 0755 /scripts
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Creating the .env file in /scripts directory with '0740' permissions</p>
+<p>Step 10 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-- (read only)
 # Others: --- (no access)
@@ -689,34 +694,34 @@ chmod 0740 /scripts/.env
 </code></pre>
 </li>
 <li>
-<p>Step 10 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions</p>
+<p>Step 11 - Copying the <strong>pgdump_standby_postgresql.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
 </li>
 <li>
-<p>Step 11 - Filling the .env file with data</p>
+<p>Step 12 - Filling the <strong>.env</strong> file with data</p>
 <pre><code>BACKUPS_DIR="/opt/vhdd-3-dump-db"
 DATABASE_USER=wikiuser
 DATABASE_PASSWORD=some_strong_password
 DATABASE_NAME=my_wiki
 DATABASE_PORT=5432
-REMOTE_HOST=192.168.10.13 # the ip address of Primary PostgreSQL
+REMOTE_HOST=192.168.10.16 # the ip address of Primary PostgreSQL
 REMOTE_USER=root
 PRIVATE_KEY_PATH=~/.ssh/id_ed25519
 </code></pre>
 </li>
 <li>
-<p>Step 12 - Copying Private ssh-key to ~/.ssh with '600' permissions</p>
+<p>Step 13 - Copying <strong>Private ssh-key</strong> to <code>~/.ssh</code> with '600' permissions</p>
 </li>
 <li>
-<p>Step 13 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/</p>
+<p>Step 14 - Copying the <strong>logrotate_pgdump_standby_posgresql</strong> file to <code>/etc/logrotate.d/</code></p>
 </li>
 <li>
-<p>Step 14 - Starting and enabling the logrotate service</p>
+<p>Step 15 - Starting and enabling the <strong>logrotate service</strong></p>
 <pre><code>systemctl start logrotate
 systemctl enable logrotate
 </code></pre>
 </li>
 <li>
-<p>Step 15 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler</p>
+<p>Step 16 - Adding the execution of <strong>pgdump_standby_postgresql.py</strong> to the <strong>cron job scheduler</strong></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
@@ -769,31 +774,31 @@ crontab -e
 </code></pre>
 </li>
 <li>
-<p>Step 4 - Creating the /zabbix_dump directory, where db_dumps will be stored with '0755' permissions</p>
+<p>Step 4 - Creating the <code>/zabbix_dump</code> directory, where <strong>db_dumps</strong> will be stored with '0755' permissions</p>
 <pre><code>mkdir /opt/vhdd-1-monitoring-system-db/zabbix_dump
 chmod 0755 /opt/vhdd-1-monitoring-system-db/zabbix_dump
 </code></pre>
 </li>
 <li>
 <p>Step 5 - Adding permissions to <code>pg_hba.conf</code> for connecting to the Standby PostgreSQL</p>
-<pre><code>host zabbix       zabbix       77.137.79.100/32                      scram-sha-256
-host zabbix       zabbix       212.179.174.196/32                    scram-sha-256
-host zabbix       zabbix       5.29.11.237/32                        scram-sha-256
+<pre><code>host zabbix       zabbix       77.137.79.100/32              scram-sha-256
+host zabbix       zabbix       212.179.174.196/32            scram-sha-256
+host zabbix       zabbix       5.29.11.237/32                scram-sha-256
 
                                # NAT IP address  
-host zabbix       zabbix       &lt;Nat IP address VM-1&gt;/32              scram-sha-256
+host zabbix       zabbix       &lt;Nat IP address VM-1&gt;/32      scram-sha-256
 
                                # Internal IP address  
-host zabbix       zabbix       192.168.10.11/32                      scram-sha-256
+host zabbix       zabbix       192.168.10.12/32              scram-sha-256
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Restarting the PostgreSQL service</p>
+<p>Step 6 - Restarting the <strong>PostgreSQL service</strong></p>
 <pre><code>systemctl restart postgresql
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Creating the "zabbix" user for the Zabbix-Server Postgresql</p>
+<p>Step 7 - Creating the "<strong>zabbix</strong>" user for the Zabbix-Server Postgresql</p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER zabbix WITH PASSWORD 'zabbixuser_password' 
@@ -815,7 +820,7 @@ CREATE DATABASE zabbix WITH OWNER = zabbix;
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Creating the /scripts directory with '0755' permissions</p>
+<p>Step 9 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
@@ -824,7 +829,7 @@ chmod 0755 /scripts
 </code></pre>
 </li>
 <li>
-<p>Step 10 - Creating the .env file in /scripts directory with '0740' permissions</p>
+<p>Step 10 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-- (read only)
 # Others: --- (no access)
@@ -833,28 +838,28 @@ chmod 0740 /scripts/.env
 </code></pre>
 </li>
 <li>
-<p>Step 11 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions</p>
+<p>Step 11 - Copying the <strong>pgdump_zabbix_server.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
 </li>
 <li>
-<p>Step 12 - Filling the .env file with data</p>
-<pre><code>BACKUPS_DIR="/opt/vhdd-1-monitoring-system-db/zabbix_dump"
+<p>Step 12 - Filling the <strong>.env</strong> file with data</p>
+<pre><code>BACKUPS_DIR="/opt/vhdd-1-monitoring-system-db/zabbix_dump"   
 DATABASE_USER=zabbix
-DATABASE_PASSWORD=some_strong_password
-DATABASE_NAME=zabix
+DATABASE_PASSWORD=some_strong_zabbix_password # (ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
+DATABASE_NAME=zabbix
 DATABASE_PORT=5432
 </code></pre>
 </li>
 <li>
-<p>Step 13 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/</p>
+<p>Step 13 - Copying the <strong>logrotate_pgdump_zabbix_server</strong> file to <code>/etc/logrotate.d/</code></p>
 </li>
 <li>
-<p>Step 14 - Starting and enabling the logrotate service</p>
+<p>Step 14 - Starting and enabling the <strong>logrotate service</strong></p>
 <pre><code>systemctl start logrotate
 systemctl enable logrotate
 </code></pre>
 </li>
 <li>
-<p>Step 15 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler</p>
+<p>Step 15 - Adding the execution of <strong>pgdump_zabbix_server.py</strong> to the <strong>cron job scheduler</strong></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
@@ -884,7 +889,7 @@ crontab -e
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
---vault-id duc_zabbix_server@~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_zabbix_server.txt\
+--vault-id duc_zabbix_server@~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_zabbix_server.txt \
 --vault-id duc_nginx_mediawiki@~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_nginx_mediawiki.txt \
 -i inventory.yaml --tags="ddns_duc_setup"
 </code></pre>
@@ -893,33 +898,33 @@ crontab -e
 <h3 id="manual_7">Manual</h3>
 <ul>
 <li>
-<p>Step 1 - Copying the noip-duc_3.3.0.tar.gz archive to root/ (and rename to noip-duc.tar.gz)</p>
+<p>Step 1 - Copying the <strong>noip-duc_3.3.0.tar.gz</strong> archive to <code>root/</code> (and rename to noip-duc.tar.gz)</p>
 </li>
 <li>
-<p>Step 2 Unzipping the noip-duc.tar.gz archive to root/</p>
+<p>Step 2 Unzipping the <strong>noip-duc.tar.gz</strong> archive to <code>root/</code></p>
 <pre><code>cd /root
 tar -xzvf noip-duc.tar.gz /root/
 </code></pre>
 </li>
 <li>
-<p>Step 3 - Removing noip-duc.tar.gz archive from /root/noip-duc.tar.gz</p>
+<p>Step 3 - Removing the <strong>noip-duc.tar.gz</strong> archive from <code>/root/noip-duc.tar.gz</code></p>
 <pre><code>rm /root/noip-duc.tar.gz
 </code></pre>
 </li>
 <li>
-<p>Step 4 - Installing noip-duc_3.3.0_amd64.deb package</p>
+<p>Step 4 - Installing <strong>noip-duc_3.3.0_amd64.deb</strong> package</p>
 <pre><code>cd /root/noip-duc/binaries/
 # The -i option tells dpkg to install the specified .deb file.
 dpkg -i noip-duc_3.3.0_amd64.deb
 </code></pre>
 </li>
 <li>
-<p>Step 5 - Copying noip-duc service file to /etc/systemd/system/noip-duc.service</p>
+<p>Step 5 - Copying <strong>noip-duc service file</strong> to <code>/etc/systemd/system/noip-duc.service</code></p>
 <pre><code>cp /root/noip-duc/debian/service /etc/systemd/system/noip-duc.service
 </code></pre>
 </li>
 <li>
-<p>Step 6, 7 - Copying dduc_zabbix_server and duc_nginx_mediawiki credentials file to /etc/default/noip-ducs</p>
+<p>Step 6, 7 - Copying <strong>dduc_zabbix_server</strong> and <strong>duc_nginx_mediawiki</strong> credentials file to <code>/etc/default/noip-ducs</code></p>
 </li>
 <li>
 <p>Step 8 - Reloading systemd daemon</p>
@@ -927,7 +932,7 @@ dpkg -i noip-duc_3.3.0_amd64.deb
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Starting and enabling the noip-duc services</p>
+<p>Step 9 - Starting and enabling the <strong>noip-duc services</strong></p>
 <pre><code>systemctl start noip-duc
 systemctl enable noip-duc
 </code></pre>
@@ -1007,7 +1012,7 @@ systemctl enable noip-duc
 </details>
 </li>
 <li>
-<p>Step 3 - Starting and Enabling nginx services</p>
+<p>Step 3 - Starting and Enabling <strong>nginx service</strong></p>
 <pre><code>systemctl start nginx
 systemctl enable nginx
 
@@ -1017,7 +1022,7 @@ systemctl is-enabled nginx
 </code></pre>
 </li>
 <li>
-<p>Step 4 - Starting and Enabling postgresql services</p>
+<p>Step 4 - Starting and Enabling <strong>postgresql service</strong></p>
 <pre><code>systemctl start postgresql
 systemctl enable postgresql
 
@@ -1027,12 +1032,12 @@ systemctl is-enabled postgresql
 </code></pre>
 </li>
 <li>
-<p>Step 5 - Removing the "default" symlink from /etc/nginx/sites-enabled/default</p>
+<p>Step 5 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></p>
 <pre><code>rm /etc/nginx/sites-enabled/default
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Copying the nginx_mediawiki configuration file to /etc/nginx/sites-available/nginx_mediawiki with '0755' permissions</p>
+<p>Step 6 - Copying the <strong>nginx_mediawiki</strong> configuration file to <code>/etc/nginx/sites-available/nginx_mediawiki</code> with '0755' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
@@ -1040,30 +1045,30 @@ chmod 0755 /etc/nginx/sites-available/nginx_mediawiki
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Symlink creation for nginx_mediawiki configuration file from /etc/nginx/sites-available/nginx_mediawiki to /etc/nginx/sites-enabled/nginx_mediawiki</p>
+<p>Step 7 - Symlink creation for <strong>nginx_mediawiki</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki</code></p>
 <pre><code>ln -s ../sites-available/nginx_mediawiki /etc/nginx/sites-enabled/nginx_mediawiki
 </code></pre>
 </li>
 <li>
-<p>Step 8 - Downloading the MediaWiki archive to /var/www/</p>
+<p>Step 8 - Downloading the <strong>MediaWiki archive</strong> to <code>/var/www/</code></p>
 <pre><code>cd /var/www/
 # -O mediawiki.tar.gz: This option specifies the output filename for the downloaded file
 wget -O mediawiki.tar.gz https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Unzipping the MediaWiki archive to /var/www/</p>
+<p>Step 9 - Unzipping the <strong>MediaWiki archive</strong> to <code>/var/www/</code></p>
 <pre><code>cd /var/www/
 tar -xzvf mediawiki.tar.gz -C /var/www/
 </code></pre>
 </li>
 <li>
-<p>Step 10 - Removing MediaWiki archive from /var/www/mediawiki.tar.gz</p>
+<p>Step 10 - Removing <strong>MediaWiki archive</strong> from <code>/var/www/mediawiki.tar.gz</code></p>
 <pre><code>rm /var/www/mediawiki.tar.gz
 </code></pre>
 </li>
 <li>
-<p>Step 11 - Copying the nginx_mediawiki configuration file to /var/www/mediawiki/LocalSettings.php with '0755' permissions</p>
+<p>Step 11 - Copying the <strong>LocalSettings.php</strong> configuration file to <code>/var/www/mediawiki/</code> with '0755' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
@@ -1071,7 +1076,7 @@ chmod 0755 /var/www/mediawiki/LocalSettings.php
 </code></pre>
 </li>
 <li>
-<p>Step 12 - Restarting the Nginx service</p>
+<p>Step 12 - Restarting the <strong>Nginx service</strong></p>
 <pre><code>systemctl restart nginx
 </code></pre>
 </li>
@@ -1115,7 +1120,7 @@ chmod 0755 /var/www/mediawiki/LocalSettings.php
 </details>
 </li>
 <li>
-<p>Step 3 - Starting and Enabling nginx service</p>
+<p>Step 3 - Starting and Enabling <strong>nginx service</strong></p>
 <pre><code>systemctl start nginx
 systemctl enable nginx
 
@@ -1125,12 +1130,12 @@ systemctl is-enabled nginx
 </code></pre>
 </li>
 <li>
-<p>Step 4 - Removing the "default" symlink from /etc/nginx/sites-enabled/default</p>
+<p>Step 4 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></p>
 <pre><code>rm /etc/nginx/sites-enabled/default
 </code></pre>
 </li>
 <li>
-<p>Step 5 - Copying the nginx_mediawiki_proxy configuration file to /etc/nginx/sites-available/ with '0755' permissions</p>
+<p>Step 5 - Copying the <strong>nginx_mediawiki_proxy</strong> configuration file to <code>/etc/nginx/sites-available/</code> with '0755' permissions</p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
@@ -1138,12 +1143,12 @@ chmod 0755 /etc/nginx/sites-available/nginx_mediawiki_proxy
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Symlink creation for nginx_mediawiki_proxy configuration file from /etc/nginx/sites-available/nginx_mediawiki_proxy to /etc/nginx/sites-enabled/nginx_mediawiki_proxy</p>
+<p>Step 6 - Symlink creation for <strong>nginx_mediawiki_proxy</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki_proxy</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki_proxy</code></p>
 <pre><code>ln -s ../sites-available/nginx_mediawiki_proxy /etc/nginx/sites-enabled/nginx_mediawiki_proxy
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Restarting the Nginx service</p>
+<p>Step 7 - Restarting the <strong>Nginx service</strong></p>
 <pre><code>systemctl restart nginx
 </code></pre>
 </li>
@@ -1220,13 +1225,13 @@ zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psq
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Configuring the "DBPassword" in /etc/zabbix/zabbix_server.conf </p>
+<p>Step 7 - Configuring the "<strong>DBPassword</strong>" in <code>/etc/zabbix/zabbix_server.conf</code></p>
 <pre><code>nano /etc/zabbix/zabbix_server.conf
-DBPassword=&lt;ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password&gt;
+DBPassword=some_strong_zabbix_password (ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
 </code></pre>
 </li>
 <li>
-<p>Step 8, 9 - Configuring the "listen" and "server_name" in /etc/zabbix/nginx.conf</p>
+<p>Step 8, 9 - Configuring the "<strong>listen</strong>" and "<strong>server_name</strong>" in <code>/etc/zabbix/nginx.conf</code></p>
 <pre><code>nano /etc/zabbix/nginx.conf
 listen 8080
 # IP or DDNS address
@@ -1235,10 +1240,10 @@ server_name monitoring-wiki.ddns.net
 </li>
 <li>
 <p>Step 10 - Restarting and Enabling services</p>
-<pre><code>systemctl start &lt;servic_name&gt;
-systemctl enable &lt;servic_name&gt;
+<pre><code>systemctl start &lt;service_name&gt;
+systemctl enable &lt;service_name&gt;
 
-# Check nginx service status
+# Check services status
 systemctl status &lt;service_name&gt;
 systemctl is-enabled &lt;service_name&gt;
 </code></pre>
@@ -1317,8 +1322,8 @@ wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix
 </li>
 <li>
 <p>Step 5, 6, 7 - Configuring the Server, ServerActive, Hostname in <code>/etc/zabbix/zabbix_agentd.conf</code></p>
-<pre><code>Server=192.168.10.11
-ServerActive=192.168.10.11
+<pre><code>Server=192.168.10.12
+ServerActive=192.168.10.12
 Hostname=&lt;current_host_name&gt;
 </code></pre>
 </li>
@@ -1327,7 +1332,7 @@ Hostname=&lt;current_host_name&gt;
 <pre><code>systemctl start &lt;service_name&gt;
 systemctl enable &lt;service_name&gt;
 
-# Check nginx service status
+# Check services status
 systemctl status &lt;service_name&gt;
 systemctl is-enabled &lt;service_name&gt;
 </code></pre>
