@@ -18,6 +18,39 @@ def define_env(env):
     env.variables['vhdd_3_full_name'] = "vhdd-3-dump-db" 
     env.variables['vssd_1_full_name'] = "vssd-1-primary-db"
 
+    env.variables['vm_1_ip_address'] = "192.168.10.11"
+    env.variables['vm_1_ip_address'] = "192.168.10.12"
+    env.variables['vm_3_ip_address'] = "192.168.10.13"
+    env.variables['vm_4_ip_address'] = "192.168.10.14"
+    env.variables['vm_5_ip_address'] = "192.168.10.15"
+    env.variables['vm_6_ip_address'] = "192.168.10.16"
+    env.variables['vm_7_ip_address'] = "192.168.10.17"
+
+    env.variables['vm_service_nat_ip_address_1'] = "77.137.79.100"
+    env.variables['vm_service_nat_ip_address_2'] = "212.179.174.196"
+    env.variables['vm_service_nat_ip_address_3'] = "5.29.11.237"
+    
+    env.variables['db_security_group'] = "dbadmin"
+
+    env.variables['postgresql_zabbix_server_backups_dir'] = "/opt/vhdd-1-monitoring-system-db/zabbix_dump"
+    env.variables['postgresql_zabbix_server_database_name'] = "zabbix"
+    env.variables['postgresql_zabbix_server_database_user'] = "zabbix"
+    env.variables['postgresql_zabbix_server_database_password'] = "some_strong_zabbix_password"
+    env.variables['postgresql_zabbix_server_database_port'] = "5432"
+
+    env.variables['postgresql_mediawiki_database_name'] = "my_wiki"
+    env.variables['postgresql_mediawiki_database_user'] = "wikiuser"
+    env.variables['postgresql_mediawiki_database_password'] = "some_strong_wikiuser_password"
+    env.variables['postgresql_mediawiki_database_port'] = "5432"
+
+    env.variables['ddns_zabbix_server'] = "monitoring-wiki.ddns.net"
+    env.variables['ddns_nginx_mediawiki'] = "veresk.ddns.net"
+
+    env.variables['zabbix_repository_link'] = "https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb"
+
+
+
+
     @env.macro
     def showTooltip(definition, description):
         """Generates HTML for a tooltip with customizable text."""
