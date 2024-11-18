@@ -1,5 +1,5 @@
-# Основные команды mkdocs
-### Официальная документация
+# Main mkdocs commands
+### Official documentation
   - [Getting-started](https://www.mkdocs.org/getting-started/)
 
         # To install MkDocs
