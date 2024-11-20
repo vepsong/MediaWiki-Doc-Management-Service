@@ -516,20 +516,20 @@ listen_addresses = '*'
 </li>
 <li>
 <p>Step 3 - Adding permissions to <code>pg_hba.conf</code> for connecting to the primary PostgreSQL</p>
-<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
+<pre><code>host my_wiki       wikiuser        &lt;Nat IP address VM-1&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-3&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-4&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-5&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
                                   # Internal IP address  
-host my_wiki       wikiuser       192.168.10.12/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.13/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.14/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.15/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.16/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.17/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.12/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.13/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.14/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.15/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.16/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.17/32             scram-sha-256
 
 host replication   syncuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
 host replication   syncuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
@@ -670,8 +670,8 @@ host replication   syncuser       192.168.10.17/32             scram-sha-256
 <p>Step 8 - Starting pg_basebackup for replication</p>
 <pre><code>sudo -u postgres
 
-pg_basebackup -h 192.168.10.16 -D /otc/mount_point/postgresql/14/main \
--U replication_user \
+pg_basebackup -h 192.168.10.16 -D /opt/vhdd-2-standby-db/postgresql/14/main \
+-U syncuser \
 -P -v -R
 </code></pre>
 </li>
