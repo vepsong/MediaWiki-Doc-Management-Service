@@ -62,7 +62,7 @@
 
 
 # Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
-- name: Step 5 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
+- name: Step 4 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
   become: true
   become_user: postgres
   replace:
@@ -74,7 +74,7 @@
     - standby_postgresql_setup_configuring_hot_standby_postgresql_conf
 
 # Deleting all contents inside the PostgreSQL Replication directory
-- name: Step 6 - Deleting all contents inside the PostgreSQL Replication directory ({{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main)
+- name: Step 5 - Deleting all contents inside the PostgreSQL Replication directory ({{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main)
   become: true
   become_user: root
   command: rm -rf {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main/
@@ -83,7 +83,7 @@
 
 
 # Restarting the PostgreSQL service
-- name: Step 7 - Restarting the PostgreSQL service
+- name: Step 6 - Restarting the PostgreSQL service
   become: true
   become_user: root
   systemd:
@@ -103,7 +103,7 @@
 # - v — outputs a detailed log of the command execution
 # - R — creates a standby.signal file in the database folder. This is a marker for the PostgreSQL server to start in standby mode
 
-- name: Step 8 - Starting pg_basebackup for replication
+- name: Step 7 - Starting pg_basebackup for replication
   become: true
   become_user: postgres
   shell: |
@@ -125,111 +125,111 @@
 # Block with Standby PostgreSQL tasks for creating a dump
 # =======================================================
 
-# Creating the /scripts directory with '0755' permissions, where scripts for the dump will be stored
-# Owner: rwx (read, write, and execute)
-# Group: r-x (read and execute)
-# Others: r-x (read and execute)
-- name: Step 9 - Creating the /scripts directory with '0755' permissions
-  become: true
-  become_user: root
-  ansible.builtin.file:
-    path: /scripts 
-    state: directory
-    mode: '0755'
-  tags:
-    - standby_postgresql_setup_creating_scripts_directory
+# # Creating the /scripts directory with '0755' permissions, where scripts for the dump will be stored
+# # Owner: rwx (read, write, and execute)
+# # Group: r-x (read and execute)
+# # Others: r-x (read and execute)
+# - name: Step 8 - Creating the /scripts directory with '0755' permissions
+#   become: true
+#   become_user: root
+#   ansible.builtin.file:
+#     path: /scripts 
+#     state: directory
+#     mode: '0755'
+#   tags:
+#     - standby_postgresql_setup_creating_scripts_directory
 
-# Creating the .env file in /scripts directory with '0740' permissions
-# Owner: rwx (read, write, and execute)
-# Group: r-- (read only)
-# Others: --- (no access)
-- name: Step 10 - Creating the .env file in /scripts directory with '0740' permissions
-  become: true
-  become_user: root
-  ansible.builtin.file:
-    path: "/scripts/.env"
-    state: touch
-    group: dbadmin
-    mode: '0740'
-  tags:
-    - standby_postgresql_setup_creating_env_file
+# # Creating the .env file in /scripts directory with '0740' permissions
+# # Owner: rwx (read, write, and execute)
+# # Group: r-- (read only)
+# # Others: --- (no access)
+# - name: Step 9 - Creating the .env file in /scripts directory with '0740' permissions
+#   become: true
+#   become_user: root
+#   ansible.builtin.file:
+#     path: "/scripts/.env"
+#     state: touch
+#     group: dbadmin
+#     mode: '0740'
+#   tags:
+#     - standby_postgresql_setup_creating_env_file
 
-# Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
-# Owner: rwx (read, write, and execute)
-# Group: r-x (read and execute)
-# Others: r-x (read and execute)
-- name: Step 11 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
-  become: true
-  become_user: root
-  copy:
-    src: "{{ playbook_dir }}/common_files/postgresql_standby/pgdump_standby_postgresql.py"
-    dest: /scripts/
-    mode: '0755'
-  tags:
-    - standby_postgresql_setup_copy_pgdump_standby_posgresql_py
-
-
-# Filling the .env file with data
-- name: Step 12 - Filling the .env file with data
-  become: true
-  become_user: root
-  blockinfile:
-    path: /scripts/.env
-    block: |
-      BACKUPS_DIR="{{ postgres_vars.db_backups_dir }}"
-      DATABASE_USER={{ postgres_wikiuser_user_vars.db_user }}
-      DATABASE_PASSWORD={{ postgres_wikiuser_user_vars.db_user_password }}
-      DATABASE_NAME={{ postgres_vars.db_name }}
-      DATABASE_PORT={{ postgres_vars.db_port }}
-      REMOTE_HOST={{ vm_7_standby_db_private_key_ssh.remote_host }}
-      REMOTE_USER={{ vm_7_standby_db_private_key_ssh.remote_user }}
-      PRIVATE_KEY_PATH={{ vm_7_standby_db_private_key_ssh.private_key_ssh_path }}
-
-    marker: "# {mark} Ansible managed block for .env"
-  tags:
-    - standby_postgresql_setup_filling_env_data
+# # Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
+# # Owner: rwx (read, write, and execute)
+# # Group: r-x (read and execute)
+# # Others: r-x (read and execute)
+# - name: Step 10 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
+#   become: true
+#   become_user: root
+#   copy:
+#     src: "{{ playbook_dir }}/common_files/postgresql_standby/pgdump_standby_postgresql.py"
+#     dest: /scripts/
+#     mode: '0755'
+#   tags:
+#     - standby_postgresql_setup_copy_pgdump_standby_posgresql_py
 
 
+# # Filling the .env file with data
+# - name: Step 11 - Filling the .env file with data
+#   become: true
+#   become_user: root
+#   blockinfile:
+#     path: /scripts/.env
+#     block: |
+#       BACKUPS_DIR="{{ postgres_vars.db_backups_dir }}"
+#       DATABASE_USER={{ postgres_wikiuser_user_vars.db_user }}
+#       DATABASE_PASSWORD={{ postgres_wikiuser_user_vars.db_user_password }}
+#       DATABASE_NAME={{ postgres_vars.db_name }}
+#       DATABASE_PORT={{ postgres_vars.db_port }}
+#       REMOTE_HOST={{ vm_7_standby_db_private_key_ssh.remote_host }}
+#       REMOTE_USER={{ vm_7_standby_db_private_key_ssh.remote_user }}
+#       PRIVATE_KEY_PATH={{ vm_7_standby_db_private_key_ssh.private_key_ssh_path }}
 
-# Copying the private SSH key to ~/.ssh with '600' permissions
-# Owner: rw- (read, write)
-- name: Step 13 - Copying Private ssh-key to ~/.ssh with '600' permissions
-  become: true
-  become_user: root
-  copy:
-    src: "{{ playbook_dir }}/common_files/id_ed25519"
-    dest: ~/.ssh
-    mode: '600'    
-  tags:
-    - standby_postgresql_setup_copying_private_ssh_key
+#     marker: "# {mark} Ansible managed block for .env"
+#   tags:
+#     - standby_postgresql_setup_filling_env_data
 
 
-# Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
-# Command for forcing logrotate to run: logrotate -f /etc/logrotate.conf
-- name: Step 14 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
-  become: true
-  become_user: root
-  copy:
-    src: "{{ playbook_dir }}/common_files/postgresql_standby/logrotate_pgdump_standby_posgresql"
-    dest: /etc/logrotate.d/
-  tags:
-    - standby_postgresql_setup_logrotate_pgdump_standby_posgresql
+
+# # Copying the private SSH key to ~/.ssh with '600' permissions
+# # Owner: rw- (read, write)
+# - name: Step 12 - Copying Private ssh-key to ~/.ssh with '600' permissions
+#   become: true
+#   become_user: root
+#   copy:
+#     src: "{{ playbook_dir }}/common_files/id_ed25519"
+#     dest: ~/.ssh
+#     mode: '600'    
+#   tags:
+#     - standby_postgresql_setup_copying_private_ssh_key
+
+
+# # Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
+# # Command for forcing logrotate to run: logrotate -f /etc/logrotate.conf
+# - name: Step 13 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
+#   become: true
+#   become_user: root
+#   copy:
+#     src: "{{ playbook_dir }}/common_files/postgresql_standby/logrotate_pgdump_standby_posgresql"
+#     dest: /etc/logrotate.d/
+#   tags:
+#     - standby_postgresql_setup_logrotate_pgdump_standby_posgresql
     
-# Starting and enabling the logrotate service
-- name: Step 15 - Starting and enabling the logrotate service
-  service:
-    name=logrotate
-    state=started 
-    enabled=yes
-  tags:
-    - standby_postgresql_setup_start_enable_logrotate_service
+# # Starting and enabling the logrotate service
+# - name: Step 14 - Starting and enabling the logrotate service
+#   service:
+#     name=logrotate
+#     state=started 
+#     enabled=yes
+#   tags:
+#     - standby_postgresql_setup_start_enable_logrotate_service
 
 
 # Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
 # minute: '0' - run at the beginning of the hour
 # hour: '*/4' - run every 4 hours"
 
-- name: Step 16 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
+- name: Step 8 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
   become: true
   become_user: root
   ansible.builtin.cron:

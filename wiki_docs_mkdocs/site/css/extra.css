@@ -59,3 +59,11 @@ details {
 /* .rst-content .external_code_rendering pre code {
     white-space: unset;
 } */
+
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption {
+    white-space: pre-wrap;
+    height: auto;
+    line-height: normal;
+    margin: 12px 0 12px;
+}

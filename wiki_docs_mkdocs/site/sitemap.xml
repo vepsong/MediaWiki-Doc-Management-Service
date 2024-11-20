@@ -2,30 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/2.%20app_deploy_schema_v4/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/3.1.%20service_vm_docker_setup/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/4.1.%20yandex_cloud_cli_and_serv_acc_setup/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/5.1.%20yandex_cloud_terraform_setup/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
     </url>
     <url>
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/7.1.%20ansible_pipeline/</loc>
-         <lastmod>2024-11-16</lastmod>
+         <lastmod>2024-11-20</lastmod>
+    </url>
+    <url>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/8.1.%20manual_failover_from_primary_to_standby_db/</loc>
+         <lastmod>2024-11-20</lastmod>
     </url>
 </urlset>

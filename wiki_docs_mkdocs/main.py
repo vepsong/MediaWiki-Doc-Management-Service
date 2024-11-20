@@ -54,7 +54,9 @@ def define_env(env):
     env.variables['postgresql_database_vhdd_2_disk_name'] = "vhdd-2-standby-db"    
     env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-2-standby-db"  
 
-    
+    env.variables['postgresql_database_vhdd_3_disk_name'] = "vhdd-3-dump-db"   
+    env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-3-dump-db"  
+
 
 
     env.variables['ddns_zabbix_server'] = "monitoring-wiki.ddns.net"

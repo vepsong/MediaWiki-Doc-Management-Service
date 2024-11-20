@@ -63,7 +63,7 @@
 
 
 # Configuring the wal_level in /etc/postgresql/14/main/postgresql.conf - Primary Postgresql
-- name: Step 4 - Configuring the wal_level in /etc/postgresql/14/main/postgresql.conf - Primary Postgresql
+- name: Step 3 - Configuring the wal_level in /etc/postgresql/14/main/postgresql.conf - Primary Postgresql
   become: true
   become_user: postgres
   replace:
@@ -76,7 +76,7 @@
 
 
 # Restarting the PostgreSQL service
-- name: Step 5 - Restarting the PostgreSQL service
+- name: Step 4 - Restarting the PostgreSQL service
   become: true
   become_user: root
   systemd:
@@ -87,7 +87,7 @@
 
 
 # Creating the "wikiuser" user for the Primary PostgreSQL
-- name: Step 6 - Creating the "wikiuser" user for the Primary PostgreSQL
+- name: Step 5 - Creating the "wikiuser" user for the Primary PostgreSQL
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -101,7 +101,7 @@
 
 
 # Creating the "syncuser" user for the Primary PostgreSQL
-- name: Step 7 - Creating the "syncuser" user for the Primary PostgreSQL
+- name: Step 6 - Creating the "syncuser" user for the Primary PostgreSQL
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
@@ -115,7 +115,7 @@
 
 
 # Checking if the database exists (and creating it if it doesn't)
-- name: Step 8 - Checking if the database exists (and creating it if it doesn't)
+- name: Step 7 - Checking if the database exists (and creating it if it doesn't)
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:

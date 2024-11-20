@@ -12,6 +12,8 @@ nav:
   - Remote deployment using Ansible:
       - 6. Ansible Setup: 6.1. ansible_setup.md
       - 7. Run the Ansible pipeline: 7.1. ansible_pipeline.md
+  - Refining the scenario for Primary PostgreSQL DB failure:
+      - 8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL: 8.1. manual_failover_from_primary_to_standby_db.md
 
 theme:
   name: readthedocs

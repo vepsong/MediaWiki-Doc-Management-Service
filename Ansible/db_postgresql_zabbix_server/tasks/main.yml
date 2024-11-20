@@ -107,45 +107,11 @@
 # Block with Zabbix-Server PostgreSQL tasks for creating a dump
 # =============================================================
 
-
-# Creating the /scripts directory with '0755' permissions, where scripts for the dump will be stored
-# Owner: rwx (read, write, and execute)
-# Group: r-x (read and execute)
-# Others: r-x (read and execute)
-- name: Step 9 - Creating the /scripts directory with '0755' permissions
-  become: true
-  become_user: root
-  ansible.builtin.file:
-    path: /scripts 
-    state: directory
-    group: dbadmin
-    mode: '0755'
-  tags:
-    - zabbix_server_postgresql_setup_creating_scripts_directory
-
-
-
-# Creating the .env file in /scripts directory with '0740' permissions
-# Owner: rwx (read, write, and execute)
-# Group: r-- (read only)
-# Others: --- (no access)
-- name: Step 10 - Creating the .env file in /scripts directory with '0740' permissions
-  become: true
-  become_user: root
-  ansible.builtin.file:
-    path: "/scripts/.env"
-    state: touch
-    group: dbadmin
-    mode: '0740'
-  tags:
-    - zabbix_server_postgresql_setup_creating_env_file
-
-
 # Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
 # Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-- name: Step 11 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+- name: Step 9 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
   become: true
   become_user: root
   copy:
@@ -156,7 +122,7 @@
     - zabbix_server_postgresql_setup_copy_pgdump_zabbix_server_py
 
 # Filling the .env file with data
-- name: Step 12 - Filling the .env file with data
+- name: Step 10 - Filling the .env file with data
   become: true
   become_user: root
   blockinfile:
@@ -175,7 +141,7 @@
 
 # Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
 # Command for forcing logrotate to run: logrotate -f /etc/logrotate.conf
-- name: Step 13 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
+- name: Step 11 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
   become: true
   become_user: root
   copy:
@@ -186,7 +152,7 @@
     
 
 # Starting and enabling the logrotate service
-- name: Step 14 - Starting and enabling the logrotate service
+- name: Step 12 - Starting and enabling the logrotate service
   service:
     name=logrotate
     state=started 
@@ -200,7 +166,7 @@
 # minute: '0' - run at the beginning of the hour
 # hour: '*/4' - run every 4 hours"
 
-- name: Step 15 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
+- name: Step 13 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
   become: true
   become_user: root
   ansible.builtin.cron:
