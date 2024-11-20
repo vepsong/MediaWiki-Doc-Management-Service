@@ -164,6 +164,11 @@
     </ul>
                   </li>
               </ul>
+              <p class="caption"><span class="caption-text">Refining the scenario for Primary PostgreSQL DB failure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../8.1.%20manual_failover_from_primary_to_standby_db/">8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
@@ -370,7 +375,15 @@ fdisk /dev/&lt;device_name&gt;
 # Step 15 - Deleting the old main Postresql directory
 # Step 16 - Configuring the data_directory in /etc/postgresql/14/main/postgresql.conf
 # Step 17 - Configuring the listen_addresses in /etc/postgresql/14/main/postgresql.conf
-# Step 18 - Restarting the PostgreSQL service
+# Step 18 - Adding permissions to pg_hba.conf for connecting to the PostgreSQL (perform only on the MediaWiki db's)
+# Step 19 - Restarting the PostgreSQL service
+# Step 20 - Creating the ``/scripts`` directory with '0755' permissions
+# Step 21 - Creating the **.env** file in ``/scripts`` directory with '0740' permissions
+# Step 22 - Copying the **pgdump_standby_postgresql.py** script to ``~/scripts`` with '0755' permissions (perform only on the MediaWiki db's)
+# Step 23 - Filling the **.env** file in ``/scripts'' directory with data
+# Step 24 - Copying **Private ssh-key** to ``~/.ssh`` with '600' permissions (perform only on the MediaWiki db's)
+# Step 25 - Copying the **logrotate_pgdump_standby_posgresql** file to ``/etc/logrotate.d/`` (perform only on the MediaWiki db's)
+# Step 26 - Starting and enabling the **logrotate service** (perform only on the MediaWiki db's)
 </code></pre>
 </li>
 <li>
@@ -475,8 +488,78 @@ listen_addresses = '*'
 </code></pre>
 </li>
 <li>
-<p>Step 18 - Restarting the PostgreSQL service</p>
+<p>Step 18 - Adding permissions to <span class="tooltip" onclick="showTooltip(event)"><strong>pg_hba.conf</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/etc/postgresql/14/main/pg_hba.conf</code></span></span> for connecting to the PostgreSQL (perform only on the MediaWiki db)</p>
+<pre><code>host my_wiki       wikiuser        &lt;Nat IP address VM-1&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-3&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-4&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-5&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host my_wiki       wikiuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
+
+                                  # Internal IP address  
+host my_wiki       wikiuser        192.168.10.12/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.13/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.14/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.15/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.16/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.17/32             scram-sha-256
+
+host replication   syncuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
+host replication   syncuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
+
+                                  # Internal IP address  
+host replication   syncuser       192.168.10.16/32             scram-sha-256
+host replication   syncuser       192.168.10.17/32             scram-sha-256
+</code></pre>
+</li>
+<li>
+<p>Step 19 - Restarting the PostgreSQL service</p>
 <pre><code>systemctl restart postgresql
+</code></pre>
+</li>
+<li>
+<p>Step 20 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
+<pre><code># Owner: rwx (read, write, and execute)
+# Group: r-x (read and execute)
+# Others: r-x (read and execute)
+mkdir /scripts
+chmod 0755 /scripts
+</code></pre>
+</li>
+<li>
+<p>Step 21 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
+<pre><code># Owner: rwx (read, write, and execute)
+# Group: r-- (read only)
+# Others: --- (no access)
+touch /scripts/.env
+chmod 0740 /scripts/.env
+</code></pre>
+</li>
+<li>
+<p>Step 22 - Copying the <strong>pgdump_standby_postgresql.py</strong> script to <code>~/scripts</code> with '0755' permissions (perform only on the MediaWiki db's)</p>
+</li>
+<li>
+<p>Step 23 - Filling the <strong>.env</strong> file in ``/scripts'' directory with data</p>
+<pre><code>BACKUPS_DIR="/opt/vhdd-3-dump-db"
+DATABASE_USER=wikiuser
+DATABASE_PASSWORD=some_strong_wikiuser_password
+DATABASE_NAME=my_wiki
+DATABASE_PORT=5432
+REMOTE_HOST=192.168.10.16 # the ip address of Primary PostgreSQL
+REMOTE_USER=root
+PRIVATE_KEY_PATH=~/.ssh/id_ed25519
+</code></pre>
+</li>
+<li>
+<p>Step 24 - Copying <strong>Private ssh-key</strong> to <code>~/.ssh</code> with '600' permissions (perform only on the MediaWiki db's)</p>
+</li>
+<li>
+<p>Step 25 - Copying the <strong>logrotate_pgdump_standby_posgresql</strong> file to <code>/etc/logrotate.d/</code> (perform only on the MediaWiki db's)</p>
+</li>
+<li>
+<p>Step 26 - Starting and enabling the <strong>logrotate service</strong> (perform only on the MediaWiki db's)</p>
+<pre><code>systemctl start logrotate
+systemctl enable logrotate
 </code></pre>
 </li>
 </ul>
@@ -488,12 +571,11 @@ listen_addresses = '*'
 <p>Tasks:</p>
 <pre><code># Step 1 - Adding secret variables
 # Step 2 - Stopping the PostgreSQL service
-# Step 3 - Adding permissions to pg_hba.conf for connecting to the primary PostgreSQL
-# Step 4 - Configuring the ``wal_level`` in ``/etc/postgresql/14/main/postgresql.conf`` - Primary Postgresql
-# Step 5 - Restarting the PostgreSQL service
-# Step 6 - Creating the "wikiuser" user for the Primary PostgreSQL
-# Step 7 - Creating the "syncuser" user for the Primary PostgreSQL
-# Step 8 - Checking if the database exists (and creating it if it doesn't)
+# Step 3 - Configuring the ``wal_level`` in ``/etc/postgresql/14/main/postgresql.conf`` - Primary Postgresql
+# Step 4 - Restarting the PostgreSQL service
+# Step 5 - Creating the "wikiuser" user for the Primary PostgreSQL
+# Step 6 - Creating the "syncuser" user for the Primary PostgreSQL
+# Step 7 - Checking if the database exists (and creating it if it doesn't)
 </code></pre>
 </li>
 <li>
@@ -515,42 +597,17 @@ listen_addresses = '*'
 </code></pre>
 </li>
 <li>
-<p>Step 3 - Adding permissions to <code>pg_hba.conf</code> for connecting to the primary PostgreSQL</p>
-<pre><code>host my_wiki       wikiuser        &lt;Nat IP address VM-1&gt;/32     scram-sha-256
-host my_wiki       wikiuser        &lt;Nat IP address VM-3&gt;/32     scram-sha-256
-host my_wiki       wikiuser        &lt;Nat IP address VM-4&gt;/32     scram-sha-256
-host my_wiki       wikiuser        &lt;Nat IP address VM-5&gt;/32     scram-sha-256
-host my_wiki       wikiuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
-host my_wiki       wikiuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
-
-                                  # Internal IP address  
-host my_wiki       wikiuser        192.168.10.12/32             scram-sha-256
-host my_wiki       wikiuser        192.168.10.13/32             scram-sha-256
-host my_wiki       wikiuser        192.168.10.14/32             scram-sha-256
-host my_wiki       wikiuser        192.168.10.15/32             scram-sha-256
-host my_wiki       wikiuser        192.168.10.16/32             scram-sha-256
-host my_wiki       wikiuser        192.168.10.17/32             scram-sha-256
-
-host replication   syncuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
-host replication   syncuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
-
-                                  # Internal IP address  
-host replication   syncuser       192.168.10.16/32             scram-sha-256
-host replication   syncuser       192.168.10.17/32             scram-sha-256
-</code></pre>
-</li>
-<li>
-<p>Step 4 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
+<p>Step 3 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
 <pre><code>wal_level = replica
 </code></pre>
 </li>
 <li>
-<p>Step 5 - Restarting the PostgreSQL service</p>
+<p>Step 4 - Restarting the PostgreSQL service</p>
 <pre><code>systemctl restart postgresql
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Creating the "<strong>wikiuser</strong>" user for the Primary PostgreSQL</p>
+<p>Step 5 - Creating the "<strong>wikiuser</strong>" user for the Primary PostgreSQL</p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER wikiuser WITH PASSWORD 'wikiuser_password' 
@@ -560,7 +617,7 @@ SUPERUSER CREATEDB CREATEROLE LOGIN INHERIT;
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Creating the "<strong>syncuser</strong>" user for the Primary PostgreSQL</p>
+<p>Step 6 - Creating the "<strong>syncuser</strong>" user for the Primary PostgreSQL</p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER syncuser WITH PASSWORD 'syncuser_password' 
@@ -570,7 +627,7 @@ REPLICATION;
 </code></pre>
 </li>
 <li>
-<p>Step 8 - Checking if the database exists (and creating it if it doesn't)</p>
+<p>Step 7 - Checking if the database exists (and creating it if it doesn't)</p>
 <pre><code>sudo -u postgres psql
 
 # Checking if the database exists
@@ -591,20 +648,11 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 <pre><code># Step 1 - Adding secret variables
 # Step 2 - Creating dynamic variables
 # Step 3 - Stopping the PostgreSQL service
-# Step 4 - Adding permissions to pg_hba.conf for connecting to the Standby PostgreSQL
-# Step 5 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
-# Step 6 - Deleting all contents inside the PostgreSQL Replication directory
-# Step 7 - Restarting the PostgreSQL service
-# Step 8 - Starting pg_basebackup for replication
-
-# Step 9 - Creating the /scripts directory with '0755' permissions
-# Step 10 - Creating the .env file in /scripts directory with '0740' permissions
-# Step 11 - Copying the pgdump_standby_postgresql.py script to ~/scripts with '0755' permissions
-# Step 12 - Filling the .env file with data
-# Step 13 - Copying Private ssh-key to ~/.ssh with '600' permissions
-# Step 14 - Copying the logrotate_pgdump_standby_posgresql file to /etc/logrotate.d/
-# Step 15 - Starting and enabling the logrotate service
-# Step 16 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
+# Step 4 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
+# Step 5 - Deleting all contents inside the PostgreSQL Replication directory
+# Step 6 - Restarting the PostgreSQL service
+# Step 7 - Starting pg_basebackup for replication
+# Step 8 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
 </code></pre>
 </li>
 <li>
@@ -627,101 +675,37 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 </code></pre>
 </li>
 <li>
-<p>Step 4 - Adding permissions to <code>pg_hba.conf</code> for connecting to the Standby PostgreSQL</p>
-<pre><code>host my_wiki       wikiuser       &lt;Nat IP address VM-1&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-3&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-4&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-5&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
-host my_wiki       wikiuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
-
-                                  # Internal IP address  
-host my_wiki       wikiuser       192.168.10.12/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.13/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.14/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.15/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.16/32             scram-sha-256
-host my_wiki       wikiuser       192.168.10.17/32             scram-sha-256
-
-host replication   syncuser       &lt;Nat IP address VM-6&gt;/32     scram-sha-256
-host replication   syncuser       &lt;Nat IP address VM-7&gt;/32     scram-sha-256
-
-                                  # Internal IP address  
-host replication   syncuser       192.168.10.16/32             scram-sha-256
-host replication   syncuser       192.168.10.17/32             scram-sha-256
-</code></pre>
-</li>
-<li>
-<p>Step 5 - Configuring the <code>hot_standby</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
+<p>Step 4 - Configuring the <code>hot_standby</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
 <pre><code>hot_standby = on
 </code></pre>
 </li>
 <li>
-<p>Step 6 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-2-standby-db/postgresql/14/main</code>       </p>
-<pre><code>rm -rf /opt/vhdd-2-standby-db/postgresql/14/main
+<p>Step 5 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-3-dump-db/postgresql/14/main</code>       </p>
+<pre><code>rm -rf /opt/vhdd-3-dump-db/postgresql/14/main
 </code></pre>
 </li>
 <li>
-<p>Step 7 - Restarting the PostgreSQL service</p>
+<p>Step 6 - Restarting the PostgreSQL service</p>
 <pre><code>systemctl restart postgresql
 </code></pre>
 </li>
 <li>
-<p>Step 8 - Starting pg_basebackup for replication</p>
-<pre><code>sudo -u postgres
+<p>Step 7 - Starting pg_basebackup for replication</p>
+<pre><code># - h MAIN_IP — the address of the Primary PostgreSQL
+# - D — the folder where the backup should be placed
+# - U — the user for connection
+# - P — prompts for password input
+# - v — outputs a detailed log of the command execution
+# - R — creates a standby.signal file in the database folder. This is a marker for the PostgreSQL server to start in standby mode
 
-pg_basebackup -h 192.168.10.16 -D /opt/vhdd-2-standby-db/postgresql/14/main \
--U syncuser \
--P -v -R
+sudo -u postgres
+
+pg_basebackup -h 192.168.10.16 -D /opt/vhdd-3-dump-db/postgresql/14/main \
+-U syncuser -P -v -R
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
-# Group: r-x (read and execute)
-# Others: r-x (read and execute)
-mkdir /scripts
-chmod 0755 /scripts
-</code></pre>
-</li>
-<li>
-<p>Step 10 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
-# Group: r-- (read only)
-# Others: --- (no access)
-touch /scripts/.env
-chmod 0740 /scripts/.env
-</code></pre>
-</li>
-<li>
-<p>Step 11 - Copying the <strong>pgdump_standby_postgresql.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
-</li>
-<li>
-<p>Step 12 - Filling the <strong>.env</strong> file with data</p>
-<pre><code>BACKUPS_DIR="/opt/vhdd-3-dump-db"
-DATABASE_USER=wikiuser
-DATABASE_PASSWORD=some_strong_password
-DATABASE_NAME=my_wiki
-DATABASE_PORT=5432
-REMOTE_HOST=192.168.10.16 # the ip address of Primary PostgreSQL
-REMOTE_USER=root
-PRIVATE_KEY_PATH=~/.ssh/id_ed25519
-</code></pre>
-</li>
-<li>
-<p>Step 13 - Copying <strong>Private ssh-key</strong> to <code>~/.ssh</code> with '600' permissions</p>
-</li>
-<li>
-<p>Step 14 - Copying the <strong>logrotate_pgdump_standby_posgresql</strong> file to <code>/etc/logrotate.d/</code></p>
-</li>
-<li>
-<p>Step 15 - Starting and enabling the <strong>logrotate service</strong></p>
-<pre><code>systemctl start logrotate
-systemctl enable logrotate
-</code></pre>
-</li>
-<li>
-<p>Step 16 - Adding the execution of <strong>pgdump_standby_postgresql.py</strong> to the <strong>cron job scheduler</strong></p>
+<p>Step 8 - Adding the execution of <strong>pgdump_standby_postgresql.py</strong> to the <strong>cron job scheduler</strong></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
@@ -746,13 +730,11 @@ crontab -e
 # Step 7 - Creating the "zabbix" user for the Zabbix-Server Postgresql
 # Step 8 - Checking if the database exists (and creating it if it doesn't)
 
-# Step 9 - Creating the /scripts directory with '0755' permissions
-# Step 10 - Creating the .env file in /scripts directory with '0740' permissions
-# Step 11 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
-# Step 12 - Filling the .env file with data
-# Step 13 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
-# Step 14 - Starting and enabling the logrotate service
-# Step 15 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
+# Step 9 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+# Step 10 - Filling the .env file with data
+# Step 11 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
+# Step 12 - Starting and enabling the logrotate service
+# Step 13 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
 </code></pre>
 </li>
 <li>
@@ -820,28 +802,10 @@ CREATE DATABASE zabbix WITH OWNER = zabbix;
 </code></pre>
 </li>
 <li>
-<p>Step 9 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
-# Group: r-x (read and execute)
-# Others: r-x (read and execute)
-mkdir /scripts
-chmod 0755 /scripts
-</code></pre>
+<p>Step 9 - Copying the <strong>pgdump_zabbix_server.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
 </li>
 <li>
-<p>Step 10 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
-# Group: r-- (read only)
-# Others: --- (no access)
-touch /scripts/.env
-chmod 0740 /scripts/.env
-</code></pre>
-</li>
-<li>
-<p>Step 11 - Copying the <strong>pgdump_zabbix_server.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
-</li>
-<li>
-<p>Step 12 - Filling the <strong>.env</strong> file with data</p>
+<p>Step 10 - Filling the <strong>.env</strong> file with data</p>
 <pre><code>BACKUPS_DIR="/opt/vhdd-1-monitoring-system-db/zabbix_dump"   
 DATABASE_USER=zabbix
 DATABASE_PASSWORD=some_strong_zabbix_password # (ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
@@ -850,16 +814,16 @@ DATABASE_PORT=5432
 </code></pre>
 </li>
 <li>
-<p>Step 13 - Copying the <strong>logrotate_pgdump_zabbix_server</strong> file to <code>/etc/logrotate.d/</code></p>
+<p>Step 11 - Copying the <strong>logrotate_pgdump_zabbix_server</strong> file to <code>/etc/logrotate.d/</code></p>
 </li>
 <li>
-<p>Step 14 - Starting and enabling the <strong>logrotate service</strong></p>
+<p>Step 12 - Starting and enabling the <strong>logrotate service</strong></p>
 <pre><code>systemctl start logrotate
 systemctl enable logrotate
 </code></pre>
 </li>
 <li>
-<p>Step 15 - Adding the execution of <strong>pgdump_zabbix_server.py</strong> to the <strong>cron job scheduler</strong></p>
+<p>Step 13 - Adding the execution of <strong>pgdump_zabbix_server.py</strong> to the <strong>cron job scheduler</strong></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
@@ -1355,6 +1319,7 @@ systemctl is-enabled &lt;service_name&gt;
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
           <a href="../6.1.%20ansible_setup/" class="btn btn-neutral float-left" title="6. Ansible Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+          <a href="../8.1.%20manual_failover_from_primary_to_standby_db/" class="btn btn-neutral float-right" title="8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL">Next <span class="icon icon-circle-arrow-right"></span></a>
       </div>
   
     <hr/>
@@ -1378,6 +1343,8 @@ systemctl is-enabled &lt;service_name&gt;
     
       <span><a href="../6.1.%20ansible_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../8.1.%20manual_failover_from_primary_to_standby_db/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

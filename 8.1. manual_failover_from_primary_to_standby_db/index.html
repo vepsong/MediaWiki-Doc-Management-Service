@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://vepsong.github.io/MediaWiki-Doc-Management-Service/8.1.%20manual_failover_from_primary_to_standby_db/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>6. Ansible Setup - MediaWiki Doc Management Service</title>
+    <title>8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL - MediaWiki Doc Management Service</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,9 +13,9 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "6. Ansible Setup";
-        var mkdocs_page_input_path = "6.1. ansible_setup.md";
-        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/6.1.%20ansible_setup/";
+        var mkdocs_page_name = "8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL";
+        var mkdocs_page_input_path = "8.1. manual_failover_from_primary_to_standby_db.md";
+        var mkdocs_page_url = "/MediaWiki-Doc-Management-Service/8.1.%20manual_failover_from_primary_to_standby_db/";
       </script>
     
     <!--[if lt IE 9]>
@@ -60,8 +60,15 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Remote deployment using Ansible</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../6.1.%20ansible_setup/">6. Ansible Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../7.1.%20ansible_pipeline/">7. Run the Ansible pipeline</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Refining the scenario for Primary PostgreSQL DB failure</span></p>
               <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">6. Ansible Setup</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#files-and-variables-setup">Files and Variables Setup</a>
         <ul>
@@ -72,13 +79,6 @@
     <li class="toctree-l2"><a class="reference internal" href="#essential-ansible-commands">Essential Ansible commands</a>
     </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../7.1.%20ansible_pipeline/">7. Run the Ansible pipeline</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Refining the scenario for Primary PostgreSQL DB failure</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../8.1.%20manual_failover_from_primary_to_standby_db/">8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL</a>
                   </li>
               </ul>
       </div>
@@ -95,8 +95,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Remote deployment using Ansible</li>
-      <li class="breadcrumb-item active">6. Ansible Setup</li>
+          <li class="breadcrumb-item">Refining the scenario for Primary PostgreSQL DB failure</li>
+      <li class="breadcrumb-item active">8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -105,7 +105,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="ansible-setup">Ansible setup</h1>
+                <h1 id="manual-failover-from-the-primary-postgresql-to-the-standby-postgresql">Manual Failover From the Primary PostgreSQL to the Standby PostgreSQL</h1>
 <h3 id="files-and-variables-setup">Files and Variables Setup</h3>
 <ol>
 <li>
@@ -532,8 +532,7 @@ ansible-vault view "&lt;path to file&gt;"
             </div>
           </div><footer>
       <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-          <a href="../5.1.%20yandex_cloud_terraform_setup/" class="btn btn-neutral float-left" title="5. Yandex Cloud Terraform Setup"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-          <a href="../7.1.%20ansible_pipeline/" class="btn btn-neutral float-right" title="7. Run the Ansible pipeline">Next <span class="icon icon-circle-arrow-right"></span></a>
+          <a href="../7.1.%20ansible_pipeline/" class="btn btn-neutral float-left" title="7. Run the Ansible pipeline"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       </div>
   
     <hr/>
@@ -555,10 +554,8 @@ ansible-vault view "&lt;path to file&gt;"
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../5.1.%20yandex_cloud_terraform_setup/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../7.1.%20ansible_pipeline/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../7.1.%20ansible_pipeline/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

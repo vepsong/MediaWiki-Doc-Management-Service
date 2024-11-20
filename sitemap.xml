@@ -28,4 +28,8 @@
          <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/7.1.%20ansible_pipeline/</loc>
          <lastmod>2024-11-20</lastmod>
     </url>
+    <url>
+         <loc>https://vepsong.github.io/MediaWiki-Doc-Management-Service/8.1.%20manual_failover_from_primary_to_standby_db/</loc>
+         <lastmod>2024-11-20</lastmod>
+    </url>
 </urlset>
