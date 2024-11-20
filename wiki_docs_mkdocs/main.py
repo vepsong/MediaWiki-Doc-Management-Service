@@ -32,6 +32,7 @@ def define_env(env):
     
     env.variables['db_security_group'] = "dbadmin"
 
+    env.variables['postgresql_zabbix_server_disk_name'] = "vhdd-1-monitoring-system-db"
     env.variables['postgresql_zabbix_server_backups_dir'] = "/opt/vhdd-1-monitoring-system-db/zabbix_dump"
     env.variables['postgresql_zabbix_server_database_name'] = "zabbix"
     env.variables['postgresql_zabbix_server_database_user'] = "zabbix"
@@ -42,6 +43,19 @@ def define_env(env):
     env.variables['postgresql_mediawiki_database_user'] = "wikiuser"
     env.variables['postgresql_mediawiki_database_password'] = "some_strong_wikiuser_password"
     env.variables['postgresql_mediawiki_database_port'] = "5432"
+
+    env.variables['postgresql_mediawiki_database_replication_name'] = "replication"
+    env.variables['postgresql_mediawiki_database_replication_user'] = "syncuser"
+    env.variables['postgresql_mediawiki_database_replication_user_password'] = "some_strong_replication_user_password"
+
+    env.variables['postgresql_database_vssd_1_disk_name'] = "vssd-1-primary-db"    
+    env.variables['postgresql_database_vssd_1_disk_dir'] = "/opt/vssd-1-primary-db"  
+
+    env.variables['postgresql_database_vhdd_2_disk_name'] = "vhdd-2-standby-db"    
+    env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-2-standby-db"  
+
+    
+
 
     env.variables['ddns_zabbix_server'] = "monitoring-wiki.ddns.net"
     env.variables['ddns_nginx_mediawiki'] = "veresk.ddns.net"

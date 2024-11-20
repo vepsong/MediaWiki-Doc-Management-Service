@@ -19,38 +19,47 @@
   tags:
     - primary_postgresql_setup_stopping_postgresql_service
 
-# Adding permissions to pg_hba.conf for connecting to the Primary PostgreSQL
-- name: Step 3 - Adding permissions to pg_hba.conf for connecting to the Primary PostgreSQL
-  become: true
-  become_user: postgres
-  blockinfile:
-    path: /etc/postgresql/14/main/pg_hba.conf
-    block: |
-      host my_wiki       wikiuser       77.137.79.100/32                                                scram-sha-256
-      host my_wiki       wikiuser       212.179.174.196/32                                              scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32        scram-sha-256
-      host my_wiki       wikiuser       192.168.10.11/32                                                scram-sha-256    
-      host my_wiki       wikiuser       {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32       scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.13/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32       scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.14/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32     scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.15/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.16/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
-      host my_wiki       wikiuser       192.168.10.17/32                                                scram-sha-256
-      host replication   syncuser       77.137.79.100/32                                                scram-sha-256
-      host replication   syncuser       212.179.174.196/32                                              scram-sha-256     
-      host replication   syncuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
-      host replication   syncuser       192.168.10.16/32                                                scram-sha-256
-      host replication   syncuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
-      host replication   syncuser       192.168.10.17/32                                                scram-sha-256
+# # Adding permissions to pg_hba.conf for connecting to the Primary PostgreSQL
+# - name: Step 3 - Adding permissions to pg_hba.conf for connecting to the Primary PostgreSQL
+#   become: true
+#   become_user: postgres
+#   blockinfile:
+#     path: /etc/postgresql/14/main/pg_hba.conf
+#     block: |
+#                                         # Nat IP address
+#       host my_wiki       wikiuser       77.137.79.100/32                                                scram-sha-256
+#       host my_wiki       wikiuser       212.179.174.196/32                                              scram-sha-256
+#       host my_wiki       wikiuser       5.29.11.237/32                                                  scram-sha-256
+                                        
+#                                         # Internal IP address
+#       host my_wiki       wikiuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32        scram-sha-256
+#       host my_wiki       wikiuser       192.168.10.11/32                                                scram-sha-256    
+#       host my_wiki       wikiuser       {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32       scram-sha-256    
+#       host my_wiki       wikiuser       192.168.10.13/32                                                scram-sha-256
+#       host my_wiki       wikiuser       {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32       scram-sha-256    
+#       host my_wiki       wikiuser       192.168.10.14/32                                                scram-sha-256
+#       host my_wiki       wikiuser       {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32     scram-sha-256    
+#       host my_wiki       wikiuser       192.168.10.15/32                                                scram-sha-256
+#       host my_wiki       wikiuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
+#       host my_wiki       wikiuser       192.168.10.16/32                                                scram-sha-256
+#       host my_wiki       wikiuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
+#       host my_wiki       wikiuser       192.168.10.17/32                                                scram-sha-256
 
-    marker: "# {mark} Ansible managed block for PostgreSQL"
-  notify: restart_postgresql
-  tags:
-    - primary_postgresql_setup_configuring_connect_permissions_dir_pg_hba_conf
+#                                         # Nat IP address
+#       host replication   syncuser       77.137.79.100/32                                                scram-sha-256
+#       host replication   syncuser       212.179.174.196/32                                              scram-sha-256     
+#       host replication   syncuser       5.29.11.237/32                                                  scram-sha-256
+
+#                                         # Internal IP address
+#       host replication   syncuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
+#       host replication   syncuser       192.168.10.16/32                                                scram-sha-256
+#       host replication   syncuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
+#       host replication   syncuser       192.168.10.17/32                                                scram-sha-256
+
+#     marker: "# {mark} Ansible managed block for PostgreSQL"
+#   notify: restart_postgresql
+#   tags:
+#     - primary_postgresql_setup_configuring_connect_permissions_dir_pg_hba_conf
 
 
 # Configuring the wal_level in /etc/postgresql/14/main/postgresql.conf - Primary Postgresql
