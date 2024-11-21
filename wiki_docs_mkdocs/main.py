@@ -19,7 +19,7 @@ def define_env(env):
     env.variables['vssd_1_full_name'] = "vssd-1-primary-db"
 
     env.variables['vm_1_ip_address'] = "192.168.10.11"
-    env.variables['vm_1_ip_address'] = "192.168.10.12"
+    env.variables['vm_2_ip_address'] = "192.168.10.12"
     env.variables['vm_3_ip_address'] = "192.168.10.13"
     env.variables['vm_4_ip_address'] = "192.168.10.14"
     env.variables['vm_5_ip_address'] = "192.168.10.15"

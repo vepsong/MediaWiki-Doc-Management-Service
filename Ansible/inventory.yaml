@@ -3,43 +3,50 @@ linuxVM:
     monitoringSystem:
       hosts:
         vm-1-zabbix-server:
-          ansible_host: 62.84.118.103
+          ansible_host: 89.169.139.50
+          ip_addr: 192.168.10.11
           external_disks:
-          - disk_id: fhmbmi3cvv6ustg007ad
+          - disk_id: fhm0d2rdnsaahrq1afr9
             disk_name: vhdd-1
             mount_point: /opt/vhdd-1
             filesystem: ext4
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 89.169.131.140
+          ansible_host: 89.169.145.2
+          ip_addr: 192.168.10.12
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.157.203
+          ansible_host: 89.169.154.110
+          ip_addr: 192.168.10.13
         vm-4-mediawiki-server-2:
-          ansible_host: 158.160.59.178
+          ansible_host: 89.169.151.240
+          ip_addr: 192.168.10.14
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 158.160.62.125
+          ansible_host: 84.201.172.40
+          ip_addr: 192.168.10.15
     database:
       hosts:
         vm-6-postgresql-db-1:
-          ansible_host: 51.250.7.192
+          ansible_host: 89.169.133.89
+          ip_addr: 192.168.10.16
           external_disks:
-          - disk_id: fhmnhon55f2t9hi2jhb4
+          - disk_id: fhmn38gr9irsngffo1pd
             disk_name: vssd-1
             mount_point: /opt/vssd-1
             filesystem: ext4
         vm-7-postgresql-db-2:
-          ansible_host: 158.160.46.41
+          ansible_host: 89.169.154.192
+          ip_addr: 192.168.10.17
           external_disks:
-          - disk_id: fhm2gv70s95blinr7c34
+          - disk_id: fhm1rp4ndr7stko3c88f
             disk_name: vhdd-2
             mount_point: /opt/vhdd-2
             filesystem: ext4
-          - disk_id: fhmrr2mlq2gjkmg0g22t
+          - disk_id: fhm47cm537j0p65dv7om
             disk_name: vhdd-3
             mount_point: /opt/vhdd-3
             filesystem: ext4

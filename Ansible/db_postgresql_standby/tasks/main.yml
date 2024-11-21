@@ -107,14 +107,13 @@
   become: true
   become_user: postgres
   shell: |
-    pg_basebackup -h 192.168.10.16 -D {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main \
+    pg_basebackup -h {{ hostvars['vm-6-postgresql-db-1'].ip_addr }} -D {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main \
     -U {{ postgres_replication_user_vars.db_user }} \
     -P -v -R
   environment:
     PGPASSWORD: "{{ postgres_replication_user_vars.db_user_password }}"
   notify: restart_postgresql
   when: db_hosts.standby in inventory_hostname
-  tags:
   tags:
     - standby_postgresql_setup_starting_replicationrun_pg_basebackup
 
