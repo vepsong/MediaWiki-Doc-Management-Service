@@ -74,10 +74,10 @@
     - standby_postgresql_setup_configuring_hot_standby_postgresql_conf
 
 # Deleting all contents inside the PostgreSQL Replication directory
-- name: Step 5 - Deleting all contents inside the PostgreSQL Replication directory ({{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main)
+- name: Step 5 - Deleting all contents inside the PostgreSQL Replication directory ({{ hostvars['vm-7-postgresql-db-2'].external_disks[0].mount_point }}/postgresql/14/main)
   become: true
   become_user: root
-  command: rm -rf {{ hostvars['vm-7-standby-db'].external_disks[0].mount_point }}/postgresql/14/main/
+  command: rm -rf {{ hostvars['vm-7-postgresql-db-2'].external_disks[0].mount_point }}/postgresql/14/main/
   tags:
     - standby_postgresql_setup_deleting_contents_in_replication_directory
 

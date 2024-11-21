@@ -2,48 +2,46 @@ linuxVM:
   children:
     monitoringSystem:
       hosts:
-        vm-1-monitoring-system:
-          ansible_host: 62.84.112.141
+        vm-1-zabbix-server:
+          ansible_host: 62.84.118.103
           external_disks:
-          - disk_id: fhm0hm9u806jh5ms3qv9
-            disk_name: vhdd-1-monitoring-system-db
-            mount_point: /opt/vhdd-1-monitoring-system-db
+          - disk_id: fhmbmi3cvv6ustg007ad
+            disk_name: vhdd-1
+            mount_point: /opt/vhdd-1
             filesystem: ext4
     nginxProxyServer:
       hosts:
         vm-2-nginx-proxy-server:
-          ansible_host: 158.160.55.232
+          ansible_host: 89.169.131.140
     mediawikiServer:
       hosts:
         vm-3-mediawiki-server-1:
-          ansible_host: 89.169.158.162
+          ansible_host: 89.169.157.203
         vm-4-mediawiki-server-2:
-          ansible_host: 130.193.36.183
+          ansible_host: 158.160.59.178
     haproxyProxyServer:
       hosts:
         vm-5-haproxy-proxy-server:
-          ansible_host: 158.160.52.92
-    primaryDb:
+          ansible_host: 158.160.62.125
+    database:
       hosts:
-        vm-6-primary-db:
-          ansible_host: 158.160.48.113
+        vm-6-postgresql-db-1:
+          ansible_host: 51.250.7.192
           external_disks:
-          - disk_id: fhmpchnjmp02pcg95icj
-            disk_name: vssd-1-primary-db
-            mount_point: /opt/vssd-1-primary-db
+          - disk_id: fhmnhon55f2t9hi2jhb4
+            disk_name: vssd-1
+            mount_point: /opt/vssd-1
             filesystem: ext4
-    standbyDb:
-      hosts:
-        vm-7-standby-db:
-          ansible_host: 84.252.130.185
+        vm-7-postgresql-db-2:
+          ansible_host: 158.160.46.41
           external_disks:
-          - disk_id: fhmlu7se1snll1spfqiv
-            disk_name: vhdd-2-standby-db
-            mount_point: /opt/vhdd-2-standby-db
+          - disk_id: fhm2gv70s95blinr7c34
+            disk_name: vhdd-2
+            mount_point: /opt/vhdd-2
             filesystem: ext4
-          - disk_id: fhm0dihlc0d02st21u7b
-            disk_name: vhdd-3-dump-db
-            mount_point: /opt/vhdd-3-dump-db
+          - disk_id: fhmrr2mlq2gjkmg0g22t
+            disk_name: vhdd-3
+            mount_point: /opt/vhdd-3
             filesystem: ext4
   vars:
     ansible_user: root

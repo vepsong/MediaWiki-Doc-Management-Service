@@ -10,9 +10,7 @@
 
 # Mounting external hard drives and initializing LVM
 - name: Mounting external hard drives 
-  # hosts: vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
-  hosts: "{{ target_groups }}"
-  # hosts: all
+  hosts: "{{ target_vms }}"
   roles:
     - role: mount_disk
   tags:
@@ -20,7 +18,7 @@
 
 # Unmounting external hard drives and deinitializing LVM
 - name: Unmounting external hard drives 
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   roles:
     - role: unmount_disk
   tags:
@@ -28,7 +26,7 @@
 
 # PostgreSQL Common Setup
 - name: PostgreSQL Common Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql

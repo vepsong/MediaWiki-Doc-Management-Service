@@ -22,6 +22,9 @@
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   loop: "{{ device_names }}"
 
+- name: Debug volume_group
+  debug:
+    var: volume_group
 
 # Partitioning the disk with new partitions
 - name: Step 4 - Partitioning the disk with new partitions "{{ device_path }}"
@@ -49,6 +52,7 @@
     vg: "{{ volume_group[item] }}"  # The VG name
     pvs: "{{ physical_volume[item] }}"  # The corresponding physical volume
   when: device_names is defined and vgs_info.stdout == ""
+  # when: device_names is defined and (volume_group[item] not in existing_vgs)
   loop: "{{ range(0, volume_group | length) | list }}"
   tags:
     - mount_external_disks_create_pv_vg

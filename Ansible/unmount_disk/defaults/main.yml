@@ -1,6 +1,7 @@
 ---
 # defaults file for unmount_disk
-target_groups:
-  - vm-1-monitoring-system
-  - vm-6-primary-db
-  - vm-7-standby-db
+target_vms:
+  - vm-1-zabbix-server
+  - vm-6-postgresql-db-1
+  - vm-7-postgresql-db-2
+
