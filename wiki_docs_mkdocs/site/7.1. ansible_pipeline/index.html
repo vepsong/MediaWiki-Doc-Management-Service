@@ -66,6 +66,8 @@
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">7. Run the Ansible pipeline</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#ansible">Ansible</a>
     </li>
@@ -73,7 +75,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</a>
+    <li class="toctree-l2"><a class="reference internal" href="#unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#ansible_1">Ansible</a>
     </li>
@@ -81,85 +83,23 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_2">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_2">Manual</a>
-    </li>
-        </ul>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#postgresql-common-setup">Postgresql Common Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_3">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_3">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#primary-postgresql-setup">Primary Postgresql Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_4">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_4">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#standby-postgresql-setup">Standby Postgresql Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_5">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_5">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#zabbix-server-postgresql-setup">Zabbix-server Postgresql Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_6">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_6">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ddns-duc-setup-noipcom">DDNS DUC Setup (noip.com)</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_7">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_7">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#mediawiki-setup">MediaWiki Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_8">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_8">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#nginx-proxy-server-setup-load-balancing-between-mediawiki-servers">Nginx Proxy Server Setup (load balancing between MediaWiki servers)</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_9">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_9">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#zabbix-server-setup">Zabbix-Server Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_10">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_10">Manual</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#zabbix-agent-setup">Zabbix-Agent Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_11">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_11">Manual</a>
-    </li>
-        </ul>
     </li>
     </ul>
                   </li>
@@ -195,27 +135,43 @@
               
                 <h1 id="ansible-pipeline">Ansible pipeline</h1>
 <h2 id="changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</h2>
-<h3 id="ansible">Ansible</h3>
+<p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
-<li>Compare the current VM hostname with <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/inventory.yaml</code></span></span> and change it if it differs.<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="change_vms_hostname"
+<li>
+<p>Compare the current VM hostname with <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/inventory.yaml</code></span></span> and change it if it differs.</p>
+</li>
+<li>
+<p>Running playbook:</p>
+<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="change_vms_hostname"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual">Manual</h3>
+<li>
+<p>Tasks:  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Changing the hostnames of all VMs</summary></p>
 <pre><code># Check the current VM hostname
 hostnamectl
 # Set a New Hostname
 hostnamectl set-hostname new-hostname
 </code></pre>
+</details>
+</li>
+</ul>
 <h2 id="mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</h2>
-<h3 id="ansible_1">Ansible</h3>
+<p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
+<h3 id="ansible">Ansible</h3>
 <ul>
 <li>Creating a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and a <code>mount point</code> in <code>/opt</code> directory</li>
-<li>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_hard_drives"
+<li>
+<p>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart</p>
+</li>
+<li>
+<p>Running playbook:</p>
+<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="mount_external_hard_drives"
 </code></pre>
 </li>
 </ul>
-<h3 id="manual_1">Manual</h3>
+<h3 id="manual">Manual</h3>
 <ul>
 <li>
 <p>Display information about disks and partitions</p>
@@ -297,13 +253,13 @@ cat /etc/fstab or mount -a
 </li>
 </ul>
 <h2 id="unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</h2>
-<h3 id="ansible_2">Ansible</h3>
+<h3 id="ansible_1">Ansible</h3>
 <ul>
 <li>Deleting a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and unmount a <code>mount point</code> in <code>/opt</code> directory<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_hard_drives"
 </code></pre>
 </li>
 </ul>
-<h3 id="manual_2">Manual</h3>
+<h3 id="manual_1">Manual</h3>
 <ul>
 <li>
 <p>Display information about disks and partitions</p>
@@ -353,73 +309,42 @@ fdisk /dev/&lt;device_name&gt;
 </li>
 </ul>
 <h2 id="postgresql-common-setup">Postgresql Common Setup</h2>
-<p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span> <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span></p>
-<h3 id="ansible_3">Ansible</h3>
+<p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span> <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Update list of packages
-# Step 2 - Apt packages installing
-# Step 3 - Pip3 packages installing
-# Step 4 - Starting and enabling the postgresql service
-# Step 5 - Adding secret variables
-# Step 6 - Creating dynamic variables
-# Step 7 - Creating a "dbadmin" security group
-# Step 8 - Adding multiple users to "dbadmin" group
-# Step 9 - Changing group ownership for PostgreSQL directories
-# Step 10 - Setting permissions for PostgreSQL directories
-# Step 11 - Stopping the PostgreSQL service
-# Step 12 - Creating a backup archive of the main PostgreSQL directory
-# Step 13 - Checking for the presence of a mount point
-# Step 14 - Copying (with -a flag) the current main database directory to the mount point
-# Step 15 - Deleting the old main Postresql directory
-# Step 16 - Configuring the data_directory in /etc/postgresql/14/main/postgresql.conf
-# Step 17 - Configuring the listen_addresses in /etc/postgresql/14/main/postgresql.conf
-# Step 18 - Adding permissions to pg_hba.conf for connecting to the PostgreSQL (perform only on the MediaWiki db's)
-# Step 19 - Restarting the PostgreSQL service
-# Step 20 - Creating the ``/scripts`` directory with '0755' permissions
-# Step 21 - Creating the **.env** file in ``/scripts`` directory with '0740' permissions
-# Step 22 - Copying the **pgdump_standby_postgresql.py** script to ``~/scripts`` with '0755' permissions (perform only on the MediaWiki db's)
-# Step 23 - Filling the **.env** file in ``/scripts'' directory with data
-# Step 24 - Copying **Private ssh-key** to ``~/.ssh`` with '600' permissions (perform only on the MediaWiki db's)
-# Step 25 - Copying the **logrotate_pgdump_standby_posgresql** file to ``/etc/logrotate.d/`` (perform only on the MediaWiki db's)
-# Step 26 - Starting and enabling the **logrotate service** (perform only on the MediaWiki db's)
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
 --vault-id ansible_secrets@~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_ansible_secrets.txt \
+--vault-id private_ssh_key@~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_private_ssh_key.txt \
 -i inventory.yaml --tags="postgresql_common_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_3">Manual</h3>
+<li>
+<p>Tasks:  </p>
 <ul>
-<li>
-<p>Steps 1, 2, 3 - Upgrage apt, install apt packages, install pip3 packages</p>
-<p><details class="external_code_rendering">
-<summary>Show apt and pip3 packages to install</summary></p>
-<pre><code> ---
- # vars file for db_postgresql
- apt_packages_to_install:
-   - postgresql
-   - postgresql-contrib
-   - python3-psycopg2
-   - acl
-   - rsync
-   - python3
-   - python3-venv
-   - python3-pip
+<li>Step 1 - Update list of packages</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2, 3 - Apt &amp; Pip3 packages installing</summary></p>
+<pre><code>---
+# vars file for db_postgresql
+apt_packages_to_install:
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+  - acl
+  - rsync
+  - python3
+  - python3-venv
+  - python3-pip
 
- pip3_packages_to_install:
-   - pip&gt;=24.3.1
-   - python-dotenv
+pip3_packages_to_install:
+  - pip&gt;=24.3.1
+  - python-dotenv
 </code></pre>
-</details>
-</li>
-<li>
-<p>Step 4 - Enable postgresql services</p>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Starting and enabling the postgresql service</summary></p>
 <pre><code>systemctl start postgresql
 systemctl enable postgresql
 
@@ -427,68 +352,90 @@ systemctl enable postgresql
 systemctl status postgresql
 systemctl is-enabled postgresql
 </code></pre>
-</li>
-<li>
-<p>Steps 5, 6 - Skipping</p>
-</li>
-<li>
-<p>Step 7 - Creating security group - <strong>dbadmin</strong></p>
+</details>
+<ul>
+<li>Step 5 - Adding secret variables</li>
+<li>Step 6 - Creating dynamic variables</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Creating a "<strong>dbadmin</strong>" security group</summary></p>
 <pre><code>groupadd dbadmin
 
 # verify the group
 getent group dbadmin
 </code></pre>
-</li>
-<li>
-<p>Step 8 - Adding multiple users: <strong>postgres</strong>, <strong>sudo</strong>, <strong>wikiuser</strong> and <strong>zabbix</strong> to the new security group</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Adding multiple users: <strong>postgres</strong>, <strong>sudo</strong>, <strong>wikiuser</strong> and <strong>zabbix</strong> to the "<strong>dbadmin</strong>" security group</summary></p>
 <pre><code># adding users to "dbadmin" security group one by one
 usermod -aG dbadmin &lt;username&gt;
 </code></pre>
-</li>
-<li>
-<p>Steps 9, 10 - Changing the directory's <strong>security group</strong>, <strong>ownership</strong> and <strong>permissions</strong></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 9 - Changing group ownership for <span class="tooltip" onclick="showTooltip(event)">PostgreSQL directories<span class="tooltip-text">/opt; /opt/mount_point</span></span></summary></p>
 <pre><code>chown -R root:dbadmin &lt;mount point&gt;
-sudo chmod -R 0770 &lt;mount point&gt;
-
 chown -R root:dbadmin /opt
-chmod -R 0770 /opt
 
-# Verify the group, ownership and permissions change
+# Verify changes in the security group ownership
+ls -ld &lt;mount point&gt; /opt
+ls -ld /opt
+
+chmod -R 0770 /opt
+chmod -R 0770 &lt;mount point&gt;
+
+# Verify changes in the security group permissions
 ls -ld &lt;mount point&gt; /opt
 ls -ld /opt
 </code></pre>
-</li>
-<li>
-<p>Step 11 - Stopping the PostgreSQL service</p>
-<pre><code>systemctl stop postgresql
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 10 - Setting permissions for <span class="tooltip" onclick="showTooltip(event)">PostgreSQL directories<span class="tooltip-text">/opt; /opt/mount_point</span></span></summary></p>
+<pre><code>chmod -R 0770 /opt
+chmod -R 0770 &lt;mount point&gt;
+
+# Verify changes in the security group permissions
+ls -ld &lt;mount point&gt; /opt
+ls -ld /opt
 </code></pre>
-</li>
-<li>
-<p>Step 12 - Creating a backup archive of the main PostgreSQL directory</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 11 - Stopping the PostgreSQL service</summary></p>
+<pre><code>systemctl stop postgresql
+systemctl status postgresql
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 12 - Creating a backup archive of the origin main PostgreSQL directory</summary></p>
 <pre><code>tar -czvf /tmp/postgres_initial_main_backup_$(date +%Y%m%d%H%M%S).tar.gz -C /var/lib/postgresql/14/ main
 </code></pre>
-</li>
-<li>
-<p>Step 13- Skipping</p>
-</li>
-<li>
-<p>Step 14 - Copying (with -a flag) the current main database directory to the mount point</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 13 - Checking for the presence of a mount point</summary></p>
+<pre><code>ls /path_to_mount_point/
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 14 - Copying (with -a flag) the current main database directory to the mount point</summary></p>
 <pre><code>cp -a /var/lib/postgresql/ /path/to/mount/point/
 </code></pre>
-</li>
-<li>
-<p>Step 15 - Deleting the old main Postresql directory</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 15 - Deleting the <span class="tooltip" onclick="showTooltip(event)">origin main Postresql directory<span class="tooltip-text">/var/lib/postgresql/14/main</span></span> directory</summary></p>
 <pre><code>rm -rf /var/lib/postgresql/14/main
 </code></pre>
-</li>
-<li>
-<p>Step 16, 17 - Configuring the <code>data_directory</code> and <code>listen_addresses</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
-<pre><code>data_directory = '/opt/&lt;mount_point&gt;/postgresql/14/main'
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 16, 17 - Configuring the <code>data_directory</code> and <code>listen_addresses</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></summary></p>
+<pre><code>data_directory = '/var/lib/postgresql/14/main'' &gt;&gt;&gt;
+data_directory = '/opt/&lt;mount_point&gt;/postgresql/14/main'
+
+#listen_addresses = 'localhost' &gt;&gt;&gt;
 listen_addresses = '*'
 </code></pre>
-</li>
-<li>
-<p>Step 18 - Adding permissions to <span class="tooltip" onclick="showTooltip(event)"><strong>pg_hba.conf</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/etc/postgresql/14/main/pg_hba.conf</code></span></span> for connecting to the PostgreSQL (perform only on the MediaWiki db)</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 18 - Adding permissions to <span class="tooltip" onclick="showTooltip(event)"><strong>pg_hba.conf</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/etc/postgresql/14/main/pg_hba.conf</code></span></span> for connecting to the PostgreSQL<br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></summary></p>
 <pre><code>host my_wiki       wikiuser        &lt;Nat IP address VM-1&gt;/32     scram-sha-256
 host my_wiki       wikiuser        &lt;Nat IP address VM-3&gt;/32     scram-sha-256
 host my_wiki       wikiuser        &lt;Nat IP address VM-4&gt;/32     scram-sha-256
@@ -496,8 +443,7 @@ host my_wiki       wikiuser        &lt;Nat IP address VM-5&gt;/32     scram-sha-
 host my_wiki       wikiuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
 host my_wiki       wikiuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
-                                  # Internal IP address  
-host my_wiki       wikiuser        192.168.10.12/32             scram-sha-256
+host my_wiki       wikiuser        192.168.10.11/32             scram-sha-256
 host my_wiki       wikiuser        192.168.10.13/32             scram-sha-256
 host my_wiki       wikiuser        192.168.10.14/32             scram-sha-256
 host my_wiki       wikiuser        192.168.10.15/32             scram-sha-256
@@ -507,40 +453,225 @@ host my_wiki       wikiuser        192.168.10.17/32             scram-sha-256
 host replication   syncuser        &lt;Nat IP address VM-6&gt;/32     scram-sha-256
 host replication   syncuser        &lt;Nat IP address VM-7&gt;/32     scram-sha-256
 
-                                  # Internal IP address  
-host replication   syncuser       192.168.10.16/32             scram-sha-256
-host replication   syncuser       192.168.10.17/32             scram-sha-256
+host replication   syncuser        192.168.10.16/32             scram-sha-256
+host replication   syncuser        192.168.10.17/32             scram-sha-256
 </code></pre>
-</li>
-<li>
-<p>Step 19 - Restarting the PostgreSQL service</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 19 - Restarting the PostgreSQL service</summary></p>
 <pre><code>systemctl restart postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 20 - Creating the <code>/scripts</code> directory with '0755' permissions</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 20 - Creating the <code>/scripts</code> directory with <code>0755</code> permissions</summary></p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
 mkdir /scripts
 chmod 0755 /scripts
 </code></pre>
-</li>
-<li>
-<p>Step 21 - Creating the <strong>.env</strong> file in <code>/scripts</code> directory with '0740' permissions</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 21 - Creating the <strong>.env</strong> file in the <code>/scripts/.env</code> directory with <code>0740</code> permissions</summary></p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-- (read only)
 # Others: --- (no access)
 touch /scripts/.env
 chmod 0740 /scripts/.env
 </code></pre>
-</li>
-<li>
-<p>Step 22 - Copying the <strong>pgdump_standby_postgresql.py</strong> script to <code>~/scripts</code> with '0755' permissions (perform only on the MediaWiki db's)</p>
-</li>
-<li>
-<p>Step 23 - Filling the <strong>.env</strong> file in ``/scripts'' directory with data</p>
-<pre><code>BACKUPS_DIR="/opt/vhdd-3-dump-db"
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 22 - Copying the <strong>pgdump_standby_postgresql.py</strong> script to <code>/scripts/pgdump_standby_postgresql.py</code> directory with <code>0755</code> permissions<br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></summary></p>
+<pre><code> from datetime import datetime, timedelta  
+ from pathlib import Path
+ import os
+ import re
+ from collections import OrderedDict
+ from pprint import pprint
+ import tempfile
+ import sys
+ from dotenv import load_dotenv
+ import subprocess
+
+ load_dotenv()
+
+ NOW = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+
+ DATABASE_NAME = os.getenv("DATABASE_NAME")
+ DATABASE_USER = os.getenv("DATABASE_USER")
+ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+ DATABASE_PORT = os.getenv("DATABASE_PORT")
+
+ BACKUPS_PATH = Path(os.getenv("BACKUPS_DIR"))
+ PRIVATE_KEY_PATH = Path(os.getenv("PRIVATE_KEY_PATH"))
+ REMOTE_HOST = os.getenv("REMOTE_HOST")
+ REMOTE_USER = os.getenv("REMOTE_USER")
+
+ REMOTE_PATH = '/var/www/mediawiki'
+ MEDIAWIKI_FOLDER_NAME = 'mediawiki'
+
+ ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_sql_{DATABASE_NAME}_{NOW}.sql.gz'.replace('/', '_')
+ ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME = f'backup_{REMOTE_HOST}_{REMOTE_PATH}_{NOW}.tar.gz'.replace('/', '_')
+
+ BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.sql\.gz")
+ BACKUP_MEDIAWIKI_PATTERN = re.compile(r"backup_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.tar\.gz")
+
+ KEEP_LAST_N_BACKUPS = 10  # The number of backups that need to be retained
+
+ # Archiving to .tar.gz
+ def make_archive(dest_path, source_path):
+     """Archiving to .tar.gz."""
+
+     try:
+         # Command for creating an archive
+         tar_command = ['tar', '-czvf', dest_path, '-C', source_path, '.']
+ #         # Executing the archiving command
+         tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+         print(f"Archiving completed successfully: {NOW}")
+         print(tar_result.stdout.decode('utf-8'))
+
+     except subprocess.CalledProcessError as e:
+         print("Error while creating the archive:")
+         print(e.stderr.decode('utf-8'))
+
+ # Executing rsync of the remote directory to the local VM and archiving
+ def get_and_archive_remote_folder():
+     """"rsync of the remote directory to the local VM and archiving."""
+     try:
+         command = [
+             'rsync',
+             '-avz',
+             '--delete',
+             '-e', f"ssh -i {PRIVATE_KEY_PATH} -o StrictHostKeyChecking=no",
+             f"{REMOTE_USER}@{REMOTE_HOST}:{REMOTE_PATH}",
+             BACKUPS_PATH
+         ]
+
+         # Executing the rsync command
+         result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+         # Outputting the results
+         print("Synchronization result:")
+         print(result.stdout.decode('utf-8'))
+
+     except subprocess.CalledProcessError as e:
+         print("Error during synchronization:")
+         print(e.stderr.decode('utf-8'))
+
+     # Creating an archive after synchronization
+     dest_path = f'{BACKUPS_PATH}/{ARCHIVE_MEDIAWIKI_REMOTE_FOLDER_NAME}'
+     source_path = f'{BACKUPS_PATH}/{MEDIAWIKI_FOLDER_NAME}'
+
+     make_archive(dest_path, source_path)
+
+ # Создание sql-dump'a БД"
+ def create_dump_postgres():
+     """Creating an SQL dump of the database."""
+     try:
+         dest_path = f'{BACKUPS_PATH}/{ARCHIVE_SQL_DUMP_FILE_NAME}'
+
+         command = (
+             f"PGPASSWORD={DATABASE_PASSWORD} "
+             f"pg_dump -U {DATABASE_USER} -p {DATABASE_PORT} -h localhost {DATABASE_NAME} "
+             f"| gzip &gt; {dest_path}"
+         )
+
+         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         print("Command pg_dump was successfully executed")
+
+     except Exception as e:
+         print(f"Error in create_dump_postgres: {e.stderr.decode('utf-8')}")
+         sys.exit(10)
+
+ def rotate_sql_backups(backups_by_db):
+     """Rotation of SQL backups."""
+
+     for db_name, backups in backups_by_db.items():
+         # Sorting backups by creation time (according to the file name)
+         backups.sort(key=lambda x: x[1], reverse=True)
+
+         # If the number of backups is greater than the number to be retained:
+         if len(backups) &gt; KEEP_LAST_N_BACKUPS:
+             print(f"Deleting old backups for {db_name}. Current count: {len(backups)}")
+             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
+                 print(f"Deleting old SQL backup: {backup_to_delete[0]}")
+                 backup_to_delete[0].unlink()  # File deleting
+         else:
+             print(f"No rotation needed for {db_name}. Current count: {len(backups)}")
+
+ def rotate_mediawiki_backups(backups_by_remote):
+     """Rotation of MediaWiki backups."""
+     for remote_host, backups in backups_by_remote.items():
+
+         # Sorting backups by creation time (according to the file name)
+         backups.sort(key=lambda x: x[1], reverse=True)
+
+         # If the number of backups is greater than the number to be retained:
+         if len(backups) &gt; KEEP_LAST_N_BACKUPS:
+             print(f"Deleting old backups for {remote_host}. Current count: {len(backups)}")
+             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
+                 print(f"Deleting old MediaWiki backup: {backup_to_delete[0]}")
+                 backup_to_delete[0].unlink()  # # File deleting
+         else:
+             print(f"No rotation needed for {remote_host}. Current count {len(backups)}")
+
+ def rotate_backups():
+     """Rotating backup files and retaining only the last N copies for each database"""
+     backups_by_db = {}  # For storing SQL backups by database
+     backups_by_remote = {}  # For storing MediaWiki backups by remote servers
+
+     # Iterating through files in the backup directory
+     for backup_file in BACKUPS_PATH.iterdir():
+         if backup_file.is_file():
+             # Checking for SQL dumps
+             sql_match = BACKUP_SQL_PATTERN.match(backup_file.name)
+             if sql_match:
+                 db_name, timestamp = sql_match.groups()
+                 if db_name not in backups_by_db:
+                     backups_by_db[db_name] = []
+                 backups_by_db[db_name].append((backup_file, timestamp))
+
+             # Checking for MediaWiki dumps
+             mediawiki_match = BACKUP_MEDIAWIKI_PATTERN.match(backup_file.name)
+             if mediawiki_match:
+                 remote_host, timestamp = mediawiki_match.groups()
+                 if remote_host not in backups_by_remote:
+                     backups_by_remote[remote_host] = []
+                 backups_by_remote[remote_host].append((backup_file, timestamp))
+
+     try:           
+         rotate_sql_backups(backups_by_db)
+     except Exception as e:
+         print(f"Error in rotate_sql_backups: {e}")
+     try:           
+         rotate_mediawiki_backups(backups_by_remote)
+     except Exception as e:
+         print(f"Error in rotate_mediawiki_backups: {e}")
+
+ if __name__ == "__main__":
+
+     try:
+         print(f"Backup script started: {NOW}")
+
+         get_and_archive_remote_folder()
+         create_dump_postgres()
+         rotate_backups()
+
+         print(f"Backup script was successfully ended: {NOW}")
+
+     except Exception as e:
+         print(f"Error occurred: {e}")
+
+chmod 0755 /opt/vhdd-1/zabbix_dump/
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 23 - Filling the <strong>.env</strong> file in <code>/scripts/.env</code> directory with data <br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></summary></p>
+<pre><code>BACKUPS_DIR="/opt/vhdd-3/mediawiki_dump/"
 DATABASE_USER=wikiuser
 DATABASE_PASSWORD=some_strong_wikiuser_password
 DATABASE_NAME=my_wiki
@@ -549,35 +680,32 @@ REMOTE_HOST=192.168.10.16 # the ip address of Primary PostgreSQL
 REMOTE_USER=root
 PRIVATE_KEY_PATH=~/.ssh/id_ed25519
 </code></pre>
+</details>
+<ul>
+<li>
+<p>Step 24 - Copying the <span class="tooltip" onclick="showTooltip(event)"><strong>id_ed25519</strong><span class="tooltip-text">Private ssh-key</span></span> file to <code>~/.ssh/id_ed25519</code> with <code>600</code> permissions</p>
 </li>
 <li>
-<p>Step 24 - Copying <strong>Private ssh-key</strong> to <code>~/.ssh</code> with '600' permissions (perform only on the MediaWiki db's)</p>
+<p>Step 25 - Copying the <strong>logrotate_pgdump_standby_posgresql</strong> file to <code>/etc/logrotate.d/logrotate_pgdump_standby_posgresql</code><br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></p>
 </li>
-<li>
-<p>Step 25 - Copying the <strong>logrotate_pgdump_standby_posgresql</strong> file to <code>/etc/logrotate.d/</code> (perform only on the MediaWiki db's)</p>
-</li>
-<li>
-<p>Step 26 - Starting and enabling the <strong>logrotate service</strong> (perform only on the MediaWiki db's)</p>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 26 - Starting and enabling the logrotate service   <br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></summary></p>
 <pre><code>systemctl start logrotate
 systemctl enable logrotate
+
+# Check logrotate services status
+systemctl status logrotate
+systemctl is-enabled logrotate
 </code></pre>
+</details>
 </li>
 </ul>
 <h2 id="primary-postgresql-setup">Primary Postgresql Setup</h2>
-<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span></p>
-<h3 id="ansible_4">Ansible</h3>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Adding secret variables
-# Step 2 - Stopping the PostgreSQL service
-# Step 3 - Configuring the ``wal_level`` in ``/etc/postgresql/14/main/postgresql.conf`` - Primary Postgresql
-# Step 4 - Restarting the PostgreSQL service
-# Step 5 - Creating the "wikiuser" user for the Primary PostgreSQL
-# Step 6 - Creating the "syncuser" user for the Primary PostgreSQL
-# Step 7 - Checking if the database exists (and creating it if it doesn't)
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
@@ -585,76 +713,60 @@ systemctl enable logrotate
 -i inventory.yaml --tags="primary_postgresql_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_4">Manual</h3>
+<li>
+<p>Tasks:</p>
 <ul>
-<li>
-<p>Step 1 - Skipping</p>
-</li>
-<li>
-<p>Step 2 - Stopping the PostgreSQL service</p>
+<li>Step 1 - Adding secret variables</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Stopping the PostgreSQL service</summary></p>
 <pre><code>systemctl stop postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 3 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
-<pre><code>wal_level = replica
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></summary></p>
+<pre><code>#wal_level = '' &gt;&gt;&gt;
+wal_level = replica
 </code></pre>
-</li>
-<li>
-<p>Step 4 - Restarting the PostgreSQL service</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Restarting the PostgreSQL service</summary></p>
 <pre><code>systemctl restart postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Creating the "<strong>wikiuser</strong>" user for the Primary PostgreSQL</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5, 6 - Creating the 'wikiuser' user and the 'syncuser' user for the PostgreSQL</summary></p>
 <pre><code>sudo -u postgres psql
 
-CREATE USER wikiuser WITH PASSWORD 'wikiuser_password' 
+CREATE USER 'wikiuser' WITH PASSWORD 'some_strong_wikiuser_password' 
 SUPERUSER CREATEDB CREATEROLE LOGIN INHERIT;
 
-\q
-</code></pre>
-</li>
-<li>
-<p>Step 6 - Creating the "<strong>syncuser</strong>" user for the Primary PostgreSQL</p>
-<pre><code>sudo -u postgres psql
-
-CREATE USER syncuser WITH PASSWORD 'syncuser_password' 
+CREATE USER 'syncuser' WITH PASSWORD 'some_strong_replication_user_password' 
 REPLICATION;
 
 \q
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Checking if the database exists (and creating it if it doesn't)</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Checking if the database exists (and creating it if it doesn't)</summary></p>
 <pre><code>sudo -u postgres psql
 
 # Checking if the database exists
 \l
 
+# if database not exists
 CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 
 \q
 </code></pre>
+</details>
 </li>
 </ul>
 <h2 id="standby-postgresql-setup">Standby Postgresql Setup</h2>
-<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span></p>
-<h3 id="ansible_5">Ansible</h3>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Adding secret variables
-# Step 2 - Creating dynamic variables
-# Step 3 - Stopping the PostgreSQL service
-# Step 4 - Configuring the hot_standby in /etc/postgresql/14/main/postgresql.conf
-# Step 5 - Deleting all contents inside the PostgreSQL Replication directory
-# Step 6 - Restarting the PostgreSQL service
-# Step 7 - Starting pg_basebackup for replication
-# Step 8 - Adding the execution of pgdump_standby_postgresql.py to the cron job scheduler
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
@@ -663,34 +775,41 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 -i inventory.yaml --tags="standby_postgresql_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_5">Manual</h3>
+<li>
+<p>Tasks:</p>
 <ul>
 <li>
-<p>Step 1, 2 - Skipping</p>
+<p>Step 1 - Adding secret variables</p>
 </li>
 <li>
-<p>Step 3 - Stopping the PostgreSQL service</p>
+<p>Step 2 - Creating dynamic variables</p>
+</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Stopping the PostgreSQL service</summary></p>
 <pre><code>systemctl stop postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 4 - Configuring the <code>hot_standby</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></p>
-<pre><code>hot_standby = on
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Configuring the <code>hot_standby</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></summary></p>
+<pre><code>#hot_standby = '' &gt;&gt;&gt;
+hot_standby = on
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-3-dump-db/postgresql/14/main</code>       </p>
-<pre><code>rm -rf /opt/vhdd-3-dump-db/postgresql/14/main
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-2//postgresql/14/main</code></summary></p>
+<pre><code>rm -rf /opt/vhdd-2//postgresql/14/main
 </code></pre>
-</li>
-<li>
-<p>Step 6 - Restarting the PostgreSQL service</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6 - Restarting the PostgreSQL service</summary></p>
 <pre><code>systemctl restart postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Starting pg_basebackup for replication</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Starting pg_basebackup for replication</summary></p>
 <pre><code># - h MAIN_IP — the address of the Primary PostgreSQL
 # - D — the folder where the backup should be placed
 # - U — the user for connection
@@ -700,12 +819,12 @@ CREATE DATABASE my_wiki WITH OWNER = wikiuser;
 
 sudo -u postgres
 
-pg_basebackup -h 192.168.10.16 -D /opt/vhdd-3-dump-db/postgresql/14/main \
+pg_basebackup -h 192.168.10.16 -D /opt/vhdd-2//postgresql/14/main \
 -U syncuser -P -v -R
 </code></pre>
-</li>
-<li>
-<p>Step 8 - Adding the execution of <strong>pgdump_standby_postgresql.py</strong> to the <strong>cron job scheduler</strong></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Adding the execution of <strong>pgdump_standby_postgresql.py</strong> to the <strong>cron job scheduler</strong></summary></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
@@ -713,30 +832,12 @@ crontab -e
 
 0 */4 * * * /usr/bin/python3 /scripts/pgdump_standby_postgresql.py &gt;&gt; /scripts/pgdump_standby_postgresql.log 2&gt;&amp;1
 </code></pre>
+</details>
 </li>
 </ul>
 <h2 id="zabbix-server-postgresql-setup">Zabbix-server Postgresql Setup</h2>
-<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span></p>
-<h3 id="ansible_6">Ansible</h3>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Adding secret variables
-# Step 2 - Creating dynamic variables
-# Step 3 - Stopping the PostgreSQL service
-# Step 4 - Creating the /zabbix_dump directory, where db_dumps will be stored with '0755' permissions
-# Step 5 - Adding permissions to pg_hba.conf for connecting to the Zabbix-Server Postgresql
-# Step 6 - Restarting the PostgreSQL service
-# Step 7 - Creating the "zabbix" user for the Zabbix-Server Postgresql
-# Step 8 - Checking if the database exists (and creating it if it doesn't)
-
-# Step 9 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
-# Step 10 - Filling the .env file with data
-# Step 11 - Copying the logrotate_pgdump_zabbix_server file to /etc/logrotate.d/
-# Step 12 - Starting and enabling the logrotate service
-# Step 13 - Adding the execution of pgdump_zabbix_server.py to the cron job scheduler
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
@@ -744,43 +845,47 @@ crontab -e
 -i inventory.yaml --tags="zabbix_server_postgresql_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_6">Manual</h3>
+<li>
+<p>Tasks:</p>
 <ul>
 <li>
-<p>Step 1, 2 - Skipping</p>
+<p>Step 1 - Adding secret variables</p>
 </li>
 <li>
-<p>Step 3 - Stopping the PostgreSQL service</p>
+<p>Step 2 - Creating dynamic variables</p>
+</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Stopping the PostgreSQL service</summary></p>
 <pre><code>systemctl stop postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 4 - Creating the <code>/zabbix_dump</code> directory, where <strong>db_dumps</strong> will be stored with '0755' permissions</p>
-<pre><code>mkdir /opt/vhdd-1-monitoring-system-db/zabbix_dump
-chmod 0755 /opt/vhdd-1-monitoring-system-db/zabbix_dump
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Creating the <code>/opt/vhdd-1/zabbix_dump/</code> directory, where <strong>db_dumps</strong> will be stored with '0755' permissions</summary></p>
+<pre><code>mkdir /opt/vhdd-1/zabbix_dump/
+chmod 0755 /opt/vhdd-1/zabbix_dump/
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Adding permissions to <code>pg_hba.conf</code> for connecting to the Standby PostgreSQL</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Adding permissions to <span class="tooltip" onclick="showTooltip(event)"><strong>pg_hba.conf</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/etc/postgresql/14/main/pg_hba.conf</code></span></span> for connecting to the Zabbix-Server PostgreSQL</summary></p>
 <pre><code>host zabbix       zabbix       77.137.79.100/32              scram-sha-256
 host zabbix       zabbix       212.179.174.196/32            scram-sha-256
 host zabbix       zabbix       5.29.11.237/32                scram-sha-256
 
-                               # NAT IP address  
-host zabbix       zabbix       &lt;Nat IP address VM-1&gt;/32      scram-sha-256
+host zabbix       zabbix        &lt;Nat IP address VM-1&gt;/32     scram-sha-256
 
-                               # Internal IP address  
-host zabbix       zabbix       192.168.10.12/32              scram-sha-256
+host zabbix       zabbix        192.168.10.11/32             scram-sha-256
 </code></pre>
-</li>
-<li>
-<p>Step 6 - Restarting the <strong>PostgreSQL service</strong></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6 - Restarting the PostgreSQL service</summary></p>
 <pre><code>systemctl restart postgresql
+systemctl status postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Creating the "<strong>zabbix</strong>" user for the Zabbix-Server Postgresql</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Creating the 'zabbix' user for the PostgreSQL</summary></p>
 <pre><code>sudo -u postgres psql
 
 CREATE USER zabbix WITH PASSWORD 'zabbixuser_password' 
@@ -788,68 +893,183 @@ SUPERUSER CREATEDB CREATEROLE LOGIN INHERIT;
 
 \q
 </code></pre>
-</li>
-<li>
-<p>Step 8 - Checking if the database exists (and creating it if it doesn't)</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Checking if the database exists (and creating it if it doesn't)</summary></p>
 <pre><code>sudo -u postgres psql
 
 # Checking if the database exists
 \l
 
+# if database not exists
 CREATE DATABASE zabbix WITH OWNER = zabbix;
 
 \q
 </code></pre>
-</li>
-<li>
-<p>Step 9 - Copying the <strong>pgdump_zabbix_server.py</strong> script to <code>~/scripts</code> with '0755' permissions</p>
-</li>
-<li>
-<p>Step 10 - Filling the <strong>.env</strong> file with data</p>
-<pre><code>BACKUPS_DIR="/opt/vhdd-1-monitoring-system-db/zabbix_dump"   
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 9 - Copying the <strong>pgdump_zabbix_server.py</strong> script to <code>/scripts/pgdump_zabbix_server.py</code> directory with <code>0755</code> permissions</summary></p>
+<pre><code> from datetime import datetime  
+ from pathlib import Path
+ import os
+ import re
+ from collections import OrderedDict
+ import sys
+ from dotenv import load_dotenv
+ import subprocess
+
+ load_dotenv()
+
+ NOW = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+
+ DATABASE_NAME = os.getenv("DATABASE_NAME")
+ DATABASE_USER = os.getenv("DATABASE_USER")
+ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+ DATABASE_PORT = os.getenv("DATABASE_PORT")
+
+ BACKUPS_PATH = Path(os.getenv("BACKUPS_DIR"))
+
+ ARCHIVE_SQL_DUMP_FILE_NAME = f'dump_sql_{DATABASE_NAME}_{NOW}.sql.gz'.replace('/', '_')
+
+ BACKUP_SQL_PATTERN = re.compile(r"dump_sql_(.+)_(\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2})\.sql\.gz")
+
+ KEEP_LAST_N_BACKUPS = 10  # The number of backups that need to be retained
+
+ # # Archiving to .tar.gz
+ # def make_archive(dest_path, source_path):
+ #     """Archiving to .tar.gz."""
+
+ #     try:
+ #         # Command for creating an archive
+ #         tar_command = ['tar', '-czvf', dest_path, '-C', source_path, '.']
+ #         # Executing the archiving command
+ #         tar_result = subprocess.run(tar_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+ #         print(f"Archiving completed successfully: {NOW}")
+ #         print(tar_result.stdout.decode('utf-8'))
+
+ #     except subprocess.CalledProcessError as e:
+ #         print("Error while creating the archive:")
+ #         print(e.stderr.decode('utf-8'))
+
+ # Step 1. Creating an SQL dump of the database
+ def create_dump_postgres():
+     """Creating an SQL dump of the database."""
+     try:
+         dest_path = f'{BACKUPS_PATH}/{ARCHIVE_SQL_DUMP_FILE_NAME}'
+
+         command = (
+             f"PGPASSWORD={DATABASE_PASSWORD} "
+             f"pg_dump -U {DATABASE_USER} -p {DATABASE_PORT} -h localhost {DATABASE_NAME} "
+             f"| gzip &gt; {dest_path}"
+         )
+
+         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         print("Command pg_dump was successfully executed")
+
+     except Exception as e:
+         print(f"Error in create_dump_postgres: {e.stderr.decode('utf-8')}")
+         sys.exit(10)
+
+ def rotate_sql_backups(backups_by_db):
+     """Rotation of SQL backups."""
+
+     for db_name, backups in backups_by_db.items():
+         # Sorting backups by creation time (according to the file name)
+         backups.sort(key=lambda x: x[1], reverse=True)
+
+         # If the number of backups is greater than the number to be retained:
+         if len(backups) &gt; KEEP_LAST_N_BACKUPS:
+             print(f"Deleting old backups for {db_name}. Current count: {len(backups)}")
+             for backup_to_delete in backups[KEEP_LAST_N_BACKUPS:]:
+                 print(f"Deleting old SQL backup: {backup_to_delete[0]}")
+                 backup_to_delete[0].unlink()  # File deleting
+         else:
+             print(f"No rotation needed for {db_name}. Current count: {len(backups)}")
+
+ def rotate_backups():
+     """Rotating backup files and retaining only the last N copies for each database"""
+     backups_by_db = {}  # For storing SQL backups by database
+     backups_by_remote = {}  # For storing MediaWiki backups by remote servers
+
+     # Iterating through files in the backup directory
+     for backup_file in BACKUPS_PATH.iterdir():
+         if backup_file.is_file():
+             # Checking for SQL dumps
+             sql_match = BACKUP_SQL_PATTERN.match(backup_file.name)
+             if sql_match:
+                 db_name, timestamp = sql_match.groups()
+                 if db_name not in backups_by_db:
+                     backups_by_db[db_name] = []
+                 backups_by_db[db_name].append((backup_file, timestamp))
+
+     try:           
+         rotate_sql_backups(backups_by_db)
+     except Exception as e:
+         print(f"Error in rotate_sql_backups: {e}")
+
+ if __name__ == "__main__":
+
+     try:
+         print(f"Backup script started: {NOW}")
+
+         create_dump_postgres()
+         rotate_backups()
+
+         print(f"Backup script was successfully ended: {NOW}")
+
+     except Exception as e:
+         print(f"Error occurred: {e}")
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 10 - Filling the <strong>.env</strong> file in <code>/scripts/.env</code> directory with data</summary></p>
+<pre><code>BACKUPS_DIR="/opt/vhdd-1/zabbix_dump/"
 DATABASE_USER=zabbix
-DATABASE_PASSWORD=some_strong_zabbix_password # (ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
+DATABASE_PASSWORD=some_strong_zabbix_password
 DATABASE_NAME=zabbix
 DATABASE_PORT=5432
+PRIVATE_KEY_PATH=~/.ssh/id_ed25519
 </code></pre>
-</li>
-<li>
-<p>Step 11 - Copying the <strong>logrotate_pgdump_zabbix_server</strong> file to <code>/etc/logrotate.d/</code></p>
-</li>
-<li>
-<p>Step 12 - Starting and enabling the <strong>logrotate service</strong></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 11 - Copying the <strong>logrotate_pgdump_zabbix_server</strong> file to <code>/etc/logrotate.d/</code></summary></p>
+<pre><code>/scripts/pgdump_zabbix_server.log {
+size 10M
+rotate 5
+compress
+missingok
+notifempty
+create 0640 root root
+}
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 12 - Starting and enabling the logrotate service   <br />
+<span class="tooltip" onclick="showTooltip(event)"><strong>Important note!</strong><span class="tooltip-text">Perform only on the MediaWiki db's</span></span></summary></p>
 <pre><code>systemctl start logrotate
 systemctl enable logrotate
+
+# Check logrotate services status
+systemctl status logrotate
+systemctl is-enabled logrotate
 </code></pre>
-</li>
-<li>
-<p>Step 13 - Adding the execution of <strong>pgdump_zabbix_server.py</strong> to the <strong>cron job scheduler</strong></p>
+<p></details>            </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 13 - Adding the execution of <strong>logrotate_pgdump_zabbix_server.py</strong> file to the <strong>cron job scheduler</strong></summary></p>
 <pre><code># minute: '0' - run at the beginning of the hour
 # # hour: '*/4' - run every 4 hours"
 
 crontab -e
 
-0 */4 * * * /usr/bin/python3 /scripts/pgdump_zabbix_server.py &gt;&gt; /scripts/pgdump_zabbix_server.log 2&gt;&amp;1
+0 */4 * * * /usr/bin/python3 /scripts/logrotate_pgdump_zabbix_server.py &gt;&gt; /scripts/logrotate_pgdump_zabbix_server.log 2&gt;&amp;1
 </code></pre>
+</details>
 </li>
 </ul>
 <h2 id="ddns-duc-setup-noipcom">DDNS DUC Setup (noip.com)</h2>
-<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span> and <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span></p>
-<h3 id="ansible_7">Ansible</h3>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span> and <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Copying the noip-duc_3.3.0.tar.gz archive to root/
-# Step 2 - Unzipping the noip-duc.tar.gz archive to root/
-# Step 3 - Removing the noip-duc.tar.gz archive from root/
-# Step 4 - Installing noip-duc_3.3.0_amd64.deb package
-# Step 5 - Copying noip-duc service file to /etc/systemd/system/noip-duc.service
-# Step 6 - Copying dduc_zabbix_server credential file to /etc/default/noip-ducs
-# Step 7 - Copying duc_nginx_mediawiki credential file to /etc/default/noip-ducs
-# Step 8 - Reloading systemd daemon
-# Step 9 - Starting and enabling the noip-duc services
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
@@ -858,70 +1078,63 @@ crontab -e
 -i inventory.yaml --tags="ddns_duc_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_7">Manual</h3>
+<li>
+<p>Tasks:</p>
 <ul>
-<li>
-<p>Step 1 - Copying the <strong>noip-duc_3.3.0.tar.gz</strong> archive to <code>root/</code> (and rename to noip-duc.tar.gz)</p>
-</li>
-<li>
-<p>Step 2 Unzipping the <strong>noip-duc.tar.gz</strong> archive to <code>root/</code></p>
+<li>Step 1 - Copying the <strong>noip-duc_3.3.0.tar.gz</strong> archive to <code>root/</code> (and rename to noip-duc.tar.gz)</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Unzipping the <strong>noip-duc.tar.gz</strong> archive to <code>root/</code></summary></p>
 <pre><code>cd /root
 tar -xzvf noip-duc.tar.gz /root/
 </code></pre>
-</li>
-<li>
-<p>Step 3 - Removing the <strong>noip-duc.tar.gz</strong> archive from <code>/root/noip-duc.tar.gz</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Removing the <strong>noip-duc.tar.gz</strong> archive from <code>/root/noip-duc.tar.gz</code></summary></p>
 <pre><code>rm /root/noip-duc.tar.gz
 </code></pre>
-</li>
-<li>
-<p>Step 4 - Installing <strong>noip-duc_3.3.0_amd64.deb</strong> package</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Installing <strong>noip-duc_3.3.0_amd64.deb</strong> package</summary></p>
 <pre><code>cd /root/noip-duc/binaries/
 # The -i option tells dpkg to install the specified .deb file.
 dpkg -i noip-duc_3.3.0_amd64.deb
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Copying <strong>noip-duc service file</strong> to <code>/etc/systemd/system/noip-duc.service</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Copying <strong>noip-duc service file</strong> to <code>/etc/systemd/system/noip-duc.service</code></summary></p>
 <pre><code>cp /root/noip-duc/debian/service /etc/systemd/system/noip-duc.service
 </code></pre>
-</li>
-<li>
-<p>Step 6, 7 - Copying <strong>dduc_zabbix_server</strong> and <strong>duc_nginx_mediawiki</strong> credentials file to <code>/etc/default/noip-ducs</code></p>
-</li>
-<li>
-<p>Step 8 - Reloading systemd daemon</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6, 7 - Copying <strong>dduc_zabbix_server</strong> and <strong>duc_nginx_mediawiki</strong> credentials file to <code>/etc/default/noip-ducs</code></summary></p>
+<pre><code># dduc_credentials_file_example
+
+NOIP_USERNAME=
+NOIP_PASSWORD=
+NOIP_HOSTNAMES=
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Reloading systemd daemon</summary></p>
 <pre><code>systemctl daemon-reload
 </code></pre>
-</li>
-<li>
-<p>Step 9 - Starting and enabling the <strong>noip-duc services</strong></p>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 9 - Starting and enabling the noip-duc service</summary></p>
 <pre><code>systemctl start noip-duc
 systemctl enable noip-duc
+
+# Check noip-duc services status
+systemctl status noip-duc
+systemctl is-enabled noip-duc
 </code></pre>
+<p></details>  </p>
 </li>
 </ul>
 <h2 id="mediawiki-setup">MediaWiki Setup</h2>
 <p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span> and <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span></p>
-<h3 id="ansible_8">Ansible</h3>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Update list of packages
-# Step 2 - Apt packages installing
-# Step 3 - Starting and enabling the nginx services
-# Step 4 - Starting and enabling the postgresql service
-# Step 5 - Removing the "default" symlink from /etc/nginx/sites-enabled/default
-# Step 6 - Copying the nginx_mediawiki configuration file to /etc/nginx/sites-available/ with '0755' permissions
-# Step 7 - Symlink creation for nginx_mediawiki configuration file from /etc/nginx/sites-available/nginx_mediawiki to /etc/nginx/sites-enabled/nginx_mediawiki
-# Step 8 - Downloading the MediaWiki archive to /var/www/
-# Step 9 - Unzipping the MediaWiki archive to /var/www/
-# Step 10 - Removing MediaWiki archive from /var/www/mediawiki.tar.gz
-# Step 11 - Copying the LocalSettings.php file to /var/www/mediawiki/LocalSettings.php with '0755' permissions
-# Step 12 - Restarting the Nginx service
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml 
@@ -929,212 +1142,342 @@ systemctl enable noip-duc
 -i inventory.yaml --tags="mediawiki_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_8">Manual</h3>
-<ul>
 <li>
-<p>Steps 1, 2 - Upgrage apt, install apt packages</p>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to install</summary></p>
-<pre><code> ---
- # vars file for mediawiki
- apt_packages_to_install:
-   - nginx
-   - php 
-   - php-intl
-   - php-mbstring
-   - php-xml
-   - php-apcu 
-   - php-curl
-   - php8.1-fpm
-   - php8.1-pgsql
-   - postgresql
-   - postgresql-contrib
-   - python3-psycopg2
-   - acl
-   - rsync
-   - python3
-   - python3-venv
-   - python3-pip
-
- pip3_packages_to_install:
-   - pip&gt;=24.3.1
-   - python-dotenv
-
- mediawiki_server:
-   mediawiki_parent_path: /var/www/
-   mediawiki_folder_name: mediawiki
-   mediawiki_archive_name: mediawiki.tar.gz
-   mediawiki_local_settings_file_name: LocalSettings.php
-   mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
-   nginx_conf_name: nginx_mediawiki
-
- server_2:
-   private_key_ssh_path: /root/.ssh/id_ed25519
-   remote_rsync_script_name: remote_rsync_mediawiki.py
+<p>Tasks:</p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Update list of packages</summary></p>
+<pre><code>apt update &amp;&amp; apt upgrade -y
 </code></pre>
 </details>
-</li>
-<li>
-<p>Step 3 - Starting and Enabling <strong>nginx service</strong></p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Apt packages installing</summary></p>
+<pre><code>---
+# vars file for mediawiki
+apt_packages_to_install:
+  - nginx
+  - php 
+  - php-intl
+  - php-mbstring
+  - php-xml
+  - php-apcu 
+  - php-curl
+  - php8.1-fpm
+  - php8.1-pgsql
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+  - acl
+  - rsync
+  - python3
+  - python3-venv
+  - python3-pip
+
+pip3_packages_to_install:
+  - pip&gt;=24.3.1
+  - python-dotenv
+
+mediawiki_server:
+  mediawiki_parent_path: /var/www/
+  mediawiki_folder_name: mediawiki
+  mediawiki_archive_name: mediawiki.tar.gz
+  mediawiki_local_settings_file_name: LocalSettings.php
+  mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
+  nginx_conf_name: nginx_mediawiki
+
+server_2:
+  private_key_ssh_path: /root/.ssh/id_ed25519
+  remote_rsync_script_name: remote_rsync_mediawiki.py
+</code></pre>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3, 4 - Starting and enabling the nginx and the postgresql services</summary></p>
 <pre><code>systemctl start nginx
 systemctl enable nginx
 
-# Check nginx services status
-systemctl status nginx
-systemctl is-enabled nginx
-</code></pre>
-</li>
-<li>
-<p>Step 4 - Starting and Enabling <strong>postgresql service</strong></p>
-<pre><code>systemctl start postgresql
+systemctl start postgresql
 systemctl enable postgresql
 
-# Check postgresql services status
+# Check the nginx and the postgresql service statuses
+systemctl status nginx
+systemctl is-enabled nginx
+
 systemctl status postgresql
 systemctl is-enabled postgresql
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></summary></p>
 <pre><code>rm /etc/nginx/sites-enabled/default
 </code></pre>
-</li>
-<li>
-<p>Step 6 - Copying the <strong>nginx_mediawiki</strong> configuration file to <code>/etc/nginx/sites-available/nginx_mediawiki</code> with '0755' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6 - Copying the <strong>nginx_mediawiki</strong> configuration file to <code>/etc/nginx/sites-available/nginx_mediawiki</code> with <code>0755</code> permissions</summary></p>
+<pre><code># nginx_mediawiki configuration file
+
+server {
+    listen 80;
+    server_name _; # Accepts requests on any NAT IP address
+
+    root /var/www/mediawiki;
+
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ index.php?$args;
+    }
+
+    location ~ \.php$ {
+          include snippets/fastcgi-php.conf;
+          fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+          deny all;
+    }
+}
+
+# Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
 chmod 0755 /etc/nginx/sites-available/nginx_mediawiki
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Symlink creation for <strong>nginx_mediawiki</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Symlink creation for <strong>nginx_mediawiki</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki</code></summary></p>
 <pre><code>ln -s ../sites-available/nginx_mediawiki /etc/nginx/sites-enabled/nginx_mediawiki
 </code></pre>
-</li>
-<li>
-<p>Step 8 - Downloading the <strong>MediaWiki archive</strong> to <code>/var/www/</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Downloading the <strong>MediaWiki archive</strong> to <code>/var/www/</code></summary></p>
 <pre><code>cd /var/www/
+
 # -O mediawiki.tar.gz: This option specifies the output filename for the downloaded file
 wget -O mediawiki.tar.gz https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz
 </code></pre>
-</li>
-<li>
-<p>Step 9 - Unzipping the <strong>MediaWiki archive</strong> to <code>/var/www/</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 9 - Unzipping the <strong>MediaWiki archive</strong> to <code>/var/www/</code></summary></p>
 <pre><code>cd /var/www/
 tar -xzvf mediawiki.tar.gz -C /var/www/
 </code></pre>
-</li>
-<li>
-<p>Step 10 - Removing <strong>MediaWiki archive</strong> from <code>/var/www/mediawiki.tar.gz</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 10 - Removing MediaWiki archive from <code>/var/www/mediawiki.tar.gz</code></summary></p>
 <pre><code>rm /var/www/mediawiki.tar.gz
 </code></pre>
-</li>
-<li>
-<p>Step 11 - Copying the <strong>LocalSettings.php</strong> configuration file to <code>/var/www/mediawiki/</code> with '0755' permissions</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 11 - Copying the <strong>LocalSettings.php</strong> configuration file to <code>/var/www/mediawiki/</code> with <code>0755</code> permissions</summary></p>
 <pre><code># Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
 chmod 0755 /var/www/mediawiki/LocalSettings.php
 </code></pre>
-</li>
-<li>
-<p>Step 12 - Restarting the <strong>Nginx service</strong></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 12 - Restarting the Nginx service</summary></p>
 <pre><code>systemctl restart nginx
+systemctl status nginx
 </code></pre>
+</details>
 </li>
 </ul>
 <h2 id="nginx-proxy-server-setup-load-balancing-between-mediawiki-servers">Nginx Proxy Server Setup (load balancing between MediaWiki servers)</h2>
 <p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span></p>
-<h3 id="ansible_9">Ansible</h3>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Update list of packages
-# Step 2 - Apt packages installing
-# Step 3 - Starting and enabling the nginx services
-# Step 4 - Removing the "default" symlink from /etc/nginx/sites-enabled/default
-# Step 5 - Copying the nginx_mediawiki_proxy configuration file to /etc/nginx/sites-available/ with '0755' permissions
-# Step 6 - Symlink creation for nginx_mediawiki_proxy configuration file 
-    # from /etc/nginx/sites-available/nginx_mediawiki_proxy 
-    # to /etc/nginx/sites-enabled/nginx_mediawiki_proxy
-# Step 7 - Copying nginx.conf (with additional logs settings) to /etc/nginx/
-# Step 8 - Restarting the Nginx service
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
 -i inventory.yaml --tags="nginx_proxy_mediawiki_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_9">Manual</h3>
-<ul>
 <li>
-<p>Steps 1, 2 - Upgrage apt, install apt packages</p>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to install</summary></p>
-<pre><code> ---
- # vars file for nginx_mediawiki_proxy
- apt_packages_to_install:
-   - nginx
+<p>Tasks:</p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Update list of packages</summary></p>
+<pre><code>apt update &amp;&amp; apt upgrade -y
 </code></pre>
 </details>
-</li>
-<li>
-<p>Step 3 - Starting and Enabling <strong>nginx service</strong></p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Apt packages installing</summary></p>
+<pre><code>---
+# vars file for nginx_mediawiki_proxy
+apt_packages_to_install:
+  - nginx
+</code></pre>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Starting and enabling the nginx services</summary></p>
 <pre><code>systemctl start nginx
 systemctl enable nginx
 
-# Check nginx service status
+# Check the nginx and the postgresql service statuses
 systemctl status nginx
 systemctl is-enabled nginx
 </code></pre>
-</li>
-<li>
-<p>Step 4 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Removing the "<strong>default</strong>" symlink from <code>/etc/nginx/sites-enabled/default</code></summary></p>
 <pre><code>rm /etc/nginx/sites-enabled/default
 </code></pre>
-</li>
-<li>
-<p>Step 5 - Copying the <strong>nginx_mediawiki_proxy</strong> configuration file to <code>/etc/nginx/sites-available/</code> with '0755' permissions</p>
-<pre><code># Owner: rwx (read, write, and execute)
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Copying the <strong>nginx_mediawiki_proxy</strong> configuration file to <code>/etc/nginx/sites-available/</code> with '0755' permissions</summary></p>
+<pre><code># nginx_mediawiki_proxy configuration file
+
+; Internal network check
+; curl -L http://192.168.10.12
+; Log check
+; grep '\-&gt;' /var/log/nginx/access.log
+
+# Defining the upstream group of MediaWiki servers
+upstream mediawiki_backend {
+    server 192.168.10.13;  # Internal IP address MediaWiki-server 1
+    server 192.168.10.14;  # Internal IP address MediaWiki-server 2
+}
+
+# Server block for handling requests
+server {
+    listen 80;
+    server_name _;  # Accepts requests on any IP address
+
+    # Proxying requests to the upstream group
+    location / {
+        proxy_pass http://mediawiki_backend;
+
+        # Preserve the Host header for the internal request
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Add a header to maintain internal context
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+# Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-chmod 0755 /etc/nginx/sites-available/nginx_mediawiki_proxy
+chmod 0755 /etc/nginx/sites-available/nginx_mediawiki
 </code></pre>
-</li>
-<li>
-<p>Step 6 - Symlink creation for <strong>nginx_mediawiki_proxy</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki_proxy</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki_proxy</code></p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6 - Symlink creation for <strong>nginx_mediawiki_proxy</strong> configuration file from <code>/etc/nginx/sites-available/nginx_mediawiki_proxy</code> to <code>/etc/nginx/sites-enabled/nginx_mediawiki_proxy</code></summary></p>
 <pre><code>ln -s ../sites-available/nginx_mediawiki_proxy /etc/nginx/sites-enabled/nginx_mediawiki_proxy
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Restarting the <strong>Nginx service</strong></p>
-<pre><code>systemctl restart nginx
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Copying <strong>nginx.conf</strong> (with additional logs settings) file to <code>/etc/nginx/</code></summary></p>
+<pre><code># nginx.conf (with additional logs settings) file
+
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+    worker_connections 768;
+    # multi_accept on;
+}
+
+http {
+
+    ## Log format to include upstream server information
+    log_format upstreamlog '[$time_local] $remote_addr -&gt; $upstream_addr '
+                          '"$request" $status $body_bytes_sent '
+                          '"$http_referer" "$http_user_agent"';
+
+    ## Use the custom log format for access logs
+    access_log /var/log/nginx/access.log upstreamlog;
+
+    ##
+    # Basic Settings
+    ##
+
+    sendfile on;
+    tcp_nopush on;
+    types_hash_max_size 2048;
+    # server_tokens off;
+
+    # server_names_hash_bucket_size 64;
+    # server_name_in_redirect off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    ##
+    # SSL Settings
+    ##
+
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+    ssl_prefer_server_ciphers on;
+
+    ##
+    # Logging Settings
+    ##
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    ##
+    # Gzip Settings
+    ##
+
+    gzip on;
+
+    # gzip_vary on;
+    # gzip_proxied any;
+    # gzip_comp_level 6;
+    # gzip_buffers 16 8k;
+    # gzip_http_version 1.1;
+    # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    ##
+    # Virtual Host Configs
+    ##
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
+
+#mail {
+#   # See sample authentication script at:
+#   # http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+#
+#   # auth_http localhost/auth.php;
+#   # pop3_capabilities "TOP" "USER";
+#   # imap_capabilities "IMAP4rev1" "UIDPLUS";
+#
+#   server {
+#       listen     localhost:110;
+#       protocol   pop3;
+#       proxy      on;
+#   }
+#
+#   server {
+#       listen     localhost:143;
+#       protocol   imap;
+#       proxy      on;
+#   }
+#}
 </code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Restarting the Nginx service</summary></p>
+<pre><code>systemctl restart nginx
+systemctl status nginx
+</code></pre>
+</details>
 </li>
 </ul>
-<h2 id="zabbix-server-setup">Zabbix-Server Setup</h2>
-<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span></p>
-<h3 id="ansible_10">Ansible</h3>
+<h2 id="zabbix-server-setup"><a href="https://www.zabbix.com/download?zabbix=7.0&amp;os_distribution=ubuntu&amp;os_version=22.04&amp;components=server_frontend_agent&amp;db=pgsql&amp;ws=nginx">Zabbix-Server Setup</a></h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span></p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Adding secret variables
-# Step 2 - Downloading the Zabbix repository
-# Step 3 - Installing Zabbix repository
-# Step 4 - Update list of packages
-# Step 5 - Apt packages installing
-# Step 6 - Importing initial schema for Zabbix server
-# Step 7 - Configuring the "DBPassword" in /etc/zabbix/zabbix_server.conf 
-# Step 8 - Configuring the "listen" in /etc/zabbix/nginx.conf
-# Step 9 - Configuring the "server_name" in /etc/zabbix/nginx.conf
-# Step 10 - Restart and enable packages
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
@@ -1142,174 +1485,152 @@ chmod 0755 /etc/nginx/sites-available/nginx_mediawiki_proxy
 -i inventory.yaml --tags="zabbix_server_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_10">Manual</h3>
+<li>
+<p>Tasks:</p>
 <ul>
-<li>
-<p>Steps 1 - Skipping</p>
-</li>
-<li>
-<p>Step 2 - Downloading the Zabbix repository</p>
+<li>Step 1 - Adding secret variables</li>
+</ul>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Downloading the Zabbix repository</summary></p>
 <pre><code>cd /tmp
 wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb -O /tmp/zabbix_all.deb
 </code></pre>
-</li>
-<li>
-<p>Step 3 - Installing Zabbix repository</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Installing Zabbix repository</summary></p>
 <pre><code>dpkg -i zabbix_all.deb
 </code></pre>
-</li>
-<li>
-<p>Step 4, 5 - Update list of packages, install apt packages</p>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to install</summary></p>
-<pre><code> ---
- # vars file for zabbix_server_monitoring_system
-
- apt_packages_to_install:
-   - zabbix-server-pgsql
-   - zabbix-frontend-php
-   - php8.1-pgsql
-   - zabbix-nginx-conf
-   - zabbix-sql-scripts
-   - zabbix-agent
-
- packages_to_restart:
-   - zabbix-server
-   - zabbix-agent
-   - nginx
-   - php8.1-fpm
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Update list of packages</summary></p>
+<pre><code>apt update &amp;&amp; apt upgrade -y
 </code></pre>
 </details>
-</li>
-<li>
-<p>Step 6 - Importing initial schema for Zabbix server</p>
-<pre><code># You will be prompted to enter your zabbix-user password (stored in ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5 - Apt packages installing</summary></p>
+<pre><code>---
+# vars file for zabbix_server_monitoring_system
+
+apt_packages_to_install:
+  - zabbix-server-pgsql
+  - zabbix-frontend-php
+  - php8.1-pgsql
+  - zabbix-nginx-conf
+  - zabbix-sql-scripts
+  - zabbix-agent
+
+packages_to_restart:
+  - zabbix-server
+  - zabbix-agent
+  - nginx
+  - php8.1-fpm
+</code></pre>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 6 - Importing initial schema for Zabbix server</summary></p>
+<pre><code># You will be prompted to enter your zabbix-user password (stored in ansible_secrets.yaml zabbix_postgresql_vars.db_user_password)
 zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
 </code></pre>
-</li>
-<li>
-<p>Step 7 - Configuring the "<strong>DBPassword</strong>" in <code>/etc/zabbix/zabbix_server.conf</code></p>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 7 - Configuring the "<strong>DBPassword</strong>" in <code>/etc/zabbix/zabbix_server.conf</code></summary></p>
 <pre><code>nano /etc/zabbix/zabbix_server.conf
 DBPassword=some_strong_zabbix_password (ansible_secrets.yaml postgres_zabbix_server_user_vars.db_user_password)
 </code></pre>
-</li>
-<li>
-<p>Step 8, 9 - Configuring the "<strong>listen</strong>" and "<strong>server_name</strong>" in <code>/etc/zabbix/nginx.conf</code></p>
-<pre><code>nano /etc/zabbix/nginx.conf
-listen 8080
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8, 9 - Configuring the <code>listen</code> &amp;&amp;  <code>server_name</code> in <code>/etc/zabbix/nginx.conf</code></summary></p>
+<pre><code>listen 8080
 # IP or DDNS address
 server_name monitoring-wiki.ddns.net
 </code></pre>
-</li>
-<li>
-<p>Step 10 - Restarting and Enabling services</p>
-<pre><code>systemctl start &lt;service_name&gt;
-systemctl enable &lt;service_name&gt;
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 10 - Restarting services</summary></p>
+<pre><code>---
+# vars file for zabbix_server_monitoring_system
 
-# Check services status
-systemctl status &lt;service_name&gt;
-systemctl is-enabled &lt;service_name&gt;
-</code></pre>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to restart and enable</summary></p>
-<pre><code> ---
- # vars file for zabbix_server_monitoring_system
+apt_packages_to_install:
+  - zabbix-server-pgsql
+  - zabbix-frontend-php
+  - php8.1-pgsql
+  - zabbix-nginx-conf
+  - zabbix-sql-scripts
+  - zabbix-agent
 
- apt_packages_to_install:
-   - zabbix-server-pgsql
-   - zabbix-frontend-php
-   - php8.1-pgsql
-   - zabbix-nginx-conf
-   - zabbix-sql-scripts
-   - zabbix-agent
-
- packages_to_restart:
-   - zabbix-server
-   - zabbix-agent
-   - nginx
-   - php8.1-fpm
+packages_to_restart:
+  - zabbix-server
+  - zabbix-agent
+  - nginx
+  - php8.1-fpm
 </code></pre>
 </details>
 </li>
 </ul>
-<h2 id="zabbix-agent-setup">Zabbix-Agent Setup</h2>
-<p>Target VM: All(<span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span>)</p>
-<h3 id="ansible_11">Ansible</h3>
+<h2 id="zabbix-agent-setup"><a href="https://www.zabbix.com/download?zabbix=7.0&amp;os_distribution=ubuntu&amp;os_version=22.04&amp;components=agent&amp;db=&amp;ws=">Zabbix-Agent Setup</a></h2>
+<p>Target VM: All(<span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-2<span class="tooltip-text">vm-2-nginx-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span>)</p>
 <ul>
-<li>
-<p>Tasks:</p>
-<pre><code># Step 1 - Downloading the Zabbix repository
-# Step 2 - Installing the Zabbix repository
-# Step 3 - Updating the apt repository
-# Step 4 - Install packages
-# Step 5 - Configuring the "Server" in /etc/zabbix/zabbix_agentd.conf 
-# Step 6 - Configuring the "ServerActive" in /etc/zabbix/zabbix_agentd.conf 
-# Step 7 - Configuring the "Hostname" in /etc/zabbix/zabbix_agentd.conf 
-# Step 8 - Restarting and enabling packages
-</code></pre>
-</li>
 <li>
 <p>Running playbook:</p>
 <pre><code>ansible-playbook playbook.yaml \
 -i inventory.yaml --tags="zabbix_agent_setup"
 </code></pre>
 </li>
-</ul>
-<h3 id="manual_11">Manual</h3>
-<ul>
 <li>
-<p>Step 1 - Downloading the Zabbix repository</p>
+<p>Tasks:</p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Downloading the Zabbix repository</summary></p>
 <pre><code>cd /tmp
 wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest+ubuntu22.04_all.deb -O /tmp/zabbix_all.deb
 </code></pre>
-</li>
-<li>
-<p>Step 2 - Installing Zabbix repository</p>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Installing Zabbix repository</summary></p>
 <pre><code>dpkg -i zabbix_all.deb
 </code></pre>
-</li>
-<li>
-<p>Step 3, 4 - Update list of packages, install apt packages</p>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to install</summary></p>
-<pre><code> ---
- # vars file for zabbix_agent_monitoring_system
-
- apt_packages_to_install:
-   - zabbix-agent
-
- packages_to_restart:
-   - zabbix-agent
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Update list of packages</summary></p>
+<pre><code>apt update &amp;&amp; apt upgrade -y
 </code></pre>
 </details>
-</li>
-<li>
-<p>Step 5, 6, 7 - Configuring the Server, ServerActive, Hostname in <code>/etc/zabbix/zabbix_agentd.conf</code></p>
-<pre><code>Server=192.168.10.12
-ServerActive=192.168.10.12
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 4 - Apt packages installing</summary></p>
+<pre><code>---
+# vars file for zabbix_agent_monitoring_system
+
+apt_packages_to_install:
+  - zabbix-agent
+
+packages_to_restart:
+  - zabbix-agent
+</code></pre>
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 5, 6, 7 - Configuring the "<strong>Server</strong>", "<strong>ServerActive</strong>", "<strong>Hostname</strong>" in <code>/etc/zabbix/zabbix_agentd.conf</code></summary></p>
+<pre><code>Server=192.168.10.11
+ServerActive=192.168.10.11
 Hostname=&lt;current_host_name&gt;
 </code></pre>
-</li>
-<li>
-<p>Step 8 - Restarting and Enabling services</p>
-<pre><code>systemctl start &lt;service_name&gt;
-systemctl enable &lt;service_name&gt;
+<p></details>  </p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 8 - Restarting services</summary></p>
+<pre><code>---
+# vars file for zabbix_server_monitoring_system
 
-# Check services status
-systemctl status &lt;service_name&gt;
-systemctl is-enabled &lt;service_name&gt;
-</code></pre>
-<p><details class="external_code_rendering">
-<summary>Show apt packages to restart and enable</summary></p>
-<pre><code> ---
- # vars file for zabbix_agent_monitoring_system
+apt_packages_to_install:
+  - zabbix-server-pgsql
+  - zabbix-frontend-php
+  - php8.1-pgsql
+  - zabbix-nginx-conf
+  - zabbix-sql-scripts
+  - zabbix-agent
 
- apt_packages_to_install:
-   - zabbix-agent
-
- packages_to_restart:
-   - zabbix-agent
+packages_to_restart:
+  - zabbix-server
+  - zabbix-agent
+  - nginx
+  - php8.1-fpm
 </code></pre>
 </details>
 </li>

@@ -202,61 +202,61 @@ ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Managem
 <p>The <code>ansible_secrets.yml</code> file contains secret variables, such as database connection credentials, IP addresses, and more</p>
 <p><details class="external_code_rendering">
 <summary>Show ansible_secrets.yml_EXAMPLE</summary></p>
-<pre><code> ---
- # vars file for db_postgresql
- postgres_vars:
+<pre><code> mediawiki_postgresql_vars:
    db_name: my_wiki
    db_tablespace_name: primary_tablespace
    db_port: 5432
-   db_backups_dir: /opt/vhdd-3-dump-db
+   db_backups_dir: /opt/vhdd-3/mediawiki_dump
 
- postgres_zabbix_server_vars:
+   db_user: wikiuser
+   db_user_password: strong_password_1
+   db_user_attr: 
+     - SUPERUSER
+     - CREATEDB
+     - CREATEROLE
+     - LOGIN
+     - INHERIT
+
+   db_replication_name: replication
+   db_replication_user: syncuser
+   db_replication_user_password: strong_password_2
+   db_replication_user_attr: 
+     - REPLICATION
+
+ zabbix_postgresql_vars:
    db_name: zabbix
    db_tablespace_name: primary_tablespace
    db_port: 5432
-   db_backups_dir: /opt/vhdd-1-monitoring-system-db/zabbix_dump
+   db_backups_dir: /opt/vhdd-1/zabbix_dump
 
- postgres_wikiuser_user_vars:
-   db_user: wikiuser
-   db_user_password: password1
-   attr: 
-     - SUPERUSER
-     - CREATEDB
-     - CREATEROLE
-     - LOGIN
-     - INHERIT
-
- postgres_replication_user_vars:
-   db_user: syncuser
-   db_user_password: password2 
-   attr: 
-     - REPLICATION
-
- postgres_zabbix_server_user_vars:
    db_user: zabbix
-   db_user_password: password1
-   attr: 
+   db_user_password: strong_password_3
+   db_user_attr: 
      - SUPERUSER
      - CREATEDB
      - CREATEROLE
      - LOGIN
      - INHERIT
 
- vm_7_standby_db_private_key_ssh:
-   remote_host: 192.168.10.16
+ postgresql_db_1:
+   ip_addr: 192.168.10.16
    remote_user: root
    private_key_ssh_path: /root/.ssh/id_ed25519
 
- secret_vm_3_mediawiki_server_1:
-   host_ip: 192.168.10.13
-   user: root
-
- secret_vm_4_mediawiki_server_2:
-   host_ip: 192.168.10.14
-   user: root
-
-   remote_host_ip: 192.168.10.13
+ postgresql_db_2:
+   ip_addr: 192.168.10.17
    remote_user: root
+   private_key_ssh_path: /root/.ssh/id_ed25519
+
+ mediawiki_server_1:
+   ip_addr: 192.168.10.13
+   user: root
+   private_key_ssh_path: /root/.ssh/id_ed25519
+
+ mediawiki_server_2:
+   ip_addr: 192.168.10.14
+   user: root
+   private_key_ssh_path: /root/.ssh/id_ed25519
 </code></pre>
 </details>
 </li>

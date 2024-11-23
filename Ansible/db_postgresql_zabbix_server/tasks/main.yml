@@ -128,11 +128,11 @@
   blockinfile:
     path: /scripts/.env
     block: |
-      BACKUPS_DIR="{{ postgres_zabbix_server_vars.db_backups_dir }}"
-      DATABASE_USER={{ postgres_zabbix_server_user_vars.db_user }}
-      DATABASE_PASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }}
-      DATABASE_NAME={{ postgres_zabbix_server_vars.db_name }}
-      DATABASE_PORT={{ postgres_zabbix_server_vars.db_port }}
+      BACKUPS_DIR="{{ zabbix_postgresql_vars.db_backups_dir }}"
+      DATABASE_USER={{ zabbix_postgresql_vars.db_user }}
+      DATABASE_PASSWORD={{ zabbix_postgresql_vars.db_user_password }}
+      DATABASE_NAME={{ zabbix_postgresql_vars.db_name }}
+      DATABASE_PORT={{ zabbix_postgresql_vars.db_port }}
 
     marker: "# {mark} Ansible managed block for .env"
   tags:
