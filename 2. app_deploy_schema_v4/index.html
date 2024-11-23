@@ -117,7 +117,7 @@
 </details></p>
 </li>
 <li>
-<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-monitoring-system</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-1<span class="tooltip-text">vhdd-1-monitoring-system-db</span></span></strong> — Monitoring System (Zabbix + PostgreSQL) + External HDD drive.<br />
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-1<span class="tooltip-text">vhdd-1</span></span></strong> — Monitoring System (Zabbix + PostgreSQL) + External HDD drive.<br />
    Stack: Ubuntu 22.04, Zabbix-Server, PostgreSQL.  </p>
 <p><details>
 <summary>Show description</summary></p>
@@ -142,16 +142,19 @@ Data is written to a mounted hard disk <span class="tooltip" onclick="showToolti
 <p>The MediaWiki servers handle user requests and read from and write data to the PostgreSQL database.
 </details></p>
 </li>
+</ol>
+<!-- 5. **<span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span>** — Proxy Server. MediaWiki Requests to PostgreSQL db  
+   Stack: Ubuntu 22.04, HAProxy, Zabbix-agent. 
+
+    <details>
+    <summary>Show description</summary>
+
+    The HAProxy proxy server is responsible for distributing requests from the MediaWiki servers between the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> and <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQLL<span class="tooltip-text">vm-7-standby-db</span></span> databases.
+    </details> -->
+
+<ol>
 <li>
-<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-5<span class="tooltip-text">vm-5-haproxy-proxy-server</span></span></strong> — Proxy Server. MediaWiki Requests to PostgreSQL db<br />
-   Stack: Ubuntu 22.04, HAProxy, Zabbix-agent. </p>
-<p><details>
-<summary>Show description</summary></p>
-<p>The HAProxy proxy server is responsible for distributing requests from the MediaWiki servers between the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL<span class="tooltip-text">vm-6-primary-db</span></span> and <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQLL<span class="tooltip-text">vm-7-standby-db</span></span> databases.
-</details></p>
-</li>
-<li>
-<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-primary-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1-primary-db</span></span></strong> — Primary PostgreSQL db + External SSD-drive<br />
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span> + <span class="tooltip" onclick="showTooltip(event)">VSSD-1<span class="tooltip-text">vssd-1</span></span></strong> — Primary PostgreSQL db + External SSD-drive<br />
    Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.  </p>
 <p><details>
 <summary>Show description</summary></p>
@@ -159,14 +162,14 @@ Data is written to a mounted hard disk <span class="tooltip" onclick="showToolti
 </details></p>
 </li>
 <li>
-<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span></strong> — Standby PostgreSQL db.<br />
+<p><strong><span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2</span></span> + <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3</span></span></strong> — Standby PostgreSQL db.<br />
 Replication from the Primary db and <code>pg_dump</code> backup + 2 External HDD drives (replication data storage and backups)<br />
    Stack: Ubuntu 22.04, PostgreSQL, Zabbix-agent.</p>
 <p><details>
 <summary>Show description</summary></p>
-<p>The <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQL db<span class="tooltip-text">vm-7-standby-db</span></span> performs asynchronous data replication from the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> to <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2-standby-db</span></span>.<br />
+<p>The <span class="tooltip" onclick="showTooltip(event)">Standby PostgreSQL db<span class="tooltip-text">vm-7-standby-db</span></span> performs asynchronous data replication from the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> to <span class="tooltip" onclick="showTooltip(event)">VHDD-2<span class="tooltip-text">vhdd-2</span></span>.<br />
 This allows for a quick failover in case the <span class="tooltip" onclick="showTooltip(event)">Primary PostgreSQL db<span class="tooltip-text">vm-6-primary-db</span></span> fails.</p>
-<p>The <code>pg_dump</code> utility is used for backups on <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3-dump-db</span></span>.<br />
+<p>The <code>pg_dump</code> utility is used for backups on <span class="tooltip" onclick="showTooltip(event)">VHDD-3<span class="tooltip-text">vhdd-3</span></span>.<br />
 This enables restoring the database to a specific point in time, which can be useful if the database has been compromised by malware that has already replicated to both databases.
 </details></p>
 </li>

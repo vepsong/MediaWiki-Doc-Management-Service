@@ -1,0 +1,34 @@
+; Internal network check
+; curl -L http://192.168.10.12
+; Log check
+; grep '\->' /var/log/nginx/access.log
+
+# Defining the upstream group of MediaWiki servers
+upstream mediawiki_backend {
+    server 192.168.10.13;  # Internal IP address MediaWiki-server 1
+    server 192.168.10.14;  # Internal IP address MediaWiki-server 2
+}
+
+# Server block for handling requests
+server {
+    listen 80;
+    server_name _;  # Accepts requests on any IP address
+
+    # Proxying requests to the upstream group
+    location / {
+        proxy_pass http://mediawiki_backend;
+
+        # Preserve the Host header for the internal request
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Add a header to maintain internal context
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+
