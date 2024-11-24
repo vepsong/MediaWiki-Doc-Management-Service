@@ -257,6 +257,11 @@ ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Managem
    ip_addr: 192.168.10.14
    user: root
    private_key_ssh_path: /root/.ssh/id_ed25519
+
+ service_vm:
+   nat_ip_addr_1: 54.231.52.120
+   nat_ip_addr_2: 154.182.274.243
+   nat_ip_addr_3: 9.12.19.127
 </code></pre>
 </details>
 </li>
@@ -426,7 +431,7 @@ ansible-vault encrypt --vault-id ansible_secrets@prompt ~/MediaWiki-Doc-Manageme
 <li>
 <p>File Encryption with Ansible Voult </p>
 <pre><code># Encrypting the LocalSettings.php File Using Vault-ID: "mediawiki_localsettings"
-ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/LocalSettings.php"
+ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/mediawiki_servers/LocalSettings.php"
 </code></pre>
 </li>
 <li>

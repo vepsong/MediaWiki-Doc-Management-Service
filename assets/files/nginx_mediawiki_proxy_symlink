@@ -1,7 +1,7 @@
-; Internal network check
-; curl -L http://192.168.10.12
-; Log check
-; grep '\->' /var/log/nginx/access.log
+# Internal network check
+# curl -L http://192.168.10.12
+# Log check
+# grep '\->' /var/log/nginx/access.log
 
 # Defining the upstream group of MediaWiki servers
 upstream mediawiki_backend {
@@ -27,8 +27,5 @@ server {
         # Add a header to maintain internal context
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
-
-
