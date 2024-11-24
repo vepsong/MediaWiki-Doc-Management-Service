@@ -35,7 +35,7 @@
 
 # Primary PostgreSQL Setup
 - name: Primary PostgreSQL db Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_primary
@@ -44,7 +44,7 @@
 
 # Standby PostgreSQL Setup
 - name: Set up standby db_postgresql
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_standby
@@ -53,7 +53,7 @@
 
 # Zabbix-Server PostgreSQL Setup
 - name: Zabbix-Server PostgreSQL Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_zabbix_server

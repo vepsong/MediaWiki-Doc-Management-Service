@@ -196,40 +196,40 @@
   blockinfile:
     path: /etc/postgresql/14/main/pg_hba.conf
     block: |
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   77.137.79.100/32    scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   212.179.174.196/32    scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   5.29.11.237/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_1 }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_2 }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_3 }}/32    scram-sha-256
                                         
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-1-zabbix-server'].ansible_host }}/32    scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-1-zabbix-server'].ip_addr }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ansible_host }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ip_addr }}/32   scram-sha-256
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32   scram-sha-256    
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-3-mediawiki-server-1'].ip_addr }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-3-mediawiki-server-1'].ip_addr }}/32    scram-sha-256
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32   scram-sha-256    
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-4-mediawiki-server-2'].ip_addr }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-4-mediawiki-server-2'].ip_addr }}/32    scram-sha-256
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32   scram-sha-256    
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-5-haproxy-proxy-server'].ip_addr }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-5-haproxy-proxy-server'].ip_addr }}/32    scram-sha-256
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32    scram-sha-256    
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32    scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32    scram-sha-256
 
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32    scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32    scram-sha-256
 
 
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    77.137.79.100/32   scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    212.179.174.196/32   scram-sha-256     
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    5.29.11.237/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_1 }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_2 }}/32   scram-sha-256     
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_3 }}/32   scram-sha-256
       
 
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32   scram-sha-256    
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32   scram-sha-256
       
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32   scram-sha-256
-      host {{ mediawiki_postgresql_vars.db_replication_name }}   {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32   scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
   notify: restart_postgresql
@@ -314,7 +314,7 @@
 
       REMOTE_HOST={{ mediawiki_server_1.ip_addr }}
       REMOTE_USER={{ mediawiki_server_1.user }}
-      PRIVATE_KEY_PATH={{ mediawiki_server_2.private_key_ssh_path }}
+      PRIVATE_KEY_PATH={{ mediawiki_server_1.private_key_ssh_path }}
 
     marker: "# {mark} Ansible managed block for .env"
   when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
