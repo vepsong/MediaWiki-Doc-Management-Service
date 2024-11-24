@@ -72,7 +72,7 @@
 
 # MediaWiki Setup
 - name: MediaWiki Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: mediawiki
@@ -81,7 +81,7 @@
 
 # Nginx-proxy MediaWiki Setup
 - name: Nginx-proxy MediaWiki Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: nginx_mediawiki_proxy

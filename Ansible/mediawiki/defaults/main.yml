@@ -1,9 +1,9 @@
 ---
 # defaults file for mediawiki
 
-target_groups:
-  - mediawikiServer
-
+target_vms:
+  - vm-3-mediawiki-server-1
+  - vm-4-mediawiki-server-2
 
 mediawiki_hosts:
   server1: vm-3-mediawiki-server-1
