@@ -1,10 +1,10 @@
 ---
 # defaults file for ddns_duc
 
-ddns_hosts:
-  - vm-1-monitoring-system
+target_vms:
+  - vm-1-zabbix-server
   - vm-2-nginx-proxy-server
 
 ddns_hosts_dict:
-  zabbix_server: vm-1-monitoring-system
+  zabbix_server: vm-1-zabbix-server
   nginx_mediawiki: vm-2-nginx-proxy-server

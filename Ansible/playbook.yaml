@@ -62,7 +62,7 @@
 
 # DDNS Noip DUC Setup 
 - name: DDNS Noip DUC Setup 
-  hosts: "{{ ddns_hosts }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: ddns_duc
