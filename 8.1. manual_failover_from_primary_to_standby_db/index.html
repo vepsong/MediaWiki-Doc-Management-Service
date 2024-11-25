@@ -70,13 +70,15 @@
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">8. Manual failover from the Primary PostgreSQL to the Standby PostgreSQL</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#files-and-variables-setup">Files and Variables Setup</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ddns-setup">DDNS Setup</a>
+    <li class="toctree-l2"><a class="reference internal" href="#promoting-the-standby-to-primary">Promoting the Standby to Primary</a>
     </li>
-        </ul>
+    <li class="toctree-l2"><a class="reference internal" href="#changing-the-mediawiki-servers-settings">Changing the MediaWiki servers settings</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#essential-ansible-commands">Essential Ansible commands</a>
+    <li class="toctree-l2"><a class="reference internal" href="#changing-settings-on-the-new-primary-postgresql">Changing settings on the new Primary Postgresql</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#disconnect-vhdd-3-from-the-new-primary-vm-vm-7-and-attach-it-to-the-new-standby-vm-vm-6-using-the-yandex-cloud-web-interface">Disconnect "vhdd-3" from the new Primary VM (VM-7) and attach it to the new Standby VM (VM-6) using the Yandex Cloud Web interface</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mounting-the-vhdd-3-to-the-new-standby-vm-vm-6-mount-point">Mounting the "vhdd-3" to the new Standby VM (VM-6) mount point</a>
     </li>
     </ul>
                   </li>
@@ -106,433 +108,89 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="manual-failover-from-the-primary-postgresql-to-the-standby-postgresql">Manual Failover From the Primary PostgreSQL to the Standby PostgreSQL</h1>
-<h3 id="files-and-variables-setup">Files and Variables Setup</h3>
-<ol>
-<li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_structure.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/ansible_structure.py</code></span></span> file</p>
+<h2 id="promoting-the-standby-to-primary">Promoting the Standby to Primary</h2>
+<p>Target VM: Current StanbBy Postgresql - <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
-<li>This file contains <code>dynamic_groups</code> dictionary which confugires the output <code>inventory.yaml</code> file</li>
-<li>The file is already configured. No changes are needed.</li>
-</ul>
+<li>
+<p>Steps:</p>
+<ul>
+<li>
+<p>Step 1 - Changing user to postgres</p>
+<pre><code>sudo su -postgresql
+</code></pre>
 </li>
 <li>
-<p>Create <span class="tooltip" onclick="showTooltip(event)"><strong>inventory.yaml</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/inventory.yaml</code></span></span> by running <span class="tooltip" onclick="showTooltip(event)"><strong>update_ansible_inventory.py</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/python_scripts/update_ansible_inventory.py</code></span></span>   </p>
-<p><details class="external_code_rendering">
-<summary>Show inventory.yaml_EXAMPLE</summary></p>
-<pre><code> linuxVM:
-   children:
-     monitoringSystem:
-       hosts:
-         vm-1-monitoring-system:
-           ansible_host: 51.250.1.167
-           external_disks:
-           - disk_id: fhmmla0r5sm2j6c4le8l
-             disk_name: vhdd-1-monitoring-system-db
-             mount_point: /opt/vhdd-1-monitoring-system-db
-             filesystem: ext4
-     nginxProxyServer:
-       hosts:
-         vm-2-nginx-proxy-server:
-           ansible_host: 130.193.38.129
-     mediawikiServer:
-       hosts:
-         vm-3-mediawiki-server-1:
-           ansible_host: 130.193.37.91
-         vm-4-mediawiki-server-2:
-           ansible_host: 62.84.116.227
-     haproxyProxyServer:
-       hosts:
-         vm-5-haproxy-proxy-server:
-           ansible_host: 130.193.36.108
-     primaryDb:
-       hosts:
-         vm-6-primary-db:
-           ansible_host: 84.252.128.13
-           external_disks:
-           - disk_id: fhmvasqeieo3t7nqlol7
-             disk_name: vssd-1-primary-db
-             mount_point: /opt/vssd-1-primary-db
-             filesystem: ext4
-     standbyDb:
-       hosts:
-         vm-7-standby-db:
-           ansible_host: 51.250.67.113
-           external_disks:
-           - disk_id: fhm0653bevuv57f7ng16
-             disk_name: vhdd-2-standby-db
-             mount_point: /opt/vhdd-2-standby-db
-             filesystem: ext4
-           - disk_id: fhm9rbu6jc8q2ak0cni2
-             disk_name: vhdd-3-dump-db
-             mount_point: /opt/vhdd-3-dump-db
-             filesystem: ext4
-   vars:
-     ansible_user: root
-     ansible_password: ''
-     connection_protocol: ssh
+<p>Step 2 - Promoting the Standby to Primary</p>
+<pre><code># -D - data directory of the PostgreSQL
+/usr/lib/postgresql/14/bin/pg_ctl promote -D /opt/vhdd-2/postgresql/14/main
+
+# In case of 'pg_ctl: command not found', run this command to locate pg_ctl
+find / -name pg_ctl 2&gt;/dev/null
+</code></pre>
+</li>
+<li>
+<p>Step 3 - Verify the Promotion</p>
+<pre><code># Entrance to psql
+psql
+
+# Verifying the status
+SELECT pg_is_in_recovery();
+
+# It should return the 'f' output
+
+    postgres=# SELECT pg_is_in_recovery();
+    pg_is_in_recovery
+    -------------------
+    f
+    (1 row)
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="changing-the-mediawiki-servers-settings">Changing the MediaWiki servers settings</h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-3<span class="tooltip-text">vm-3-mediawiki-server-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-4<span class="tooltip-text">vm-4-mediawiki-server-2</span></span></p>
+<ul>
+<li>
+<p>Steps:</p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Configuring the <code>$wgDBserver</code> in <code>/var/www/mediawiki/LocalSettings.php</code></summary></p>
+<pre><code># The new Primary IP or DNS addres
+$wgDBserver = '192.168.10.17'
 </code></pre>
 </details>
 </li>
-<li>
-<p>Review or Replace the <code>Private SSH Key</code> File in the <code>~/MediaWiki-Doc-Management-Service/Ansible/common_files</code> Directory</p>
-<ul>
-<li>
-<p>This <code>Private SSH Key</code> file is required to allow SSH connections between specific VMs</p>
-<pre><code># If there is no Private SSH Key file, or if you wish to replace the current one, run the following command
-cp ~/.ssh/id_ed25519 ~/MediaWiki-Doc-Management-Service/Ansible/common_files
-</code></pre>
-</li>
-<li>
-<p>File Encryption with Ansible Voult </p>
-<pre><code># Encrypting the Private SSH Key File Using Vault-ID: "private_ssh_key"
-ansible-vault encrypt --vault-id private_ssh_key@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/id_ed25519"
-</code></pre>
-</li>
-<li>
-<p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password1" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_private_ssh_key.txt
-</code></pre>
-</li>
 </ul>
-</li>
-<li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>ansible_secrets.yml</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/ansible_secrets.yml</code></span></span> File</p>
+<h2 id="changing-settings-on-the-new-primary-postgresql">Changing settings on the new Primary Postgresql</h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
 <li>
-<p>The <code>ansible_secrets.yml</code> file contains secret variables, such as database connection credentials, IP addresses, and more</p>
-<p><details class="external_code_rendering">
-<summary>Show ansible_secrets.yml_EXAMPLE</summary></p>
-<pre><code> mediawiki_postgresql_vars:
-   db_name: my_wiki
-   db_tablespace_name: primary_tablespace
-   db_port: 5432
-   db_backups_dir: /opt/vhdd-3/mediawiki_dump
-
-   db_user: wikiuser
-   db_user_password: strong_password_1
-   db_user_attr: 
-     - SUPERUSER
-     - CREATEDB
-     - CREATEROLE
-     - LOGIN
-     - INHERIT
-
-   db_replication_name: replication
-   db_replication_user: syncuser
-   db_replication_user_password: strong_password_2
-   db_replication_user_attr: 
-     - REPLICATION
-
- zabbix_postgresql_vars:
-   db_name: zabbix
-   db_tablespace_name: primary_tablespace
-   db_port: 5432
-   db_backups_dir: /opt/vhdd-1/zabbix_dump
-
-   db_user: zabbix
-   db_user_password: strong_password_3
-   db_user_attr: 
-     - SUPERUSER
-     - CREATEDB
-     - CREATEROLE
-     - LOGIN
-     - INHERIT
-
- postgresql_db_1:
-   ip_addr: 192.168.10.16
-   remote_user: root
-   private_key_ssh_path: /root/.ssh/id_ed25519
-
- postgresql_db_2:
-   ip_addr: 192.168.10.17
-   remote_user: root
-   private_key_ssh_path: /root/.ssh/id_ed25519
-
- mediawiki_server_1:
-   ip_addr: 192.168.10.13
-   user: root
-   private_key_ssh_path: /root/.ssh/id_ed25519
-
- mediawiki_server_2:
-   ip_addr: 192.168.10.14
-   user: root
-   private_key_ssh_path: /root/.ssh/id_ed25519
-
- service_vm:
-   nat_ip_addr_1: 54.231.52.120
-   nat_ip_addr_2: 154.182.274.243
-   nat_ip_addr_3: 9.12.19.127
+<p>Steps:</p>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 1 - Stopping the PostgreSQL service</summary></p>
+<pre><code>systemctl stop postgresql
+systemctl status postgresql
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 2 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></summary></p>
+<pre><code>#wal_level = '' &gt;&gt;&gt;
+wal_level = replica
+</code></pre>
+</details>
+<p><details class="tasks_external_code_rendering">
+<summary>- Step 3 - Restarting the PostgreSQL service</summary></p>
+<pre><code>systemctl restart postgresql
+systemctl status postgresql
 </code></pre>
 </details>
 </li>
-<li>
-<p>File Encryption with Ansible Voult </p>
-<pre><code># Encrypting the ansible_secrets.yml File Using Vault-ID: "ansible_secrets"
-ansible-vault encrypt --vault-id ansible_secrets@prompt ~/MediaWiki-Doc-Management-Service/Ansible/common_files/ansible_secrets.yaml
-</code></pre>
-</li>
-<li>
-<p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password2" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_ansible_secrets.txt
-</code></pre>
-</li>
 </ul>
-</li>
-<li>
-<p>Review or Modify the <span class="tooltip" onclick="showTooltip(event)"><strong>LocalSettings.php</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/LocalSettings.php</code></span></span> File</p>
+<h2 id="disconnect-vhdd-3-from-the-new-primary-vm-vm-7-and-attach-it-to-the-new-standby-vm-vm-6-using-the-yandex-cloud-web-interface">Disconnect "vhdd-3" from the new Primary VM (VM-7) and attach it to the new Standby VM (VM-6) using the Yandex Cloud Web interface</h2>
+<h2 id="mounting-the-vhdd-3-to-the-new-standby-vm-vm-6-mount-point">Mounting the "vhdd-3" to the new Standby VM (VM-6) mount point</h2>
 <ul>
-<li>The <code>LocalSettings.php</code> file contains the MediaWiki configuration</li>
-<li>
-<p>Pay attention to the following blocks and lines in the file:</p>
-<ul>
-<li>line: <span class="tooltip" onclick="showTooltip(event)"><code>$wgServer = 'http://nginx-proxy server IP or URL address';</code><span class="tooltip-text">The address that users will use to access the MediaWiki service</span></span></li>
-<li>line: <span class="tooltip" onclick="showTooltip(event)"><code>$wgDefaultSkin = 'monobook';</code><span class="tooltip-text">The theme MediaWiki service</span></span></li>
-<li>block: <span class="tooltip" onclick="showTooltip(event)">Database settings<span class="tooltip-text">Credentials for Database Connection</span></span></li>
-<li>block: <span class="tooltip" onclick="showTooltip(event)">Postgres specific settings<span class="tooltip-text">Database Connection Settings</span></span></li>
+<li>Look at the Run Ansible PipeLine page</li>
 </ul>
-<p><details class="external_code_rendering">
-<summary>Show LocalSettings.php_EXAMPLE</summary></p>
-<pre><code> &lt;?php
- # This file was automatically generated by the MediaWiki 1.42.3
- # installer. If you make manual changes, please keep track in case you
- # need to recreate them later.
- #
- # See includes/MainConfigSchema.php for all configurable settings
- # and their default values, but don't forget to make changes in _this_
- # file, not there.
- #
- # Further documentation for configuration settings may be found at:
- # https://www.mediawiki.org/wiki/Manual:Configuration_settings
-
- # Protect against web entry
- if ( !defined( 'MEDIAWIKI' ) ) {
-    exit;
- }
-
- ## Uncomment this to disable output compression
- # $wgDisableOutputCompression = true;
-
- $wgSitename = 'sprint13_yp';
- $wgMetaNamespace = 'Sprint13_yp';
-
- ## The URL base path to the directory containing the wiki;
- ## defaults for all runtime URL paths are based off of this.
- ## For more information on customizing the URLs
- ## (like /w/index.php/Page_title to /wiki/Page_title) please see:
- ## https://www.mediawiki.org/wiki/Manual:Short_URL
- $wgScriptPath = '';
-
- ## The protocol and server name to use in fully-qualified URLs
- $wgServer = 'http://130.193.39.49';
-
- ## The URL path to static resources (images, scripts, etc.)
- $wgResourceBasePath = $wgScriptPath;
-
- ## The URL paths to the logo.  Make sure you change this from the default,
- ## or else you'll overwrite your logo when you upgrade!
- $wgLogos = [
-    '1x' =&gt; "$wgResourceBasePath/resources/assets/change-your-logo.svg",
-    'icon' =&gt; "$wgResourceBasePath/resources/assets/change-your-logo.svg",
- ];
-
- ## UPO means: this is also a user preference option
-
- $wgEnableEmail = true;
- $wgEnableUserEmail = true; # UPO
-
- $wgEmergencyContact = '';
- $wgPasswordSender = '';
-
- $wgEnotifUserTalk = false; # UPO
- $wgEnotifWatchlist = false; # UPO
- $wgEmailAuthentication = true;
-
- ## Database settings
- $wgDBtype = 'postgres';
- $wgDBserver = '192.168.10.16';
- $wgDBname = 'my_wiki';
- $wgDBuser = 'wikiuser';
- $wgDBpassword = 'YOUR_SUPER_STRONG_PASSWORD';
-
- # Postgres specific settings
- $wgDBport = "5432";
- $wgDBssl = false;
- $wgDBmwschema = "mediawiki";
-
- # Shared database table
- # This has no effect unless $wgSharedDB is also set.
- $wgSharedTables[] = "actor";
-
- ## Shared memory settings
- $wgMainCacheType = CACHE_ACCEL;
- $wgMemCachedServers = [];
-
- ## To enable image uploads, make sure the 'images' directory
- ## is writable, then set this to true:
- $wgEnableUploads = false;
- #$wgUseImageMagick = true;
- #$wgImageMagickConvertCommand = '/usr/bin/convert';
-
- # InstantCommons allows wiki to use images from https://commons.wikimedia.org
- $wgUseInstantCommons = false;
-
- # Periodically send a pingback to https://www.mediawiki.org/ with basic data
- # about this MediaWiki instance. The Wikimedia Foundation shares this data
- # with MediaWiki developers to help guide future development efforts.
- $wgPingback = true;
-
- # Site language code, should be one of the list in ./includes/languages/data/Names.php
- $wgLanguageCode = 'en';
-
- # Time zone
- $wgLocaltimezone = 'UTC';
-
- ## Set $wgCacheDirectory to a writable directory on the web server
- ## to make your wiki go slightly faster. The directory should not
- ## be publicly accessible from the web.
- #$wgCacheDirectory = "$IP/cache";
-
- $wgSecretKey = '2d4a43e01b5d47793a1120c3cdff6440a6974780e8fe3b57504dfd388ddc3326';
-
- # Changing this will log out all existing sessions.
- $wgAuthenticationTokenVersion = '1';
-
- # Site upgrade key. Must be set to a string (default provided) to turn on the
- # web installer while LocalSettings.php is in place
- $wgUpgradeKey = '09a43ca42d627f31';
-
- ## For attaching licensing metadata to pages, and displaying an
- ## appropriate copyright notice / icon. GNU Free Documentation
- ## License and Creative Commons licenses are supported so far.
- $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
- $wgRightsUrl = '';
- $wgRightsText = '';
- $wgRightsIcon = "";
-
- # Path to the GNU diff3 utility. Used for conflict resolution.
- $wgDiff3 = '/usr/bin/diff3';
-
- ## Default skin: you can change the default skin. Use the internal symbolic
- ## names, e.g. 'vector' or 'monobook':
- $wgDefaultSkin = 'monobook';
-
- # Enabled skins.
- # The following skins were automatically enabled:
- wfLoadSkin( 'MinervaNeue' );
- wfLoadSkin( 'MonoBook' );
- wfLoadSkin( 'Timeless' );
- wfLoadSkin( 'Vector' );
-
- # End of automatically generated settings.
- # Add more configuration options below.
-</code></pre>
-</details>
-</li>
-<li>
-<p>File Encryption with Ansible Voult </p>
-<pre><code># Encrypting the LocalSettings.php File Using Vault-ID: "mediawiki_localsettings"
-ansible-vault encrypt --vault-id mediawiki_localsettings@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/LocalSettings.php"
-</code></pre>
-</li>
-<li>
-<p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password3" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_mediawiki_localsettings.txt
-</code></pre>
-</li>
-</ul>
-<h4 id="ddns-setup">DDNS Setup</h4>
-<ul>
-<li>DDNS is used to eliminate the need to change IP addresses in configuration files.</li>
-<li>To configure DDNS, follow these steps:<ul>
-<li>Register with a DDNS provider, such as <a href="https://www.noip.com/">noip.com</a></li>
-<li>Creating a custom hostname</li>
-<li>Configuring the <a href="https://www.noip.com/support/knowledgebase/install-linux-3-x-dynamic-update-client-duc#install_from_source">Dynamic Update Client (DUC)</a><ul>
-<li>DUC configuration is performed during Ansible tasks, so there is no need to configure it manually</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p>Review or modify the two <code>noip-duc</code> files:</p>
-<ul>
-<li>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_nginx_mediawiki</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_nginx_mediawiki</code></span></span> File</li>
-<li>
-<p>The <span class="tooltip" onclick="showTooltip(event)"><strong>duc_zabbix_server</strong><span class="tooltip-text"><code>~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_zabbix_server</code></span></span> File</p>
-</li>
-<li>
-<p>The <code>noip-duc</code> file contains the <a href="https://www.noip.com/">noip.com</a> credentials for automatically updating the NAT IP address with the DDNS provider</p>
-<p><details class="external_code_rendering">
-<summary>Show noip-duc_EXAMPLE</summary></p>
-<pre><code> NOIP_USERNAME=myusername
- NOIP_PASSWORD=mypassword
- NOIP_HOSTNAMES=example.ddns.net
-</code></pre>
-</details>
-</li>
-<li>
-<p>File Encryption with Ansible Voult </p>
-<pre><code># Encrypting the duc_nginx_mediawiki File Using Vault-ID: "duc_nginx_mediawiki"
-ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_nginx_mediawiki"
-
-# Encrypting the duc_zabbix_server File Using Vault-ID: "duc_zabbix_server"
-ansible-vault encrypt --vault-id duc_nginx_mediawiki@prompt "~/MediaWiki-Doc-Management-Service/Ansible/common_files/duc_zabbix_server"
-</code></pre>
-</li>
-<li>
-<p>Write Ansible Voult password to file:</p>
-<pre><code>echo "password4" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_zabbix_server.txt
-echo "password5" &gt; ~/MediaWiki-Doc-Management-Service/Ansible/vault_passwords/vault_duc_nginx_mediawiki.txt
-</code></pre>
-</li>
-</ul>
-</li>
-</ol>
-<h3 id="essential-ansible-commands">Essential Ansible commands</h3>
-<ol>
-<li>
-<p>Ansible</p>
-<pre><code># Checking syntax and availability of cloud resources
-ansible all -m ping -i inventory.yaml
-
-# Installing or updating the collection 
-ansible-galaxy collection install &lt;collection name&gt;
-
-# List of installed collections
-ansible-galaxy collection list
-
-# Creating a role (used to separate tasks that will be executed within the playbook)
-ansible-galaxy init &lt;role name&gt;
-
-# List of used roles
-ansible-galaxy role list
-
-# Running the playbook
-ansible-playbook &lt;playbook&gt;.yaml name&gt; -i &lt;inventory&gt;.yaml name&gt; --tags="&lt;tag&gt;"
-#Example:
-ansible-playbook mount_disks_playbook.yaml -i inventory.yaml --tags="mount"
-</code></pre>
-</li>
-<li>
-<p>Ansible Vault</p>
-<pre><code># Encrypting File using Ansible Vault 
-ansible-vault encrypt --vault-id &lt;vault-id-name&gt;@prompt "&lt;path to file&gt;"
-
-# Change Vault Password
-ansible-vault rekey "&lt;path to file&gt;"
-
-# Edit Vault-Encrypted File
-ansible-vault edit "&lt;path to file&gt;"
-
-# Decrypting File 
-ansible-vault decrypt "&lt;path to file&gt;"
-
-# Viewing the Vault-Encrypted File
-ansible-vault view "&lt;path to file&gt;"
-</code></pre>
-</li>
-</ol>
               
             </div>
           </div><footer>
