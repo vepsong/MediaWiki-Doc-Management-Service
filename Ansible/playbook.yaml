@@ -91,7 +91,7 @@
 
 # Zabbix-Server Setup
 - name: Zabbix-Server Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: zabbix_server_monitoring_system
@@ -101,7 +101,7 @@
 
 # Zabbix-Agent Setup
 - name: Zabbix-Agent Setup
-  hosts: "{{ target_groups }}"
+  hosts: all
   become: true
   roles:
     - role: zabbix_agent_monitoring_system

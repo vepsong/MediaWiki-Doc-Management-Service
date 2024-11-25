@@ -50,7 +50,7 @@
 - name: Step 6 - Importing initial schema for Zabbix server
   become_user: zabbix
   ansible.builtin.shell: |
-    PGPASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }} zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | psql -U zabbix -d zabbix
+    PGPASSWORD={{ zabbix_postgresql_vars.db_user_password }} zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | psql -U zabbix -d zabbix
   tags:
     - zabbix_server_setup_import_initial_schema
 
@@ -61,7 +61,7 @@
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_server.conf
     regexp: '^#?\s*DBPassword\s*=.*'
-    replace: "DBPassword = {{ postgres_zabbix_server_user_vars.db_user_password }}"
+    replace: "DBPassword = {{ zabbix_postgresql_vars.db_user_password }}"
   notify: restart_zabbix_server
   tags:
     - zabbix_server_setup_add_dbpassword

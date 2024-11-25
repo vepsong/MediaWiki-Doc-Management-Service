@@ -110,7 +110,7 @@
 # Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-- name: Step 9 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+- name: Step 9 - Copying the pgdump_zabbix_server.py script to /scripts with '0755' permissions
   become: true
   become_user: root
   copy:

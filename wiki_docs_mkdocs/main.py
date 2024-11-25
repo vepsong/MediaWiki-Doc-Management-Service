@@ -52,10 +52,12 @@ def define_env(env):
 
     env.variables['postgresql_database_vssd_1_disk_name'] = "vssd-1"    
     env.variables['postgresql_database_vssd_1_disk_dir'] = "/opt/vssd-1/"  
-
+    env.variables['postgresql_database_vssd_1_disk_data_dir'] = "/opt/vssd_1/postgresql/14/main"  
+    
     env.variables['postgresql_database_vhdd_2_disk_name'] = "vhdd-2"    
     env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-2/"  
-
+    env.variables['postgresql_database_vhdd_2_disk_data_dir'] = "/opt/vhdd-2/postgresql/14/main"  
+    
     env.variables['postgresql_database_vhdd_3_disk_name'] = "vhdd-3"
     env.variables['postgresql_database_vhdd_3_disk_dir'] = "/opt/vhdd-3/"  
     env.variables['postgresql_database_vhdd_3_disk_dump_dir'] = "/opt/vhdd-3/mediawiki_dump/"  
