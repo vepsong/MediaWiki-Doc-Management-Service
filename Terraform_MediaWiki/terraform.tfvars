@@ -28,13 +28,6 @@ virtual_machines = {
       disk_size     = 24
       ip_address    = "192.168.10.14"
     },
-    "vm-5" = {
-      vm_name       = "vm-5-haproxy-proxy-server"
-      vm_desc       = "Haproxy proxy"
-      disk_name     = "vm-5-disk"
-      disk_size     = 25
-      ip_address    = "192.168.10.15"
-    },
     "vm-6" = {
       vm_name       = "vm-6-postgresql-db-1"
       vm_desc       = "PostgreSQL db-1" 
