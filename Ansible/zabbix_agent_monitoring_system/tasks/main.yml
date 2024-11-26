@@ -16,7 +16,8 @@
 # Installing the Zabbix repository
 - name: Step 2 - Installing the Zabbix repository
   ansible.builtin.apt:
-    deb: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+    # deb: /tmp/zabbix-release_latest+ubuntu22.04_all.deb
+    deb: /tmp/zabbix_all.deb
   tags:
     - zabbix_agent_setup_install_zabbix_repository
 
@@ -34,7 +35,7 @@
   ansible.builtin.apt:
     name: "{{ item }}" 
     state: present
-  loop: "{{ packages_to_install }}"
+  loop: "{{ apt_packages_to_install }}"
   tags:
     - zabbix_agent_setup_install_packages
 
@@ -45,7 +46,7 @@
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_agentd.conf 
     regexp: '^Server=.*$'
-    replace: 'Server=192.168.10.11'
+    replace: "Server={{ hostvars['vm-1-zabbix-server'].ip_addr }}"
   tags:
     - zabbix_agent_setup_add_server_name
 
@@ -56,7 +57,7 @@
   ansible.builtin.replace:
     path: /etc/zabbix/zabbix_agentd.conf 
     regexp: '^ServerActive=.*$'
-    replace: 'ServerActive=192.168.10.11'
+    replace: "ServerActive={{ hostvars['vm-1-zabbix-server'].ip_addr }}"
   tags:
     - zabbix_agent_setup_add_server_active
 
@@ -82,6 +83,6 @@
     name: "{{ item }}" 
     state: restarted
     enabled: yes
-  loop: "{{ packages_to_restart }}"
+  loop: "{{ apt_packages_to_restart }}"
   tags:
     - zabbix_agent_setup_restarting_enabling_packages

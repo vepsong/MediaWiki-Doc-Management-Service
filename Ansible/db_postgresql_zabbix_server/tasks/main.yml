@@ -34,11 +34,10 @@
 - name: Step 4 - Creating the /zabbix_dump directory, where db_dumps will be stored with '0755' permissions
   become: true
   ansible.builtin.file:
-    path: "{{ postgres_zabbix_server_vars.db_backups_dir }}"
+    path: "{{ zabbix_postgresql_vars.db_backups_dir }}"
     state: directory
     group: dbadmin
     mode: '0755'
-  when: zabbix_server_hosts.zabbix_server1 in inventory_hostname
   tags:
     - zabbix_server_postgresql_setup_creating_zabbix_dump_directory
 
@@ -50,11 +49,11 @@
   blockinfile:
     path: /etc/postgresql/14/main/pg_hba.conf
     block: |
-      host zabbix       zabbix       77.137.79.100/32                                                scram-sha-256
-      host zabbix       zabbix       212.179.174.196/32                                              scram-sha-256
-      host zabbix       zabbix       5.29.11.237/32                                                  scram-sha-256
-      host zabbix       zabbix       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32        scram-sha-256
-      host zabbix       zabbix       192.168.10.11/32                                                scram-sha-256
+      host     {{ zabbix_postgresql_vars.db_name }}    {{ zabbix_postgresql_vars.db_user }}    {{ service_vm.nat_ip_addr_1 }}/32    scram-sha-256
+      host     {{ zabbix_postgresql_vars.db_name }}    {{ zabbix_postgresql_vars.db_user }}    {{ service_vm.nat_ip_addr_2 }}/32    scram-sha-256
+      host     {{ zabbix_postgresql_vars.db_name }}    {{ zabbix_postgresql_vars.db_user }}    {{ service_vm.nat_ip_addr_3 }}/32    scram-sha-256
+      host     {{ zabbix_postgresql_vars.db_name }}    {{ zabbix_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ansible_host }}/32    scram-sha-256
+      host     {{ zabbix_postgresql_vars.db_name }}    {{ zabbix_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ip_addr }}/32    scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
   notify: restart_postgresql
@@ -79,9 +78,9 @@
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
-    name: "{{ postgres_zabbix_server_user_vars.db_user }}"
-    password: "{{ postgres_zabbix_server_user_vars.db_user_password }}"
-    role_attr_flags: "{{ postgres_zabbix_server_user_vars.attr | join(',') }}"
+    name: "{{ zabbix_postgresql_vars.db_user }}"
+    password: "{{ zabbix_postgresql_vars.db_user_password }}"
+    role_attr_flags: "{{ zabbix_postgresql_vars.db_user_attr | join(',') }}"
     state: present
   notify: restart_postgresql
   tags:
@@ -94,8 +93,8 @@
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
-    name: "{{ postgres_zabbix_server_vars.db_name }}"
-    owner: "{{ postgres_zabbix_server_user_vars.db_user }}"
+    name: "{{ zabbix_postgresql_vars.db_name }}"
+    owner: "{{ zabbix_postgresql_vars.db_user }}"
     state: present
   tags:
     - zabbix_server_postgresql_setup_checking_postgresql_database_existsance
@@ -111,7 +110,7 @@
 # Owner: rwx (read, write, and execute)
 # Group: r-x (read and execute)
 # Others: r-x (read and execute)
-- name: Step 9 - Copying the pgdump_zabbix_server.py script to ~/scripts with '0755' permissions
+- name: Step 9 - Copying the pgdump_zabbix_server.py script to /scripts with '0755' permissions
   become: true
   become_user: root
   copy:
@@ -128,11 +127,11 @@
   blockinfile:
     path: /scripts/.env
     block: |
-      BACKUPS_DIR="{{ postgres_zabbix_server_vars.db_backups_dir }}"
-      DATABASE_USER={{ postgres_zabbix_server_user_vars.db_user }}
-      DATABASE_PASSWORD={{ postgres_zabbix_server_user_vars.db_user_password }}
-      DATABASE_NAME={{ postgres_zabbix_server_vars.db_name }}
-      DATABASE_PORT={{ postgres_zabbix_server_vars.db_port }}
+      BACKUPS_DIR="{{ zabbix_postgresql_vars.db_backups_dir }}"
+      DATABASE_USER={{ zabbix_postgresql_vars.db_user }}
+      DATABASE_PASSWORD={{ zabbix_postgresql_vars.db_user_password }}
+      DATABASE_NAME={{ zabbix_postgresql_vars.db_name }}
+      DATABASE_PORT={{ zabbix_postgresql_vars.db_port }}
 
     marker: "# {mark} Ansible managed block for .env"
   tags:

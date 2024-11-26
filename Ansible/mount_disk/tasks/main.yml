@@ -5,6 +5,7 @@
     virtio_disk_ids: "{{ virtio_disk_ids | default([]) + ['virtio-' + item.disk_id] }}"
   loop: "{{ hostvars[inventory_hostname].external_disks | default([]) }}"
 
+
 # Compare with "ansible_facts.device_links.ids
 - name: Step 2 - Compare with "ansible_facts.device_links.ids"
   set_fact:
@@ -12,13 +13,11 @@
   loop: "{{ ansible_facts.device_links.ids | dict2items }}"
   when: item.value | intersect(virtio_disk_ids) | length > 0
 
+
 # Create dynamic variables
 - name: Step 3 - Create dynamic variables
   set_fact:
     device_path: "{{ device_path + [origin_path + item] }}"
-    logical_volume: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_name') | map('regex_replace', '^', 'lv-') | list }}"
-    physical_volume: "{{ physical_volume + ([origin_path + item] | map('regex_replace', '$', '1')) }}"
-    volume_group: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='disk_name') | map('regex_replace', '^', 'vg-db-storage-') | list }}"
     mount_point: "{{ hostvars[inventory_hostname]['external_disks'] | map(attribute='mount_point') | list }}"
   loop: "{{ device_names }}"
 
@@ -28,7 +27,6 @@
   community.general.parted:
     device: "{{ item }}"
     number: 1
-    flags: [ lvm ]
     label: "gpt"
     state: present
     part_end: "100%"
@@ -37,63 +35,20 @@
   tags:
     - mount_external_disks_create_disk_partition
 
-# Run the "vgs" command to check if there is a VG in the system
-- name: Step 5 - Run the "vgs" command to check if there is a VG in the system
-  command: "vgs"
-  register: vgs_info
-  changed_when: false
 
-# Creating a Volume Group for every of Physical Volumes
-- name: Step 6 - Creating the Volume Group for every of Physical Volumes
-  community.general.lvg:
-    vg: "{{ volume_group[item] }}"  # The VG name
-    pvs: "{{ physical_volume[item] }}"  # The corresponding physical volume
-  when: device_names is defined and vgs_info.stdout == ""
-  loop: "{{ range(0, volume_group | length) | list }}"
-  tags:
-    - mount_external_disks_create_pv_vg
-
-# Run the "lvs" command to check if there is a LV in the system
-- name: Step 7 - Run the "lvs" command to check if there is a LV in the system
-  command: "lvs"
-  register: lvs_info
-  changed_when: false
-
-# Creating the Logical Volume with a specified size
-- name: Step 8 - Creating the Logical Volume '{{ logical_volume }}' with a specified size
-  community.general.lvol:
-    vg: "{{ volume_group[item] }}"
-    lv: "{{ logical_volume[item] }}"
-    size: 100%FREE
-  when: device_names is defined and lvs_info.stdout == ""
-  loop: "{{ range(0, volume_group | length) | list }}"
-  tags:
-    - mount_external_disks_create_lv
-
-# Creating the "vg_lv_path" variable (/dev/volume_group/logical_volume)
-- name: Step 9 - Creating the "vg_lv_path" variable (/dev/volume_group/logical_volume)
-  set_fact:
-    vg_lv_path: "{{ vg_lv_path + ['/dev/' + volume_group[item] + '/' + logical_volume[item]] }}"
-  loop: "{{ range(0, volume_group | length) | list }}"
-
-- name: Debug output for vg_lv_path
-  debug:
-    msg: "vg_lv_path: {{ vg_lv_path }}"
-
-    
 # Formatting the partition and creating the file system
-- name: Step 10 - Formatting the partition and creating the file system "{{ file_system }}"
+- name: Step 5 - Formatting the partition and creating the file system "{{ file_system }}"
   community.general.filesystem:
     fstype: "{{ file_system }}"
-    dev: "{{ item }}"
+    dev: "{{ item }}1"
   when: device_names is defined
-  loop: "{{ vg_lv_path }}"
+  loop: "{{ device_path }}"
   tags:
     - mount_external_disks_create_file_system
 
 
 # Creating a directory for mounting the hard drive
-- name: Step 11 - Creating a directory for mounting the hard drive opt/"{{ mount_point }}"
+- name: Step 6 - Creating a directory for mounting the hard drive opt/"{{ mount_point }}"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -104,33 +59,40 @@
     - mount_external_disks_create_mount_dir
 
 
-# Creating the "mount_pairs" variable: a list of corresponding mount_point and vg_lv_path pairs)
-# Input consists of two lists: mount_point and vg_lv_path:
-# mount_point: [/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db]
-# vg_lv_path: [/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db, /dev/vg-db-storage-vhdd-3-dump-db/lv-vhdd-3-dump-db]
-# Input consists of one list:
-# mount_pairs: [['/opt/vhdd-2-standby-db', '/dev/vg-db-storage-vhdd-2-standby-db/lv-vhdd-2-standby-db'], 
-#               ['/opt/vhdd-3-dump-db', '/dev/vg-db-storage-vhdd-3-dump-db/lv-vhdd-3-dump-db']
-#              ]
-- name: Step 12 - Creating the "mount_pairs" variable (a list of corresponding mount_point and vg_lv_path pairs)
-  set_fact:
-    mount_pairs: "{{ mount_pairs + [[mount_point[item], vg_lv_path[item]]] }}"
-  loop: "{{ range(0, mount_point | length) | list }}"
+# Retrieving UUIDs for all external disks
+- name: Step 7 - Retrieving UUIDs for all external disks
+  ansible.builtin.shell: "blkid -o value -s UUID {{ item }}1"
+  register: disk_uuids
+  loop: "{{ device_path }}"
+  when: device_names is defined
+  tags:
+    - mount_external_disks_get_uuid
 
-- name: Debug output for mount pairs
+
+# Setting facts for UUIDs and disks
+- name: Step 8 - Setting facts for UUIDs and disks
+  ansible.builtin.set_fact:
+    disk_uuids_map: "{{ disk_uuids.results | map(attribute='stdout') | zip(device_path, mount_point) }}"
+  when: device_names is defined
+  tags:
+    - mount_external_disks_set_facts
+
+- name: Debug disk UUIDs and devices
   debug:
-    msg: "Mount pairs: {{ mount_pairs }}"
+    var: disk_uuids_map
 
 
 # Mounting the hard drive at mount_point and enabling automount
-- name: Step 13 - Mounting the hard drive at "{{ mount_point }}" and enabling automount
+- name: Step 9 - Mounting the hard drive at "{{ mount_point }}" and enabling automount
   ansible.posix.mount:
-    path: "{{ item[0] }}"  # mount_point
-    src: "{{ item[1] }}"   # vg_lv_path
+    path: "{{ item[2] }}"  # mount_point
+    src: "UUID={{ item[0] }}" # UUID
     fstype: "{{ file_system }}"
+    opts: "defaults,nofail,x-systemd.device-timeout=5"
+    dump: 0 
+    passno: 2
     state: mounted
-  loop: "{{ mount_pairs }}"
+  loop: "{{ disk_uuids_map }}"
   when: device_names is defined
   tags:
     - mount_external_disks_add_automount
-

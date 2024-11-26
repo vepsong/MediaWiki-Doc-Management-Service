@@ -1,10 +1,6 @@
 ---
 # defaults file for db_postgresql
-target_groups:
-  - standbyDb
-
-
-db_hosts:
-  primary: vm-6-primary-db
-  standby: vm-7-standby-db
-  zabbix-serer: vm-1-monitoring-system
+target_vms:
+  # - vm-1-zabbix-server
+  # - vm-6-postgresql-db-1
+  - vm-7-postgresql-db-2

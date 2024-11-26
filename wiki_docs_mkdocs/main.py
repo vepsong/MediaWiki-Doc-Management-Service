@@ -6,20 +6,20 @@ def define_env(env):
     env.variables['repository_name'] = "MediaWiki-Doc-Management-Service"
 
     env.variables['vm_0_full_name'] = "vm-0-service-virtual-machine"
-    env.variables['vm_1_full_name'] = "vm-1-monitoring-system"
+    env.variables['vm_1_full_name'] = "vm-1-zabbix-server"
     env.variables['vm_2_full_name'] = "vm-2-nginx-proxy-server"
     env.variables['vm_3_full_name'] = "vm-3-mediawiki-server-1"
     env.variables['vm_4_full_name'] = "vm-4-mediawiki-server-2"
     env.variables['vm_5_full_name'] = "vm-5-haproxy-proxy-server"
-    env.variables['vm_6_full_name'] = "vm-6-primary-db"
-    env.variables['vm_7_full_name'] = "vm-7-standby-db"
-    env.variables['vhdd_1_full_name'] = "vhdd-1-monitoring-system-db"
-    env.variables['vhdd_2_full_name'] = "vhdd-2-standby-db" 
-    env.variables['vhdd_3_full_name'] = "vhdd-3-dump-db" 
-    env.variables['vssd_1_full_name'] = "vssd-1-primary-db"
+    env.variables['vm_6_full_name'] = "vm-6-postgresql-db-1"
+    env.variables['vm_7_full_name'] = "vm-7-postgresql-db-2"
+    env.variables['vhdd_1_full_name'] = "vhdd-1"
+    env.variables['vhdd_2_full_name'] = "vhdd-2" 
+    env.variables['vhdd_3_full_name'] = "vhdd-3" 
+    env.variables['vssd_1_full_name'] = "vssd-1"
 
     env.variables['vm_1_ip_address'] = "192.168.10.11"
-    env.variables['vm_1_ip_address'] = "192.168.10.12"
+    env.variables['vm_2_ip_address'] = "192.168.10.12"
     env.variables['vm_3_ip_address'] = "192.168.10.13"
     env.variables['vm_4_ip_address'] = "192.168.10.14"
     env.variables['vm_5_ip_address'] = "192.168.10.15"
@@ -32,8 +32,10 @@ def define_env(env):
     
     env.variables['db_security_group'] = "dbadmin"
 
-    env.variables['postgresql_zabbix_server_disk_name'] = "vhdd-1-monitoring-system-db"
-    env.variables['postgresql_zabbix_server_backups_dir'] = "/opt/vhdd-1-monitoring-system-db/zabbix_dump"
+    env.variables['postgresql_zabbix_server_disk_name'] = "vhdd-1"
+    env.variables['postgresql_zabbix_server_disk_dir'] = "/opt/vhdd-1/"
+    env.variables['postgresql_zabbix_server_disk_dump_dir'] = "/opt/vhdd-1/zabbix_dump/"
+
     env.variables['postgresql_zabbix_server_database_name'] = "zabbix"
     env.variables['postgresql_zabbix_server_database_user'] = "zabbix"
     env.variables['postgresql_zabbix_server_database_password'] = "some_strong_zabbix_password"
@@ -48,14 +50,17 @@ def define_env(env):
     env.variables['postgresql_mediawiki_database_replication_user'] = "syncuser"
     env.variables['postgresql_mediawiki_database_replication_user_password'] = "some_strong_replication_user_password"
 
-    env.variables['postgresql_database_vssd_1_disk_name'] = "vssd-1-primary-db"    
-    env.variables['postgresql_database_vssd_1_disk_dir'] = "/opt/vssd-1-primary-db"  
-
-    env.variables['postgresql_database_vhdd_2_disk_name'] = "vhdd-2-standby-db"    
-    env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-2-standby-db"  
-
-    env.variables['postgresql_database_vhdd_3_disk_name'] = "vhdd-3-dump-db"   
-    env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-3-dump-db"  
+    env.variables['postgresql_database_vssd_1_disk_name'] = "vssd-1"    
+    env.variables['postgresql_database_vssd_1_disk_dir'] = "/opt/vssd-1/"  
+    env.variables['postgresql_database_vssd_1_disk_data_dir'] = "/opt/vssd_1/postgresql/14/main"  
+    
+    env.variables['postgresql_database_vhdd_2_disk_name'] = "vhdd-2"    
+    env.variables['postgresql_database_vhdd_2_disk_dir'] = "/opt/vhdd-2/"  
+    env.variables['postgresql_database_vhdd_2_disk_data_dir'] = "/opt/vhdd-2/postgresql/14/main"  
+    
+    env.variables['postgresql_database_vhdd_3_disk_name'] = "vhdd-3"
+    env.variables['postgresql_database_vhdd_3_disk_dir'] = "/opt/vhdd-3/"  
+    env.variables['postgresql_database_vhdd_3_disk_dump_dir'] = "/opt/vhdd-3/mediawiki_dump/"  
 
 
 

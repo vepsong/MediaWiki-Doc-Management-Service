@@ -73,8 +73,8 @@
   loop:
     - postgres
     - sudo
-    - "{{ postgres_wikiuser_user_vars.db_user }}"
-    - "{{ postgres_zabbix_server_user_vars.db_user }}"
+    - "{{ mediawiki_postgresql_vars.db_user }}"
+    - "{{ zabbix_postgresql_vars.db_user }}"
   tags:
     - db_postgresql_add_users_dbadmin_group
 
@@ -129,6 +129,7 @@
   command: >
     tar -czvf /tmp/postgres_initial_main_backup_{{ ansible_date_time.iso8601_basic }}.tar.gz
     -C /var/lib/postgresql/14/ main
+  ignore_errors: yes
   tags:
     - db_postgresql_create_backup_archive
 
@@ -148,6 +149,7 @@
   become_user: root
   command: >
     cp -a /var/lib/postgresql/ {{ hostvars[inventory_hostname].external_disks[0].mount_point }}
+  # when: inventory_hostname in ['vm-1-zabbix-server', 'vm-6-postgresql-db-1']
   tags:
     - db_postgresql_copying_current_main_db_dir_to_mount_point
 
@@ -194,39 +196,44 @@
   blockinfile:
     path: /etc/postgresql/14/main/pg_hba.conf
     block: |
-                                        # Nat IP address
-      host my_wiki       wikiuser       77.137.79.100/32                                                scram-sha-256
-      host my_wiki       wikiuser       212.179.174.196/32                                              scram-sha-256
-      host my_wiki       wikiuser       5.29.11.237/32                                                  scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_1 }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_2 }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}   {{ service_vm.nat_ip_addr_3 }}/32    scram-sha-256
                                         
-                                        # Internal IP address
-      host my_wiki       wikiuser       {{ hostvars['vm-1-monitoring-system'].ansible_host }}/32        scram-sha-256
-      host my_wiki       wikiuser       192.168.10.11/32                                                scram-sha-256    
-      host my_wiki       wikiuser       {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32       scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.13/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32       scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.14/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32     scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.15/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
-      host my_wiki       wikiuser       192.168.10.16/32                                                scram-sha-256
-      host my_wiki       wikiuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
-      host my_wiki       wikiuser       192.168.10.17/32                                                scram-sha-256
 
-                                        # Nat IP address
-      host replication   syncuser       77.137.79.100/32                                                scram-sha-256
-      host replication   syncuser       212.179.174.196/32                                              scram-sha-256     
-      host replication   syncuser       5.29.11.237/32                                                  scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ansible_host }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-1-zabbix-server'].ip_addr }}/32   scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-3-mediawiki-server-1'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-3-mediawiki-server-1'].ip_addr }}/32    scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-4-mediawiki-server-2'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-4-mediawiki-server-2'].ip_addr }}/32    scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-5-haproxy-proxy-server'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-5-haproxy-proxy-server'].ip_addr }}/32    scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32    scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32    scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32    scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_name }}    {{ mediawiki_postgresql_vars.db_user }}    {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32    scram-sha-256
+
+
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_1 }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_2 }}/32   scram-sha-256     
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ service_vm.nat_ip_addr_3 }}/32   scram-sha-256
       
-                                        # Internal IP address
-      host replication   syncuser       {{ hostvars['vm-6-primary-db'].ansible_host }}/32               scram-sha-256    
-      host replication   syncuser       192.168.10.16/32                                                scram-sha-256
-      host replication   syncuser       {{ hostvars['vm-7-standby-db'].ansible_host }}/32               scram-sha-256
-      host replication   syncuser       192.168.10.17/32                                                scram-sha-256
+
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ansible_host }}/32   scram-sha-256    
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-6-postgresql-db-1'].ip_addr }}/32   scram-sha-256
+      
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ansible_host }}/32   scram-sha-256
+      host    {{ mediawiki_postgresql_vars.db_replication_name }}    {{ mediawiki_postgresql_vars.db_replication_user }}    {{ hostvars['vm-7-postgresql-db-2'].ip_addr }}/32   scram-sha-256
 
     marker: "# {mark} Ansible managed block for PostgreSQL"
   notify: restart_postgresql
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_configuring_connect_permissions_dir_pg_hba_conf
 
@@ -287,7 +294,7 @@
     src: "{{ playbook_dir }}/common_files/postgresql_standby/pgdump_standby_postgresql.py"
     dest: /scripts/
     mode: '0755'
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_copy_pgdump_standby_posgresql_py
 
@@ -299,17 +306,18 @@
   blockinfile:
     path: /scripts/.env
     block: |
-      BACKUPS_DIR="{{ postgres_vars.db_backups_dir }}"
-      DATABASE_USER={{ postgres_wikiuser_user_vars.db_user }}
-      DATABASE_PASSWORD={{ postgres_wikiuser_user_vars.db_user_password }}
-      DATABASE_NAME={{ postgres_vars.db_name }}
-      DATABASE_PORT={{ postgres_vars.db_port }}
-      REMOTE_HOST={{ vm_7_standby_db_private_key_ssh.remote_host }}
-      REMOTE_USER={{ vm_7_standby_db_private_key_ssh.remote_user }}
-      PRIVATE_KEY_PATH={{ vm_7_standby_db_private_key_ssh.private_key_ssh_path }}
+      BACKUPS_DIR="{{ mediawiki_postgresql_vars.db_backups_dir }}"
+      DATABASE_USER={{ mediawiki_postgresql_vars.db_user }}
+      DATABASE_PASSWORD={{ mediawiki_postgresql_vars.db_user_password }}
+      DATABASE_NAME={{ mediawiki_postgresql_vars.db_name }}
+      DATABASE_PORT={{ mediawiki_postgresql_vars.db_port }}
+
+      REMOTE_HOST={{ mediawiki_server_1.ip_addr }}
+      REMOTE_USER={{ mediawiki_server_1.user }}
+      PRIVATE_KEY_PATH={{ mediawiki_server_1.private_key_ssh_path }}
 
     marker: "# {mark} Ansible managed block for .env"
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_filling_env_data
 
@@ -323,7 +331,7 @@
     src: "{{ playbook_dir }}/common_files/id_ed25519"
     dest: ~/.ssh
     mode: '600'    
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_copying_private_ssh_key
 
@@ -336,7 +344,7 @@
   copy:
     src: "{{ playbook_dir }}/common_files/postgresql_standby/logrotate_pgdump_standby_posgresql"
     dest: /etc/logrotate.d/
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_logrotate_pgdump_standby_posgresql
     
@@ -346,6 +354,6 @@
     name=logrotate
     state=started 
     enabled=yes
-  when: inventory_hostname in [db_hosts.primary, db_hosts.standby]
+  when: inventory_hostname in ['vm-6-postgresql-db-1', 'vm-7-postgresql-db-2']
   tags:
     - db_postgresql_start_enable_logrotate_service

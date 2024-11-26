@@ -108,9 +108,15 @@
   tags:
     - mediawiki_setup_unzipping_mediaWiki_archive
 
+# Renaming /var/www/mediawiki-1.42.3 folder to /var/www/mediawiki
+- name: Step 10 - Renaming the "{{mediawiki_folder_just_unzipped_name}}" folder to "{{ mediawiki_server.mediawiki_parent_path }}{{mediawiki_server.mediawiki_folder_name}}"
+  ansible.builtin.shell:
+    cmd: mv "{{ mediawiki_server.mediawiki_parent_path }}{{mediawiki_server.mediawiki_folder_just_unzipped_name}}" "{{ mediawiki_server.mediawiki_parent_path }}{{mediawiki_server.mediawiki_folder_name}}"
+  tags:
+    - mediawiki_setup_renaming_unzipped_mediawiki_folder_with_new_name
 
 # Removing MediaWiki archive from /var/www/mediawiki.tar.gz
-- name: Step 10 - Removing MediaWiki archive from /var/www/mediawiki.tar.gz
+- name: Step 11 - Removing MediaWiki archive from /var/www/mediawiki.tar.gz
   become: true
   become_user: root
   ansible.builtin.file:
@@ -119,8 +125,10 @@
   tags:
     - mediawiki_setup_removing_mediaWiki_archive
 
+
+
 # Copying the LocalSettings.php file to /var/www/mediawiki with '0755' permissions
-- name: Step 11 - Copying the LocalSettings.php file to /var/www/mediawiki with '0755' permissions
+- name: Step 12 - Copying the LocalSettings.php file to /var/www/mediawiki with '0755' permissions
   become: true
   become_user: root
   copy:
@@ -132,7 +140,7 @@
 
 
 # Restarting the Nginx service
-- name: Step 12 - Restarting the Nginx service
+- name: Step 13 - Restarting the Nginx service
   become: true
   become_user: root
   systemd:

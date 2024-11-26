@@ -1,6 +1,6 @@
 ---
 # Compare the current VM hostname with inventory.yaml and change it if it differs.
-- name: Changing the hostnames of all VMs
+- name: Step 1 - Changing the hostnames of all VMs
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
   notify: "vm_reboot"

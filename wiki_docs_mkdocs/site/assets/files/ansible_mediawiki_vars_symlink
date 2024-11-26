@@ -26,6 +26,7 @@ pip3_packages_to_install:
 mediawiki_server:
   mediawiki_parent_path: /var/www/
   mediawiki_folder_name: mediawiki
+  mediawiki_folder_just_unzipped_name: mediawiki-1.42.3
   mediawiki_archive_name: mediawiki.tar.gz
   mediawiki_local_settings_file_name: LocalSettings.php
   mediawiki_download_link: https://releases.wikimedia.org/mediawiki/1.42/mediawiki-1.42.3.tar.gz

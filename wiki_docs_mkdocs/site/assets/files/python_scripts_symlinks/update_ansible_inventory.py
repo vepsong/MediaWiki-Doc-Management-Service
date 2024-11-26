@@ -40,11 +40,14 @@ def create_inventory_data(ansible_meta, terraform_vm_data, dynamic_groups):
         for subgroup_name, subgroup_info in subgroups.items():
             subgroup_data = {"hosts": {}}
             vm_names = subgroup_info.get("hosts", [])
-            external_disks = subgroup_info.get("external_disks", [])
-
+            external_disks = subgroup_info.get("external_disks", {})
+            # external_disks = subgroup_info.get("external_disks", [])
+            print(f"Debugging subgroup_info: {subgroup_info}")
+            
             for vm_name in vm_names:
-                if vm_name in terraform_vm_data.get("vm_ip", {}):
-                    vm_info = get_vm_info(vm_name, terraform_vm_data, external_disks)
+
+                    vm_external_disks = external_disks.get(vm_name, [])
+                    vm_info = get_vm_info(vm_name, terraform_vm_data, vm_external_disks)
                     subgroup_data["hosts"][vm_name] = vm_info
 
             group_data["children"][subgroup_name] = subgroup_data

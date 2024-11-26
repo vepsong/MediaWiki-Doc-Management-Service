@@ -10,9 +10,7 @@
 
 # Mounting external hard drives and initializing LVM
 - name: Mounting external hard drives 
-  # hosts: vm-1-monitoring-system, vm-6-primary-db, vm-7-standby-db
-  hosts: "{{ target_groups }}"
-  # hosts: all
+  hosts: "{{ target_vms }}"
   roles:
     - role: mount_disk
   tags:
@@ -20,7 +18,7 @@
 
 # Unmounting external hard drives and deinitializing LVM
 - name: Unmounting external hard drives 
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   roles:
     - role: unmount_disk
   tags:
@@ -28,7 +26,7 @@
 
 # PostgreSQL Common Setup
 - name: PostgreSQL Common Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql
@@ -37,7 +35,7 @@
 
 # Primary PostgreSQL Setup
 - name: Primary PostgreSQL db Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_primary
@@ -46,7 +44,7 @@
 
 # Standby PostgreSQL Setup
 - name: Set up standby db_postgresql
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_standby
@@ -55,7 +53,7 @@
 
 # Zabbix-Server PostgreSQL Setup
 - name: Zabbix-Server PostgreSQL Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: db_postgresql_zabbix_server
@@ -64,7 +62,7 @@
 
 # DDNS Noip DUC Setup 
 - name: DDNS Noip DUC Setup 
-  hosts: "{{ ddns_hosts }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: ddns_duc
@@ -74,7 +72,7 @@
 
 # MediaWiki Setup
 - name: MediaWiki Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: mediawiki
@@ -83,7 +81,7 @@
 
 # Nginx-proxy MediaWiki Setup
 - name: Nginx-proxy MediaWiki Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: nginx_mediawiki_proxy
@@ -93,7 +91,7 @@
 
 # Zabbix-Server Setup
 - name: Zabbix-Server Setup
-  hosts: "{{ target_groups }}"
+  hosts: "{{ target_vms }}"
   become: true
   roles:
     - role: zabbix_server_monitoring_system
@@ -103,7 +101,7 @@
 
 # Zabbix-Agent Setup
 - name: Zabbix-Agent Setup
-  hosts: "{{ target_groups }}"
+  hosts: all
   become: true
   roles:
     - role: zabbix_agent_monitoring_system

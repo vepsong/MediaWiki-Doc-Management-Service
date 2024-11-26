@@ -1,9 +1,9 @@
 ---
 # defaults file for nginx_mediawiki_proxy
 
-target_groups:
-  - nginxProxyServer
 
+target_vms:
+  - vm-2-nginx-proxy-server
 
 nginx_mediawiki_hosts:
   nginx_mediawiki_proxy: vm-2-nginx-proxy-server

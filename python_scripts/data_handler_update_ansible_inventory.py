@@ -35,7 +35,8 @@ def get_external_disks_info(vm_name, external_disks, terraform_vm_data):
 def get_vm_info(vm_name, terraform_vm_data, external_disks):
     """Retrieving information about the VM, including external disks."""
     nat_ip = terraform_vm_data["vm_nat_ip"].get(vm_name)
-    vm_info = {"ansible_host": nat_ip}
+    vm_ip = terraform_vm_data["vm_ip"].get(vm_name)
+    vm_info = {"ansible_host": nat_ip, "ip_addr": vm_ip}
 
     if external_disks:
         vm_info["external_disks"] = get_external_disks_info(vm_name, external_disks, terraform_vm_data)
