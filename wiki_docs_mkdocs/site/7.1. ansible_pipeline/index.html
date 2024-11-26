@@ -67,21 +67,13 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#changing-the-hostnames-of-all-vms">Changing the hostnames of all VMs</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</a>
+    <li class="toctree-l2"><a class="reference internal" href="#mounting-external-hard-drives">Mounting external hard drives</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#ansible">Ansible</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#manual">Manual</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#essential-lvm-commands">Essential LVM commands</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#ansible_1">Ansible</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#manual_1">Manual</a>
+    <li class="toctree-l3"><a class="reference internal" href="#essential-commands-documentation">Essential commands &amp; Documentation</a>
     </li>
         </ul>
     </li>
@@ -159,11 +151,11 @@ hostnamectl set-hostname new-hostname
 </details>
 </li>
 </ul>
-<h2 id="mounting-external-hard-drives-and-initializing-lvm">Mounting external hard drives and initializing LVM</h2>
+<h2 id="mounting-external-hard-drives">Mounting external hard drives</h2>
 <p>Target VMs: <span class="tooltip" onclick="showTooltip(event)">VM-1<span class="tooltip-text">vm-1-zabbix-server</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span>, <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <h3 id="ansible">Ansible</h3>
 <ul>
-<li>Creating a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and a <code>mount point</code> in <code>/opt</code> directory</li>
+<li>Creating a <code>disk partition</code>, <code>file system</code> and a <code>mount point</code> in <code>/opt</code> directory</li>
 <li>
 <p>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart</p>
 </li>
@@ -177,7 +169,14 @@ hostnamectl set-hostname new-hostname
 <ul>
 <li>
 <p>Display information about disks and partitions</p>
-<pre><code>lsblk -f
+<pre><code># Information about partitions
+lsblk -f
+
+# Information about disks
+lsblk -d
+
+# Information about UUID
+blkid
 </code></pre>
 </li>
 <li>
@@ -194,42 +193,9 @@ fdisk /dev/&lt;device_name&gt;
 </code></pre>
 </li>
 <li>
-<p>Initializing the Physical Volume</p>
-<pre><code># Display information about disks and partitions
-lsblk -f
-
-# Create PV
-# Example: pvcreate /dev/vdb1
-pvcreate /dev/&lt;partition_name&gt;
-</code></pre>
-</li>
-<li>
-<p>Creating a Volume Group</p>
-<pre><code># Create VG
-# Example: vgcreate vg-db-storage /dev/vdb1
-vgcreate &lt;volume_group_name&gt; /dev/&lt;partition_name&gt;
-
-# Check that the VG is created
-vgs
-</code></pre>
-</li>
-<li>
-<p>Creating a Logical Volume</p>
-<pre><code># Check the number of physical extents
-vgdisplay
-
-# Create LV
-# Example: lvcreate -n lv-db -l 5119 vg-db-storage
-lvcreate -n &lt;LV_name&gt; -l &lt;number of extents&gt; &lt;VG_name&gt;
-
-# Check that the LV is created
-lvs
-</code></pre>
-</li>
-<li>
-<p>Formatting the LV and creating an ext4 file system</p>
-<pre><code># Example: mkfs.ext4 /dev/vg-db-storage/lv-db
-mkfs.ext4 /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
+<p>Formatting the Partition and creating an ext4 file system</p>
+<pre><code># Example: mkfs.ext4 /dev/vdb1
+mkfs.ext4 /dev/&lt;&gt;
 </code></pre>
 </li>
 <li>
@@ -239,105 +205,36 @@ mkdir /opt/&lt;directory_name&gt;/
 </code></pre>
 </li>
 <li>
-<p>Mounting the LV</p>
-<pre><code># Example: mount /dev/vg-db-storage/lv-db /opt/db_mount/
-mount /dev/&lt;VG_name&gt;/&lt;LV_name&gt; &lt;mount_point&gt;
+<p>Mounting &amp; Unnounting external disk</p>
+<pre><code># Mount external disk
+  # Example: mount UUID=1491f452-acd2-445f-b4fa-dd1f5c3beb60 /opt/vhdd-3
+  mount UUID=&lt;UUID&gt; &lt;mount_point&gt;
+
+# Unmount external disk
+  # Example: umount /opt/vhdd-3
+  umount &lt;mount point&gt;
 </code></pre>
 </li>
 <li>
 <p>Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart</p>
-<pre><code># Example: echo "/dev/vg-db-storage-vhdd-3/lv-vhdd-3 /opt/vhdd-3/ ext4 defaults 0 0" | sudo tee -a /etc/fstab
-echo "/dev/&lt;VG_name&gt;/&lt;LV_name&gt; &lt;mount point&gt; ext4 defaults 0 0" | sudo tee -a /etc/fstab
+<pre><code># Example: echo "UUID=09de2cc6-486e-4752-aa1c-582bdf460d08 /opt/vhdd-2 ext4 defaults,nofail,x-systemd.device-timeout=5 0 2" | sudo tee -a /etc/fstab
+echo "UUID=&lt;UUID&gt; &lt;mount_point&gt; ext4 defaults,nofail,x-systemd.device-timeout=5 0 2" | sudo tee -a /etc/fstab
 
 # Check automount
-cat /etc/fstab or mount -a
+cat /etc/fstab
+
+# Apply configuration from ``/etc/fstab `` configuration file        
+or mount -a
 </code></pre>
 </li>
 </ul>
-<h3 id="essential-lvm-commands">Essential LVM commands</h3>
+<h3 id="essential-commands-documentation">Essential commands &amp; Documentation</h3>
 <ul>
 <li>
-<p>Checking if the <span class="tooltip" onclick="showTooltip(event)"><code>PV</code><span class="tooltip-text">Physical Volume</span></span>, <span class="tooltip" onclick="showTooltip(event)"><code>VG</code><span class="tooltip-text">Volume Group</span></span> and <span class="tooltip" onclick="showTooltip(event)"><code>LV</code><span class="tooltip-text">Logical Volume</span></span> are available</p>
-<pre><code>pvscan
-vgscan
-lvscan
-</code></pre>
-</li>
-<li>
-<p>Checking if the filesystem works properly</p>
-<pre><code># Example: blkid /dev/vg-db-storage-vhdd-3/lv-vhdd-3
-blkid /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
-</code></pre>
-</li>
-<li>
-<p>Trying to Repair the Filesystem</p>
-<pre><code># Example: fsck.ext4 /dev/vg-db-storage-vhdd-3/lv-vhdd-3
-fsck.ext4 /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
-</code></pre>
-</li>
-<li>
-<p>Unmount disk</p>
-<pre><code># Executing the command while not in the &lt;mount point&gt; directory
-
-# Example: umount /opt/vhdd-3
-umount &lt;mount point&gt;
-</code></pre>
-</li>
+<p>Documentation</p>
+<ul>
+<li><a href="https://wiki.archlinux.org/title/Fstab#Automount_with_systemd">In case of VM run fail</a></li>
 </ul>
-<h2 id="unmounting-external-hard-drives-and-deinitializing-lvm-optional">Unmounting external hard drives and deinitializing LVM (Optional)</h2>
-<h3 id="ansible_1">Ansible</h3>
-<ul>
-<li>Deleting a <code>disk partition</code>, <code>physical volume</code>, <code>volume group</code>, <code>logical volume</code>, and unmount a <code>mount point</code> in <code>/opt</code> directory<pre><code>ansible-playbook playbook.yaml -i inventory.yaml --tags="unmount_external_hard_drives"
-</code></pre>
-</li>
-</ul>
-<h3 id="manual_1">Manual</h3>
-<ul>
-<li>
-<p>Display information about disks and partitions</p>
-<pre><code>lsblk -f
-</code></pre>
-</li>
-<li>
-<p>Unmounting the LV  </p>
-<pre><code># Example: umount /opt/db_mount/
-umount &lt;path_to_mount_point&gt;
-</code></pre>
-</li>
-<li>
-<p>Removing a Logical Volume</p>
-<pre><code># Display information about LV
-lvdisplay
-
-# Remove LV
-# Example: lvremove /dev/vg-db-storage/lv-db
-lvremove /dev/&lt;VG_name&gt;/&lt;LV_name&gt;
-</code></pre>
-</li>
-<li>
-<p>Removing a Volume Group</p>
-<pre><code># Display information about VG
-vgdisplay
-
-# Remove VG
-# Example: vgremove /dev/vg-db-storage
-vgremove /dev/&lt;VG_name&gt;
-</code></pre>
-</li>
-<li>
-<p>Removing a Partition and Physical Volume</p>
-<pre><code># Display information about Partition
-fdisk -l or sblk -f
-
-# Example: fdisk /dev/vdb
-fdisk /dev/&lt;device_name&gt;
-
-# The "fdisk" console opens
-    - g — display current partitions
-    - d — remove a disk partition &gt;
-      &gt; specify the partition number (usually 1)
-    - w — save changes and exit
-</code></pre>
 </li>
 </ul>
 <h2 id="postgresql-common-setup">Postgresql Common Setup</h2>
@@ -830,8 +727,8 @@ hot_standby = on
 </code></pre>
 </details>
 <p><details class="tasks_external_code_rendering">
-<summary>- Step 5 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-2//postgresql/14/main</code></summary></p>
-<pre><code>rm -rf /opt/vhdd-2//postgresql/14/main
+<summary>- Step 5 - Deleting all contents inside the PostgreSQL Replication directory - <code>/opt/vhdd-2/postgresql/14/main</code></summary></p>
+<pre><code>rm -rf /opt/vhdd-2/postgresql/14/main
 </code></pre>
 </details>
 <p><details class="tasks_external_code_rendering">

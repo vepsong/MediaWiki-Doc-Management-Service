@@ -80,6 +80,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#mounting-the-vhdd-3-to-the-new-standby-vm-vm-6-mount-point">Mounting the "vhdd-3" to the new Standby VM (VM-6) mount point</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#changing-settings-on-the-new-standby-postgresql">Changing settings on the new Standby Postgresql</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -165,31 +167,31 @@ $wgDBserver = '192.168.10.17'
 <p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-7<span class="tooltip-text">vm-7-postgresql-db-2</span></span></p>
 <ul>
 <li>
-<p>Steps:</p>
-<p><details class="tasks_external_code_rendering">
-<summary>- Step 1 - Stopping the PostgreSQL service</summary></p>
-<pre><code>systemctl stop postgresql
-systemctl status postgresql
-</code></pre>
-</details>
-<p><details class="tasks_external_code_rendering">
-<summary>- Step 2 - Configuring the <code>wal_level</code> in <code>/etc/postgresql/14/main/postgresql.conf</code></summary></p>
-<pre><code>#wal_level = '' &gt;&gt;&gt;
-wal_level = replica
-</code></pre>
-</details>
-<p><details class="tasks_external_code_rendering">
-<summary>- Step 3 - Restarting the PostgreSQL service</summary></p>
-<pre><code>systemctl restart postgresql
-systemctl status postgresql
-</code></pre>
-</details>
+<p><a href="../7.1.%20ansible_pipeline/#primary-postgresql-setup">Look at the documentation</a>:</p>
+<ul>
+<li>Steps: 2, 3, 4</li>
+</ul>
 </li>
 </ul>
 <h2 id="disconnect-vhdd-3-from-the-new-primary-vm-vm-7-and-attach-it-to-the-new-standby-vm-vm-6-using-the-yandex-cloud-web-interface">Disconnect "vhdd-3" from the new Primary VM (VM-7) and attach it to the new Standby VM (VM-6) using the Yandex Cloud Web interface</h2>
 <h2 id="mounting-the-vhdd-3-to-the-new-standby-vm-vm-6-mount-point">Mounting the "vhdd-3" to the new Standby VM (VM-6) mount point</h2>
 <ul>
-<li>Look at the Run Ansible PipeLine page</li>
+<li>
+<p><a href="../7.1.%20ansible_pipeline/#mounting-external-hard-drives">Look at the documentation</a>:</p>
+<ul>
+<li>Steps: Display information about disks and partitions, Creating a Mount Point, Mounting &amp; Unnounting external disk, Create an entry in <code>/etc/fstab</code> to automount the disk after a VM restart</li>
+</ul>
+</li>
+</ul>
+<h2 id="changing-settings-on-the-new-standby-postgresql">Changing settings on the new Standby Postgresql</h2>
+<p>Target VM: <span class="tooltip" onclick="showTooltip(event)">VM-6<span class="tooltip-text">vm-6-postgresql-db-1</span></span></p>
+<ul>
+<li>
+<p><a href="../7.1.%20ansible_pipeline/#standby-postgresql-setup">Look at the documentation</a>:</p>
+<ul>
+<li>Steps: 3-9</li>
+</ul>
+</li>
 </ul>
               
             </div>
