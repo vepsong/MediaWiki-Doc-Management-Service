@@ -249,6 +249,33 @@ or mount -a
 </code></pre>
 </li>
 <li>
+<p>Troubleshooting</p>
+<ul>
+<li>
+<p>In case of connection fail</p>
+<pre><code>psql: could not connect to server: No such file or directory
+    Is the server running locally and accepting
+    connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
+</code></pre>
+<ul>
+<li>
+<p>Step 1: Running <code>pg_lsclusters</code> will list all the Postgres clusters running on your device</p>
+<pre><code># Example output:
+Ver  Cluster  Port  Status  Owner     Data directory                 Log file
+14   main     5432  online  postgres  /opt/vssd-1/postgresql/14/main /var/log/postgresql/postgresql-14-main.log
+</code></pre>
+</li>
+<li>
+<p>Step 2: Trying to run the <code>pg_ctlcluster</code></p>
+<pre><code># format is pg_ctlcluster &lt;version&gt; &lt;cluster&gt; &lt;action&gt;
+sudo pg_ctlcluster 14 main start
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
 <p>Tasks:  </p>
 <ul>
 <li>Step 1 - Update list of packages</li>
@@ -302,25 +329,18 @@ usermod -aG dbadmin &lt;username&gt;
 </details>
 <p><details class="tasks_external_code_rendering">
 <summary>- Step 9 - Changing group ownership for <span class="tooltip" onclick="showTooltip(event)">PostgreSQL directories<span class="tooltip-text">/opt; /opt/mount_point</span></span></summary></p>
-<pre><code>chown -R root:dbadmin &lt;mount point&gt;
-chown -R root:dbadmin /opt
+<pre><code>chown -R postgres:dbadmin &lt;mount point&gt;
+chown -R postgres:dbadmin /opt
 
 # Verify changes in the security group ownership
-ls -ld &lt;mount point&gt; /opt
-ls -ld /opt
-
-chmod -R 0770 /opt
-chmod -R 0770 &lt;mount point&gt;
-
-# Verify changes in the security group permissions
 ls -ld &lt;mount point&gt; /opt
 ls -ld /opt
 </code></pre>
 </details>
 <p><details class="tasks_external_code_rendering">
 <summary>- Step 10 - Setting permissions for <span class="tooltip" onclick="showTooltip(event)">PostgreSQL directories<span class="tooltip-text">/opt; /opt/mount_point</span></span></summary></p>
-<pre><code>chmod -R 0770 /opt
-chmod -R 0770 &lt;mount point&gt;
+<pre><code>chmod -R 0750 /opt
+chmod -R 0750 &lt;mount point&gt;
 
 # Verify changes in the security group permissions
 ls -ld &lt;mount point&gt; /opt
